@@ -285,6 +285,11 @@ body.side-on #side{transform:none;visibility:visible}
 .dlog{display:flex;flex-direction:column;gap:4px;font-size:.88rem}
 .dlog div{border-bottom:1px solid var(--line);padding:5px 0;display:flex;justify-content:space-between;gap:8px}
 .rkbtn{width:100%;border:2px solid #ff8a00;border-radius:8px;padding:11px;font:800 .95rem var(--body);background:var(--panel);color:#b45309;cursor:pointer;display:inline-flex;gap:6px;justify-content:center;align-items:center}
+/* v14 – progi szerokości (mobile first):
+   baza: telefon 375–480 px · tablet 481–1099 px · komputer od 1100 px (stałe menu z boku)
+   duże ekrany od 1800×1000 px i 4K: cała gra skalowana proporcjonalnie (JS: fitScale) */
+@media (min-width:481px) and (max-width:1099px){.app{max-width:560px}}
+body.embed .iab{display:none!important}
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40}
 .pt .ico{margin-right:3px}
 .tag{font-size:.68rem;background:var(--key);color:var(--ink);border-radius:4px;padding:1px 6px;margin-left:6px;font-weight:600}
@@ -313,7 +318,7 @@ body.side-on #side{transform:none;visibility:visible}
   <div class="ssep"></div>
   <button class="sitem" id="sHelp"></button>
   <button class="sitem" id="sMove"></button>
-  <div class="sfoot">Literiada · wersja 13.1 · 2026-11-11</div>
+  <div class="sfoot">Literiada · wersja 14 · 2026-11-11</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -684,7 +689,7 @@ function showHelp(){
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 13.1 · 2026-11-11</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 14 · 2026-11-11</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
@@ -881,7 +886,7 @@ function menuHint(){if(store.get('sd2_hint_menu',false)||!$('ov').hidden)return;
   const rm=()=>h.remove();h.onclick=rm;$('bMenu').addEventListener('click',rm,{once:true});document.body.appendChild(h);setTimeout(rm,9000)}
 function showTrain(){open(`<div class="step">Trening</div><h2>${ic('train',22)} Trening</h2>${trainPicker()}<div class="actions"><button id="aClose">Zamknij</button></div>`);bindTrain()}
 // ---- Pasek dla przeglądarek w aplikacjach: zachęta do otwarcia w Chrome/Safari
-function inApp(){const u=navigator.userAgent||'';return /FBAN|FBAV|FB_IAB|FBIOS|FB4A|Messenger|MESSENGER|Instagram/i.test(u)}
+function inApp(){if(inFrame)return false;const u=navigator.userAgent||'';return /FBAN|FBAV|FB_IAB|FBIOS|FB4A|Messenger|MESSENGER|Instagram/i.test(u)}
 function showIab(){const el=$('iab');if(!el||!inApp())return;
   let k='';try{k=sessionStorage.getItem('sd2_iab_x')||''}catch(e){}if(k)return;
   const android=/Android/i.test(navigator.userAgent),ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -978,6 +983,15 @@ $('sMove').innerHTML=ic('move',20)+'Przenieś wyniki';$('sMove').onclick=sideGo(
 if(mqWide.addEventListener)mqWide.addEventListener('change',()=>sideSet(isWide()&&store.get('sd2_side',true)));
 if(isWide()&&store.get('sd2_side',true))sideSet(true);
 $('bJoker').onclick=jokerClick;$('bSnd').onclick=()=>{SFX.unlock();SFX.toggle();sndIcon()};sndIcon();$('bStats').onclick=()=>{setMode('day');toast('Wracasz do haseł dnia')};
+// ---- v14: duże ekrany (Full HD+, 2K, 4K) – proporcjonalne powiększenie całej gry
+let ZS=1;
+function fitScale(){const w=innerWidth,h=innerHeight;let s=1;
+  if(w>=1800&&h>=1000)s=Math.max(1,Math.min(2.5,Math.min(w/1440,h/860)));s=Math.round(s*20)/20;
+  if(s!==ZS){ZS=s;document.documentElement.style.zoom=s===1?'':String(s)}
+  const ap=document.querySelector('.app');if(ap)ap.style.height=ZS>1?(innerHeight/ZS)+'px':''}
+const inFrame=(()=>{try{return window.self!==window.top}catch(e){return true}})();
+if(inFrame)document.body.classList.add('embed');
+fitScale();addEventListener('resize',()=>{fitScale();fitBoard()});
 buildBoard();buildKb();loadDay();loadDayLevel();fitBoard();addEventListener('resize',fitBoard);if(window.visualViewport)visualViewport.addEventListener('resize',fitBoard);setTimeout(fitBoard,300);
 updBadge();showIab();
 if(location.hash==='#ranking'){clearHash();store.set('sd2_seen',true);showRanking()}
