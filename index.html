@@ -281,6 +281,7 @@ body.side-on #side{transform:none;visibility:visible}
 .rjoin{display:flex;flex-direction:column;gap:8px;background:#e8f6ee;border:2px solid #12a150;border-radius:10px;padding:12px;color:#0b3d22}
 .rjoin input{font:700 1.05rem var(--body);padding:9px 10px;border:2px solid var(--line);border-radius:8px;background:#fff;color:#18201b}
 .rjoin button{border:0;border-radius:8px;padding:10px;font:800 .95rem var(--body);background:#12a150;color:#fff;cursor:pointer}
+.rjoin button.linkbtn{background:none;border:0;padding:2px 0;color:#0b3d22;font:600 .85rem var(--body);text-decoration:underline}
 .dlog{display:flex;flex-direction:column;gap:4px;font-size:.88rem}
 .dlog div{border-bottom:1px solid var(--line);padding:5px 0;display:flex;justify-content:space-between;gap:8px}
 .rkbtn{width:100%;border:2px solid #ff8a00;border-radius:8px;padding:11px;font:800 .95rem var(--body);background:var(--panel);color:#b45309;cursor:pointer;display:inline-flex;gap:6px;justify-content:center;align-items:center}
@@ -312,7 +313,7 @@ body.side-on #side{transform:none;visibility:visible}
   <div class="ssep"></div>
   <button class="sitem" id="sHelp"></button>
   <button class="sitem" id="sMove"></button>
-  <div class="sfoot">Literiada · wersja 13 · 2026-11-11</div>
+  <div class="sfoot">Literiada · wersja 13.1 · 2026-11-11</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -622,7 +623,9 @@ function showStats(){
   const allDone=done3(day)&&!p4going(day);
   const anyB=day.g.some(x=>x&&x.length)||day.res.some(Boolean);
   const p4b=p4open()&&!day.res[3]?`<button class="p4btn" id="aP4">${ic('gift',18)} ${day.g[3].length?'Wróć do weekendowej niespodzianki':'Weekendowa niespodzianka: zagraj!'}</button>`:'';
-  open(`${logo()}<div class="step">${mode==='arch'?'Archiwum · ':''}Strona 4 z 4 · Podsumowanie</div><h2>${mode==='arch'?'Dzień '+shortDate(archKey):'Podsumowanie dnia'}</h2>
+  const askRk=mode==='day'&&done3(day)&&!store.get('sd2_nick','')&&!store.get('sd2_rk_never',false)&&store.get('sd2_rk_ask','')!==todayKey();
+  const rkInv=askRk?`<div class="rjoin" id="rkInv"><b>${ic('trophy',18)} Sprawdź swoje miejsce w rankingu!</b><span style="font-size:.85rem">Dziś masz ${day.pts.reduce((a,b)=>a+b,0)} pkt. Podaj pseudonim, a Twoje punkty trafią do wspólnego rankingu graczy. Bez maila i hasła.</span><input id="rIn" maxlength="20" placeholder="np. Radek z Pręgowa" autocomplete="off"><button id="rJoin">Dołącz do rankingu</button><span class="dbad" id="rErr" hidden></span><span style="display:flex;justify-content:space-between;gap:8px"><button class="linkbtn" id="rkLater" style="padding:0;color:#0b3d22">Nie teraz</button><button class="linkbtn" id="rkNever" style="padding:0;color:#0b3d22">Nie pytaj więcej</button></span></div>`:'';
+  open(`${logo()}<div class="step">${mode==='arch'?'Archiwum · ':''}Strona 4 z 4 · Podsumowanie</div><h2>${mode==='arch'?'Dzień '+shortDate(archKey):'Podsumowanie dnia'}</h2>${rkInv}
   ${day.g.some(x=>x&&x.length)?'<p class="sub">Dotknij paska poziomu, żeby rozwinąć jego planszę.</p>':''}<div class="daysum">${dayRows}</div>
   <div class="total"><span>${mode==='arch'?'Ten dzień razem':'Dziś razem'}</span><span>${day.pts.reduce((a,b)=>a+b,0)} pkt</span></div>
   ${p4b}<button class="rkbtn" id="aRank">${ic('trophy',18)} Ranking graczy</button><button class="duelbtn" id="aDuel">${ic('swords',18)} Wyzwij znajomego na pojedynek</button><div class="actions"><button class="main" id="aShare">Kopiuj wynik</button>${anyB?'<button id="aBoards">Zobacz plansze</button>':''}${!allDone?'<button id="aBack">Wróć do gry</button>':''}<button id="aArch">${ic('cal',16)} Archiwum${pend?' ('+pend+')':''}</button></div>
@@ -641,6 +644,12 @@ function showStats(){
   if($('aBoards'))$('aBoards').onclick=()=>{const b=$('boards');b.hidden=!b.hidden;$('aBoards').textContent=b.hidden?'Zobacz plansze':'Ukryj plansze';if(!b.hidden)b.scrollIntoView({behavior:'smooth',block:'nearest'})};
   if($('aBack'))$('aBack').onclick=()=>{close();if(mode==='free')setMode('day')};
   $('aArch').onclick=showArchive;$('aDuel').onclick=showDuel;$('aRank').onclick=()=>showRanking();
+  if($('rkInv')){
+    $('rJoin').onclick=async()=>{const v=$('rIn').value.replace(/\s+/g,' ').trim().slice(0,20);
+      if(v.length<2){$('rErr').hidden=false;$('rErr').textContent='Pseudonim musi mieć co najmniej 2 znaki.';return}
+      store.set('sd2_nick',v);if(!store.get('sd2_duel_name',''))store.set('sd2_duel_name',v);$('rJoin').textContent='Dołączam…';await rankSync();showRanking('d')};
+    $('rkLater').onclick=()=>{store.set('sd2_rk_ask',todayKey());$('rkInv').remove()};
+    $('rkNever').onclick=()=>{store.set('sd2_rk_never',true);$('rkInv').remove();toast('Ranking znajdziesz zawsze w menu ☰',2200)}}
   if($('aP4'))$('aP4').onclick=startP4;
   document.querySelectorAll('[data-tog]').forEach(d=>{const f=()=>{const m=d.querySelector('.mini');m.hidden=!m.hidden;d.classList.toggle('openr',!m.hidden);d.setAttribute('aria-expanded',String(!m.hidden))};d.onclick=f;d.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();f()}}});
   document.querySelectorAll('[data-play]').forEach(d=>{const f=()=>{lvl=+d.dataset.play;close();loadDayLevel();fitBoard()};d.onclick=f;d.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();f()}}});
@@ -675,7 +684,7 @@ function showHelp(){
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 13 · 2026-11-11</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 13.1 · 2026-11-11</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
