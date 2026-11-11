@@ -268,6 +268,22 @@ body.side-on #side{transform:none;visibility:visible}
 .iab span{flex:1;min-width:0}
 .iab a{flex:none;background:#12a150;color:#fff;text-decoration:none;border-radius:8px;padding:7px 10px;font-weight:800;white-space:nowrap}
 .iab button{flex:none;border:0;background:transparent;color:#3d2e00;font:800 1.1rem var(--body);cursor:pointer;padding:2px 6px}
+.rtabs{display:flex;gap:4px;flex-wrap:wrap}
+.rtabs button{flex:1 1 auto;min-width:0;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:7px 6px;font:700 .82rem var(--body);cursor:pointer}
+.rtabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.rlist{display:flex;flex-direction:column;gap:4px}
+.rlist div{display:grid;grid-template-columns:2.2em minmax(0,1fr) auto;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-weight:600}
+.rlist div.me{border:2px solid #12a150;background:var(--lvwon)}
+.rlist .pos{font-family:var(--display);font-weight:800;text-align:center}
+.rlist .nk{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rlist .pt{font-variant-numeric:tabular-nums;font-weight:800}
+.rlist .gap{display:block;text-align:center;background:none;border:0;color:var(--muted);padding:0}
+.rjoin{display:flex;flex-direction:column;gap:8px;background:#e8f6ee;border:2px solid #12a150;border-radius:10px;padding:12px;color:#0b3d22}
+.rjoin input{font:700 1.05rem var(--body);padding:9px 10px;border:2px solid var(--line);border-radius:8px;background:#fff;color:#18201b}
+.rjoin button{border:0;border-radius:8px;padding:10px;font:800 .95rem var(--body);background:#12a150;color:#fff;cursor:pointer}
+.dlog{display:flex;flex-direction:column;gap:4px;font-size:.88rem}
+.dlog div{border-bottom:1px solid var(--line);padding:5px 0;display:flex;justify-content:space-between;gap:8px}
+.rkbtn{width:100%;border:2px solid #ff8a00;border-radius:8px;padding:11px;font:800 .95rem var(--body);background:var(--panel);color:#b45309;cursor:pointer;display:inline-flex;gap:6px;justify-content:center;align-items:center}
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40}
 .pt .ico{margin-right:3px}
 .tag{font-size:.68rem;background:var(--key);color:var(--ink);border-radius:4px;padding:1px 6px;margin-left:6px;font-weight:600}
@@ -288,6 +304,7 @@ body.side-on #side{transform:none;visibility:visible}
 <div id="sideBg" hidden></div>
 <nav id="side" aria-label="Menu gry">
   <div class="shead"><span id="sLogo"></span><button class="icon" id="sClose" aria-label="Zwiń menu"></button></div>
+  <button class="sitem" id="sRank"></button>
   <button class="sitem" id="sStats"></button>
   <button class="sitem" id="sArch"></button>
   <button class="sitem" id="sDuel"></button>
@@ -295,7 +312,7 @@ body.side-on #side{transform:none;visibility:visible}
   <div class="ssep"></div>
   <button class="sitem" id="sHelp"></button>
   <button class="sitem" id="sMove"></button>
-  <div class="sfoot">Literiada · wersja 12.2 · 2026-11-11</div>
+  <div class="sfoot">Literiada · wersja 13 · 2026-11-11</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -353,6 +370,7 @@ const SVG={
   back:'<path d="M14.5 6l-6 6 6 6"/>',
   chev:'<path d="M6 9.5l6 6 6-6"/>',
   send:'<path d="M3.5 11.5L20.5 4l-7.5 17-2.5-7z"/>',
+  trophy:'<path d="M7.5 4h9v5a4.5 4.5 0 0 1-9 0z"/><path d="M7.5 6H4.5a3 3 0 0 0 3 4M16.5 6h3a3 3 0 0 1-3 4M12 13.5v3.5M8.5 20.5h7M9.5 17h5v3.5h-5z"/>',
   sun:'<path d="M3 18h18M6.5 18a5.5 5.5 0 0 1 11 0"/><path d="M12 6.5v2.5M5.2 9.7l1.8 1.8M18.8 9.7L17 11.5M3 14h1.5M19.5 14H21"/>'};
 const ic=(n,s=18)=>`<svg class="ico" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SVG[n]}</svg>`;
 const MED={gold:['#f6cf45','#c99a06','#fff3b8'],silver:['#dfe3e8','#98a2ad','#ffffff'],bronze:['#e4a46a','#a5652e','#ffd9b5']};
@@ -510,8 +528,9 @@ function finish(won){
     p=won?Math.max(0,pointsFor(answer,guesses.length)+tb-(day.jk[lvl]===2?day.jc[lvl]:0)):0;
     day.res[lvl]=won?'won':'lost';day.pts[lvl]=p;saveDay();
     const h=store.get('sd2_hist',{});h[curKey()]=day.pts.slice();store.set('sd2_hist',h);
+    rankSync();
   }
-  if(duel)duelSave({g:guesses,res:won?'won':'lost',pts:won?pointsFor(answer,guesses.length):0});
+  if(duel){duelSave({g:guesses,res:won?'won':'lost',pts:won?pointsFor(answer,guesses.length):0});const nk=store.get('sd2_nick','');if(nk)duelPush(nk,won)}
   paint();updTimer();
   if(won)SFX.win(0);else SFX.lose(0);
   toast(won?['Genialnie!','Wspaniale!','Świetnie!','Brawo!','Nieźle!','Uff, udało się!'][guesses.length-1]:'Hasło: '+answer.toUpperCase(),2000);
@@ -563,7 +582,7 @@ function showResult(won,p){
     if($('aNo'))$('aNo').onclick=showStats;
   } else if(duel){
     body=`<p>Hasło: ${word} (${v} pkt), zagadka od: ${esc(duel.f)}</p>`+(won?`<p>Twój wynik: <b>${pointsFor(answer,guesses.length)} pkt</b> (wartość słowa × premia ${7-guesses.length} za ${guesses.length}. próbę)</p>`:'<p>Tym razem się nie udało, ale możesz się zrewanżować!</p>');
-    const nm=store.get('sd2_duel_name','');
+    const nm=store.get('sd2_duel_name','')||store.get('sd2_nick','');
     open(`<div class="step">Pojedynek · zagadka od: ${esc(duel.f)}</div><h2>${head}</h2>${cel}${body}
     <div class="dlink"><b>${ic('send',16)} Odeślij wynik do: ${esc(duel.f)}</b><span class="sub" style="color:inherit">${esc(duel.f)} zobaczy Twoją planszę i liczbę prób.</span>
     <label style="display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:.85rem">Twój podpis<input id="rName" maxlength="20" value="${esc(nm)}" placeholder="np. Ania" autocomplete="off"></label>
@@ -606,7 +625,7 @@ function showStats(){
   open(`${logo()}<div class="step">${mode==='arch'?'Archiwum · ':''}Strona 4 z 4 · Podsumowanie</div><h2>${mode==='arch'?'Dzień '+shortDate(archKey):'Podsumowanie dnia'}</h2>
   ${day.g.some(x=>x&&x.length)?'<p class="sub">Dotknij paska poziomu, żeby rozwinąć jego planszę.</p>':''}<div class="daysum">${dayRows}</div>
   <div class="total"><span>${mode==='arch'?'Ten dzień razem':'Dziś razem'}</span><span>${day.pts.reduce((a,b)=>a+b,0)} pkt</span></div>
-  ${p4b}<button class="duelbtn" id="aDuel">${ic('swords',18)} Wyzwij znajomego na pojedynek</button><div class="actions"><button class="main" id="aShare">Kopiuj wynik</button>${anyB?'<button id="aBoards">Zobacz plansze</button>':''}${!allDone?'<button id="aBack">Wróć do gry</button>':''}<button id="aArch">${ic('cal',16)} Archiwum${pend?' ('+pend+')':''}</button></div>
+  ${p4b}<button class="rkbtn" id="aRank">${ic('trophy',18)} Ranking graczy</button><button class="duelbtn" id="aDuel">${ic('swords',18)} Wyzwij znajomego na pojedynek</button><div class="actions"><button class="main" id="aShare">Kopiuj wynik</button>${anyB?'<button id="aBoards">Zobacz plansze</button>':''}${!allDone?'<button id="aBack">Wróć do gry</button>':''}<button id="aArch">${ic('cal',16)} Archiwum${pend?' ('+pend+')':''}</button></div>
   <div class="boards" id="boards" hidden>${boards}</div>
   ${pend?`<p class="sub">Zaległe dni w archiwum: <b>${pend}</b>. Możesz je nadrobić, punkty liczą się do dnia, którego dotyczą.</p>`:''}
   <h2>Twoje punkty</h2>
@@ -621,7 +640,7 @@ function showStats(){
   $('aShare').onclick=()=>{const m=mode;if(m==='free')mode='day';const t=shareText();mode=m;copy(t)};
   if($('aBoards'))$('aBoards').onclick=()=>{const b=$('boards');b.hidden=!b.hidden;$('aBoards').textContent=b.hidden?'Zobacz plansze':'Ukryj plansze';if(!b.hidden)b.scrollIntoView({behavior:'smooth',block:'nearest'})};
   if($('aBack'))$('aBack').onclick=()=>{close();if(mode==='free')setMode('day')};
-  $('aArch').onclick=showArchive;$('aDuel').onclick=showDuel;
+  $('aArch').onclick=showArchive;$('aDuel').onclick=showDuel;$('aRank').onclick=()=>showRanking();
   if($('aP4'))$('aP4').onclick=startP4;
   document.querySelectorAll('[data-tog]').forEach(d=>{const f=()=>{const m=d.querySelector('.mini');m.hidden=!m.hidden;d.classList.toggle('openr',!m.hidden);d.setAttribute('aria-expanded',String(!m.hidden))};d.onclick=f;d.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();f()}}});
   document.querySelectorAll('[data-play]').forEach(d=>{const f=()=>{lvl=+d.dataset.play;close();loadDayLevel();fitBoard()};d.onclick=f;d.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();f()}}});
@@ -647,6 +666,7 @@ function showHelp(){
   <p>Poziomy idą po kolei: poziom 2 odblokowuje się po odgadnięciu hasła z poziomu 1, a poziom 3 po odgadnięciu hasła z poziomu 2. Na końcu czeka podsumowanie dnia ze statystykami.</p>
   <p><b>Weekendowa niespodzianka.</b> W sobotę i niedzielę, po zakończeniu poziomu 3, gra zaproponuje dodatkowe hasło o trudności poziomu 3. Masz na nie 10 minut na bonus za czas (do 60 pkt) i możesz dorobić sobie ekstra punkty. Jeśli odmówisz, przycisk niespodzianki czeka w podsumowaniu do końca dnia.</p>
   <p><b>Pojedynek.</b> W menu wybierz Pojedynek: wymyśl 5-literowe hasło, a gra zrobi z niego link do wysłania znajomemu (Messenger, SMS, WhatsApp). Znajomy zgaduje Twoje słowo w 6 próbach, bez zegara i jokerów, a potem może odesłać Ci link ze swoim wynikiem i planszą. Pojedynki nie wpływają na punkty gry dnia.</p>
+  <p><b>Ranking graczy.</b> W menu ☰ wybierz Ranking graczy i podaj pseudonim (bez maila i hasła). Twoje punkty trafią do wspólnego rankingu: dziś, w tym tygodniu, w miesiącu i łącznie. Jest tam też tabela pojedynków. Ranking jest dobrowolny i w każdej chwili możesz się z niego usunąć.</p>
   <p><b>Joker.</b> Na poziomie 2, 3 i w niespodziance możesz odsłonić jedną literę hasła. Jokera dostajesz za polecenie gry znajomemu (jeden na poziom). Odsłonięta litera kosztuje tyle punktów, ile jest warta w Scrabble.</p>
   <p>Wynik = wartość słowa × premia za szybkość: 6 za odgadnięcie w 1. próbie, 5 w 2., i tak dalej do 1 w 6. próbie. Przykład: ŻÓŁTY (17 pkt) odgadnięty w 3. próbie daje 17 × 4 = 68 pkt.</p>
   <p><b>Bonus za czas.</b> Zegar 5:00 rusza po wpisaniu pierwszej litery danego poziomu i nie zatrzymuje się po wyjściu z gry. Bonus maleje płynnie z każdą sekundą: na starcie wynosi 20 pkt na poziomie 1, 40 pkt na poziomie 2 i 60 pkt na poziomie 3, a po 5 minutach spada do zera. Pasek pod zegarem pokazuje, ile jeszcze zostało. Po 5 minutach usłyszysz sygnał i grasz dalej, już bez bonusu za czas.</p>
@@ -655,7 +675,7 @@ function showHelp(){
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 12.2 · 2026-11-11</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 13 · 2026-11-11</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
@@ -746,10 +766,10 @@ const DKEY=[...new TextEncoder().encode('literalizator-pojedynek')];
 function encObj(o){const b=new TextEncoder().encode(JSON.stringify(o));let s='';b.forEach((x,i)=>s+=String.fromCharCode(x^DKEY[i%DKEY.length]^((i*7)&255)));
   return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
 function decObj(code){try{const s=atob(code.replace(/-/g,'+').replace(/_/g,'/'));const b=new Uint8Array([...s].map((c,i)=>c.charCodeAt(0)^DKEY[i%DKEY.length]^((i*7)&255)));return JSON.parse(new TextDecoder().decode(b))}catch(e){return null}}
-function duelEncode(w,f){return encObj({w,f,t:Date.now()%1e7})}
+function duelEncode(w,f){const o={w,f,t:Date.now()%1e7};if(FBUID)o.u=FBUID;return encObj(o)}
 function duelDecode(code){try{let s=atob(code.replace(/-/g,'+').replace(/_/g,'/'));const b=new Uint8Array([...s].map((c,i)=>c.charCodeAt(0)^DKEY[i%DKEY.length]^((i*7)&255)));
   const o=JSON.parse(new TextDecoder().decode(b));if(!o||typeof o.w!=='string'||[...o.w].length!==5||!/^[a-ząćęłńóśźż]{5}$/.test(o.w))return null;
-  return {w:o.w,f:String(o.f||'Znajomy').slice(0,20)||'Znajomy'}}catch(e){return null}}
+  return {w:o.w,f:String(o.f||'Znajomy').slice(0,20)||'Znajomy',u:typeof o.u==='string'?o.u.slice(0,64):null}}catch(e){return null}}
 function duelSave(part){const a=store.get('sd2_duels_in',{});a[duel.code]=Object.assign(a[duel.code]||{f:duel.f,ts:Date.now()},part);store.set('sd2_duels_in',a)}
 function clearHash(){try{if(location.hash)history.replaceState(null,'',location.pathname+location.search)}catch(e){}}
 function endDuel(){if(!duel)return;duel=null;document.body.classList.remove('duel');clearHash()}
@@ -760,7 +780,7 @@ function startDuelFromHash(){const m=location.hash.match(/^#p=([A-Za-z0-9_-]+)$/
   if(rec.res){showResult(rec.res==='won',rec.pts||0);return true}
   open(`<h2>${ic('swords',26)} Pojedynek!</h2><p style="font-size:1.1rem"><b>${esc(d.f)}</b> ma dla Ciebie zagadkę w Literiadzie.</p><p>Odgadnij 5-literowe hasło w 6 próbach. Zielony: litera na swoim miejscu, pomarańczowy: litera jest, ale gdzie indziej, szary: brak litery.</p><div class="actions"><button class="main" id="aGo">${guesses.length?'Graj dalej':'Zagraj'}</button></div>`);
   $('aGo').onclick=()=>{SFX.unlock();close()};return true}
-function showDuel(){
+function showDuel(){fb().catch(()=>{});
   const name=store.get('sd2_duel_name','');const out=store.get('sd2_duels_out',[]),inn=store.get('sd2_duels_in',{});
   const outL=out.slice(0,15).map(x=>`<div><span><b>${esc(x.w.toUpperCase())}</b></span><span>${new Date(x.ts).toLocaleDateString('pl-PL')}${(x.r||[]).map(r=>`<span class="dres">${esc(r.n)}: ${r.res==='won'?r.tries+'. próba · '+r.pts+' pkt':'nie odgadnięte'}</span>`).join('')}</span></div>`).join('')||'<p class="sub">Jeszcze nic nie wysłano.</p>';
   const inL=Object.values(inn).sort((a,b)=>b.ts-a.ts).slice(0,15).map(x=>`<div><span>od: <b>${esc(x.f)}</b></span><span>${x.res==='won'?'odgadnięte w '+x.g.length+'. próbie':x.res==='lost'?'nie udało się':'w trakcie'}</span></div>`).join('')||'<p class="sub">Jeszcze nikt Cię nie wyzwał.</p>';
@@ -787,7 +807,7 @@ function showDuel(){
     try{if(navigator.share)navigator.share({title:'Pojedynek w Literiadzie',text,url}).catch(()=>{})}catch(e){}};
   setTimeout(()=>{(name?wi:$('dFrom')).focus()},50)}
 // ---- Pojedynek: odesłanie wyniku autorowi zagadki (#r=...)
-function sendResult(won){const n=($('rName').value.trim()||'Znajomy').slice(0,20);store.set('sd2_duel_name',n);
+function sendResult(won){const n=($('rName').value.trim()||'Znajomy').slice(0,20);store.set('sd2_duel_name',n);duelPush(n,won);
   const pts=won?pointsFor(answer,guesses.length):0;
   const url=BASE()+'#r='+encObj({w:answer,a:duel.f,n,g:guesses.map(x=>x.w),res:won?'won':'lost',pts});
   const text=n+' odsyła wynik pojedynku w Literiadzie: '+(won?'odgadnięte w '+guesses.length+'. próbie!':'tym razem bez trafienia.')+' Otwórz link, żeby zobaczyć planszę.';
@@ -838,7 +858,7 @@ function mvAsk(){const o=mvParse($('mIn').value);const inf=$('mInfo');
   <div class="actions"><button class="main" id="mYes">Tak, importuj</button><button id="mNo">Anuluj</button></div>`);
   $('mNo').onclick=showMove;
   $('mYes').onclick=()=>{try{Object.keys(mvKeys()).forEach(k=>localStorage.removeItem(k));for(const k in o.d)if(/^(sd2_|lt_)/.test(k)&&typeof o.d[k]==='string')localStorage.setItem(k,o.d[k]);localStorage.setItem('sd2_seen','true');localStorage.setItem('sd2_hint_menu','true')}catch(e){toast('Nie udało się zapisać wyników',2600);return}
-    close();setMode('day');toast('Wyniki zaimportowane: '+dni(nw.days)+', '+nw.pts+' pkt',2600)}}
+    close();setMode('day');rankSync();toast('Wyniki zaimportowane: '+dni(nw.days)+', '+nw.pts+' pkt',2600)}}
 // ---- Panel boczny (menu)
 const mqWide=window.matchMedia?matchMedia('(min-width:1100px)'):{matches:false};
 const isWide=()=>mqWide.matches;
@@ -862,6 +882,68 @@ function showIab(){const el=$('iab');if(!el||!inApp())return;
   el.innerHTML=`<span>Grasz w aplikacji. ${android?'Dla pełnej gry i zapisu wyników otwórz w przeglądarce.':'Dla zapisu wyników otwórz w przeglądarce: '+(ios?'⋯ → Otwórz w Safari':'⋯ → Otwórz w przeglądarce')+'.'}</span>${link}<button aria-label="Zamknij">×</button>`;
   el.hidden=false;el.querySelector('button').onclick=()=>{el.hidden=true;try{sessionStorage.setItem('sd2_iab_x','1')}catch(e){}fitBoard()};
   setTimeout(fitBoard,50)}
+// ---- v13: wspólny ranking i tabela pojedynków (Firebase, logowanie anonimowe)
+const FB_CFG={apiKey:"AIzaSyAM_0VdKyhhi6KoPC2VKZwdhYapYk5yMHA",authDomain:"literiada-80262.firebaseapp.com",projectId:"literiada-80262",storageBucket:"literiada-80262.firebasestorage.app",messagingSenderId:"672966951809",appId:"1:672966951809:web:86c721f8bda822a6d91e80"};
+const FBV='12.18.0';let fbP=null,FBUID=null;
+function fb(){if(window.__FBMOCK)return window.__FBMOCK().then(x=>{FBUID=x.uid;return x});
+  if(fbP)return fbP;
+  fbP=(async()=>{const B='https://www.gstatic.com/firebasejs/'+FBV+'/';
+    const [A,U,F]=await Promise.all([import(B+'firebase-app.js'),import(B+'firebase-auth.js'),import(B+'firebase-firestore.js')]);
+    const app=A.initializeApp(FB_CFG),auth=U.getAuth(app),db=F.getFirestore(app);
+    if(auth.authStateReady)await auth.authStateReady();
+    if(!auth.currentUser)await U.signInAnonymously(auth);
+    FBUID=auth.currentUser.uid;return {F,db,uid:FBUID}})();
+  fbP.catch(()=>{fbP=null});return fbP}
+const rsum=a=>Array.isArray(a)?a.reduce((x,y)=>x+(+y||0),0):0;
+let rankBusy=false,rankAgain=false;
+async function rankSync(){const nick=store.get('sd2_nick','');if(!nick)return;if(rankBusy){rankAgain=true;return}rankBusy=true;
+  try{const {F,db,uid}=await fb();const h=store.get('sd2_hist',{}),cut=keyToUTC(todayKey())-62*DAY,days={};let all=0;
+    for(const k in h){const s=Math.round(rsum(h[k]));all+=s;if(s>0&&keyToUTC(k)>=cut)days[k]=s}
+    await F.setDoc(F.doc(db,'players',uid),{nick,all:Math.round(all),days,upd:Date.now()})}catch(e){console.warn('ranking',e)}
+  rankBusy=false;if(rankAgain){rankAgain=false;rankSync()}}
+async function duelPush(sn,won){try{if(!duel)return;const {F,db,uid}=await fb();
+  const id=String(duel.code||'x').replace(/[^A-Za-z0-9_-]/g,'').slice(0,40)+'_'+uid;
+  await F.setDoc(F.doc(db,'duels',id),{au:duel.u||null,an:String(duel.f).slice(0,20),sn:String(sn).slice(0,20),su:uid,res:won?'won':'lost',tries:guesses.length,pts:won?pointsFor(answer,guesses.length):0,ts:Date.now()})}catch(e){console.warn('pojedynek',e)}}
+let RK={tab:'d',rows:null,duels:null,mine:null,err:null};
+function rankRange(tab){const tk=todayKey(),t=keyToUTC(tk);if(tab==='d')return [t,t];
+  if(tab==='w'){const dow=(new Date(t).getUTCDay()+6)%7;return [t-dow*DAY,t]}
+  if(tab==='m')return [Date.UTC(+tk.slice(0,4),+tk.slice(5,7)-1,1),t];return null}
+function rankVal(r,tab){if(tab==='a')return +r.all||0;const [a,b]=rankRange(tab);let s=0;const d=r.days||{};for(const k in d){const x=keyToUTC(k);if(x>=a&&x<=b)s+=+d[k]||0}return s}
+function rankHTML(){const tab=RK.tab,nick=store.get('sd2_nick','');
+  const tabs=[['d','Dziś'],['w','Tydzień'],['m',new Date(keyToUTC(todayKey())).toLocaleDateString('pl-PL',{month:'long',timeZone:'UTC'})],['a','Łącznie'],['p','Pojedynki']].map(([k,l])=>`<button data-rt="${k}" aria-pressed="${tab===k}">${l}</button>`).join('');
+  let body='';
+  if(RK.err)body=`<p class="dbad">Ranking jest chwilowo niedostępny. Sprawdź połączenie z internetem i spróbuj ponownie.</p><div class="actions"><button id="rRetry">Spróbuj ponownie</button></div>`;
+  else if(!RK.rows)body='<p class="sub">Wczytuję ranking…</p>';
+  else if(tab==='p'){
+    const line=d=>`<div><span><b>${esc(d.sn)}</b> ${d.res==='won'?'odgadł(a)':'nie odgadł(a)'} zagadki od <b>${esc(d.an)}</b></span><span style="white-space:nowrap">${d.res==='won'?d.tries+'. próba · '+d.pts+' pkt':'—'}</span></div>`;
+    const mine=(RK.mine||[]).sort((a,b)=>b.ts-a.ts).slice(0,20);
+    body=(FBUID?`<p><b>Wyniki Twoich zagadek</b></p><div class="dlog">${mine.length?mine.map(line).join(''):'<p class="sub">Nikt jeszcze nie odesłał wyniku Twojej zagadki. Wyślij nową w menu: Pojedynek.</p>'}</div>`:'')
+      +`<p><b>Ostatnie pojedynki</b></p><div class="dlog">${(RK.duels||[]).length?RK.duels.map(line).join(''):'<p class="sub">Brak pojedynków. Bądź pierwszy!</p>'}</div>`;
+  } else {
+    const list=RK.rows.map(r=>({id:r.id,nick:r.nick||'?',v:rankVal(r,tab)})).filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
+    const me=list.findIndex(r=>r.id===FBUID);
+    const row=(r,i)=>`<div class="${r.id===FBUID?'me':''}"><span class="pos">${i<3?medal(['gold','silver','bronze'][i],22):i+1}</span><span class="nk">${esc(r.nick)}</span><span class="pt">${r.v} pkt</span></div>`;
+    body=list.length?`<div class="rlist">${list.slice(0,50).map(row).join('')}${me>=50?'<span class="gap">…</span>'+row(list[me],me):''}</div>`:'<p class="sub">Nikt jeszcze nie zdobył punktów w tym okresie. Twoja szansa!</p>';
+    body+=`<p class="sub">Graczy w rankingu: ${RK.rows.length}${me>=0?' · Twoje miejsce: <b>'+(me+1)+'</b>':''}</p>`;
+  }
+  const join=nick?`<p class="sub">Grasz jako <b>${esc(nick)}</b>. <button class="linkbtn" id="rNick" style="padding:0">Zmień nick</button> · <button class="linkbtn" id="rOut" style="padding:0">Usuń mnie z rankingu</button></p>`
+    :`<div class="rjoin"><b>Dołącz do rankingu</b><span style="font-size:.85rem">Wpisz pseudonim, który zobaczą inni gracze. Bez maila i hasła, zapisujemy tylko pseudonim i punkty.</span><input id="rIn" maxlength="20" placeholder="np. Radek z Pręgowa" autocomplete="off"><button id="rJoin">Dołącz</button><span class="dbad" id="rErr" hidden></span></div>`;
+  return `<div class="step">Ranking</div><h2>${ic('trophy',24)} Ranking graczy</h2>${join}<div class="rtabs">${tabs}</div>${body}<div class="actions"><button id="aClose">Zamknij</button></div><p class="sub">Link do rankingu: literiada.github.io/#ranking</p>`}
+function rankBind(){document.querySelectorAll('[data-rt]').forEach(b=>b.onclick=()=>{RK.tab=b.dataset.rt;rankDraw()});
+  if($('rRetry'))$('rRetry').onclick=()=>{RK.err=null;rankLoad()};
+  if($('rJoin'))$('rJoin').onclick=async()=>{const v=$('rIn').value.replace(/\s+/g,' ').trim().slice(0,20);
+    if(v.length<2){$('rErr').hidden=false;$('rErr').textContent='Pseudonim musi mieć co najmniej 2 znaki.';return}
+    store.set('sd2_nick',v);if(!store.get('sd2_duel_name',''))store.set('sd2_duel_name',v);$('rJoin').textContent='Dołączam…';await rankSync();rankLoad()};
+  if($('rNick'))$('rNick').onclick=()=>{store.set('sd2_nick','');rankDraw();setTimeout(()=>{const i=$('rIn');if(i)i.focus()},50)};
+  if($('rOut'))$('rOut').onclick=async()=>{try{const {F,db,uid}=await fb();await F.deleteDoc(F.doc(db,'players',uid))}catch(e){}store.set('sd2_nick','');toast('Usunięto Cię z rankingu',2000);rankLoad()}}
+function rankDraw(){if($('ov').hidden||!$('card').querySelector('.rtabs'))return;$('card').innerHTML=rankHTML();const c=$('aClose');if(c)c.onclick=close;rankBind()}
+async function rankLoad(){RK.rows=null;rankDraw();
+  try{const {F,db,uid}=await fb();
+    const [ps,ds,ms]=await Promise.all([F.getDocs(F.collection(db,'players')),F.getDocs(F.query(F.collection(db,'duels'),F.orderBy('ts','desc'),F.limit(30))),F.getDocs(F.query(F.collection(db,'duels'),F.where('au','==',uid)))]);
+    RK.rows=ps.docs.map(d=>Object.assign({id:d.id},d.data()));RK.duels=ds.docs.map(d=>d.data());RK.mine=ms.docs.map(d=>d.data());RK.err=null}
+  catch(e){console.warn('ranking',e);RK.err=e;RK.rows=null}
+  rankDraw()}
+function showRanking(tab){if(tab)RK.tab=tab;open(rankHTML());rankBind();rankLoad()}
 function newFree(){const pool=L[freeLvl];let a;do{a=pool[Math.floor(Math.random()*pool.length)]}while(a===answer);answer=a;guesses=[];cur='';done=false;paint();fitBoard()}
 function setMode(m){mode=m;close();endDuel();
   if(m==='day'){loadDay();loadDayLevel()}else{freeLvl=lvl;newFree()}}
@@ -877,6 +959,7 @@ document.addEventListener('keydown',e=>{
 $('ov').addEventListener('click',e=>{if(e.target.id==='ov')close()});
 $('bMenu').innerHTML=ic('menu',22)+'<span class="mdot" id="mDot" hidden></span>';$('bMenu').onclick=()=>sideSet(!document.body.classList.contains('side-on'),true);
 $('sClose').innerHTML=ic('back',20);$('sClose').onclick=()=>sideSet(false,true);$('sideBg').onclick=()=>sideSet(false);$('sLogo').innerHTML=brandT();
+$('sRank').innerHTML=ic('trophy',20)+'Ranking graczy';$('sRank').onclick=sideGo(()=>showRanking());
 $('sStats').innerHTML=ic('chart',20)+'Podsumowanie i wyniki';$('sStats').onclick=sideGo(()=>{if(mode==='free')setMode('day');showStats()});
 $('sArch').innerHTML=ic('cal',20)+'Archiwum<span class="badge" id="arBadge" hidden></span>';$('sArch').onclick=sideGo(showArchive);
 $('sDuel').innerHTML=ic('swords',20)+'Pojedynek';$('sDuel').onclick=sideGo(showDuel);
@@ -888,11 +971,13 @@ if(isWide()&&store.get('sd2_side',true))sideSet(true);
 $('bJoker').onclick=jokerClick;$('bSnd').onclick=()=>{SFX.unlock();SFX.toggle();sndIcon()};sndIcon();$('bStats').onclick=()=>{setMode('day');toast('Wracasz do haseł dnia')};
 buildBoard();buildKb();loadDay();loadDayLevel();fitBoard();addEventListener('resize',fitBoard);if(window.visualViewport)visualViewport.addEventListener('resize',fitBoard);setTimeout(fitBoard,300);
 updBadge();showIab();
-if(startDuelFromHash()||startResultFromHash()){store.set('sd2_seen',true)}
+if(location.hash==='#ranking'){clearHash();store.set('sd2_seen',true);showRanking()}
+else if(startDuelFromHash()||startResultFromHash()){store.set('sd2_seen',true)}
 else if(!store.get('sd2_seen',false)){store.set('sd2_seen',true);showHelp()}
 else if(done3(day)&&lvl!==3)showStats();
 else setTimeout(menuHint,800);
-addEventListener('hashchange',()=>{if(/^#p=/.test(location.hash)){close();startDuelFromHash()}else if(/^#r=/.test(location.hash)){close();startResultFromHash()}});
+if(store.get('sd2_nick',''))setTimeout(rankSync,3000);
+addEventListener('hashchange',()=>{if(location.hash==='#ranking'){clearHash();showRanking()}else if(/^#p=/.test(location.hash)){close();startDuelFromHash()}else if(/^#r=/.test(location.hash)){close();startResultFromHash()}});
 </script>
 
 </body>
