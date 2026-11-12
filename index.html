@@ -259,8 +259,6 @@ body.side-on #side{transform:none;visibility:visible}
 .daysum div.openr .chev{transform:rotate(180deg)}
 .daysum div[data-play]{cursor:pointer;border-style:dashed}
 .daysum .lvn{font-weight:800;font-family:var(--display)}
-.boards{width:min(94vw,820px);align-self:center}
-@media (min-width:700px){.boards{flex-direction:row;flex-wrap:wrap;justify-content:center}.boards .bl{flex:0 1 200px}.boards .mini i{width:30px;height:30px}}
 .mv textarea{width:100%;box-sizing:border-box;font:.78rem ui-monospace,monospace;padding:8px;border:2px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);resize:vertical}
 .mvbox{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:10px}
 .dres{font-size:.8rem;color:var(--muted);display:block;text-align:right}
@@ -282,6 +280,7 @@ body.side-on #side{transform:none;visibility:visible}
 .rjoin input{font:700 1.05rem var(--body);padding:9px 10px;border:2px solid var(--line);border-radius:8px;background:#fff;color:#18201b}
 .rjoin button{border:0;border-radius:8px;padding:10px;font:800 .95rem var(--body);background:#12a150;color:#fff;cursor:pointer}
 .rjoin button.linkbtn{background:none;border:0;padding:2px 0;color:#0b3d22;font:600 .85rem var(--body);text-decoration:underline}
+.invbtn{width:100%;border:2px solid #12a150;border-radius:8px;padding:11px;font:800 .95rem var(--body);background:var(--panel);color:#0f7a3d;cursor:pointer;display:inline-flex;gap:6px;justify-content:center;align-items:center}
 .dlog{display:flex;flex-direction:column;gap:4px;font-size:.88rem}
 .dlog div{border-bottom:1px solid var(--line);padding:5px 0;display:flex;justify-content:space-between;gap:8px}
 .rkbtn{width:100%;border:2px solid #ff8a00;border-radius:8px;padding:11px;font:800 .95rem var(--body);background:var(--panel);color:#b45309;cursor:pointer;display:inline-flex;gap:6px;justify-content:center;align-items:center}
@@ -314,11 +313,12 @@ body.embed .iab{display:none!important}
   <button class="sitem" id="sStats"></button>
   <button class="sitem" id="sArch"></button>
   <button class="sitem" id="sDuel"></button>
+  <button class="sitem" id="sInv"></button>
   <button class="sitem" id="sTrain"></button>
   <div class="ssep"></div>
   <button class="sitem" id="sHelp"></button>
   <button class="sitem" id="sMove"></button>
-  <div class="sfoot">Literiada · wersja 14.1 · 2026-11-11</div>
+  <div class="sfoot">Literiada · wersja 15 · 2026-11-12</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -534,7 +534,7 @@ function finish(won){
     p=won?Math.max(0,pointsFor(answer,guesses.length)+tb-(day.jk[lvl]===2?day.jc[lvl]:0)):0;
     day.res[lvl]=won?'won':'lost';day.pts[lvl]=p;saveDay();
     const h=store.get('sd2_hist',{});h[curKey()]=day.pts.slice();store.set('sd2_hist',h);
-    rankSync();
+    rankSync();refPush();
   }
   if(duel){duelSave({g:guesses,res:won?'won':'lost',pts:won?pointsFor(answer,guesses.length):0});const nk=store.get('sd2_nick','');if(nk)duelPush(nk,won)}
   paint();updTimer();
@@ -650,7 +650,7 @@ function showStats(){
   ${day.g.some(x=>x&&x.length)?'<p class="sub">Dotknij paska poziomu, żeby rozwinąć jego planszę.</p>':''}<div class="daysum">${dayRows}</div>
   <div class="total"><span>${mode==='arch'?'Ten dzień razem':'Dziś razem'}</span><span>${day.pts.reduce((a,b)=>a+b,0)} pkt</span></div>
   ${day.res.some(Boolean)?shareBtns('S'):''}
-  ${p4b}<button class="rkbtn" id="aRank">${ic('trophy',18)} Ranking graczy</button><button class="duelbtn" id="aDuel">${ic('swords',18)} Wyzwij znajomego na pojedynek</button><div class="actions">${anyB?'<button id="aBoards">Zobacz plansze</button>':''}${!allDone?'<button id="aBack">Wróć do gry</button>':''}<button id="aArch">${ic('cal',16)} Archiwum${pend?' ('+pend+')':''}</button></div>
+  ${p4b}<button class="invbtn" id="aInv">${ic('send',18)} Zaproś znajomych do gry</button><button class="rkbtn" id="aRank">${ic('trophy',18)} Ranking graczy</button><button class="duelbtn" id="aDuel">${ic('swords',18)} Wyzwij znajomego na pojedynek</button><div class="actions">${anyB?'<button id="aBoards">Zobacz plansze</button>':''}${!allDone?'<button id="aBack">Wróć do gry</button>':''}<button id="aArch">${ic('cal',16)} Archiwum${pend?' ('+pend+')':''}</button></div>
   <div class="boards" id="boards" hidden>${boards}</div>
   ${pend?`<p class="sub">Zaległe dni w archiwum: <b>${pend}</b>. Możesz je nadrobić, punkty liczą się do dnia, którego dotyczą.</p>`:''}
   <h2>Twoje punkty</h2>
@@ -665,7 +665,7 @@ function showStats(){
   bindShare('S');
   if($('aBoards'))$('aBoards').onclick=()=>{const b=$('boards');b.hidden=!b.hidden;$('aBoards').textContent=b.hidden?'Zobacz plansze':'Ukryj plansze';if(!b.hidden)b.scrollIntoView({behavior:'smooth',block:'nearest'})};
   if($('aBack'))$('aBack').onclick=()=>{close();if(mode==='free')setMode('day')};
-  $('aArch').onclick=showArchive;$('aDuel').onclick=showDuel;$('aRank').onclick=()=>showRanking();
+  $('aArch').onclick=showArchive;$('aDuel').onclick=showDuel;$('aRank').onclick=()=>showRanking();$('aInv').onclick=()=>inviteFriends();
   if($('rkInv')){
     $('rJoin').onclick=async()=>{const v=$('rIn').value.replace(/\s+/g,' ').trim().slice(0,20);
       if(v.length<2){$('rErr').hidden=false;$('rErr').textContent='Pseudonim musi mieć co najmniej 2 znaki.';return}
@@ -698,6 +698,7 @@ function showHelp(){
   <p><b>Weekendowa niespodzianka.</b> W sobotę i niedzielę, po zakończeniu poziomu 3, gra zaproponuje dodatkowe hasło o trudności poziomu 3. Masz na nie 10 minut na bonus za czas (do 60 pkt) i możesz dorobić sobie ekstra punkty. Jeśli odmówisz, przycisk niespodzianki czeka w podsumowaniu do końca dnia.</p>
   <p><b>Pojedynek.</b> W menu wybierz Pojedynek: wymyśl 5-literowe hasło, a gra zrobi z niego link do wysłania znajomemu (Messenger, SMS, WhatsApp). Znajomy zgaduje Twoje słowo w 6 próbach, bez zegara i jokerów, a potem może odesłać Ci link ze swoim wynikiem i planszą. Pojedynki nie wpływają na punkty gry dnia.</p>
   <p><b>Ranking graczy.</b> W menu ☰ wybierz Ranking graczy i podaj pseudonim (bez maila i hasła). Twoje punkty trafią do wspólnego rankingu: dziś, w tym tygodniu, w miesiącu i łącznie. Jest tam też tabela pojedynków. Ranking jest dobrowolny i w każdej chwili możesz się z niego usunąć.</p>
+  <p><b>Zaproś znajomych.</b> W menu ☰ albo w podsumowaniu dnia kliknij „Zaproś do gry” i wyślij link w Messengerze, SMS-ie lub WhatsAppie.</p>
   <p><b>Joker.</b> Na poziomie 2, 3 i w niespodziance możesz odsłonić jedną literę hasła. Jokera dostajesz za polecenie gry znajomemu (jeden na poziom). Odsłonięta litera kosztuje tyle punktów, ile jest warta w Scrabble.</p>
   <p>Wynik = wartość słowa × premia za szybkość: 6 za odgadnięcie w 1. próbie, 5 w 2., i tak dalej do 1 w 6. próbie. Przykład: ŻÓŁTY (17 pkt) odgadnięty w 3. próbie daje 17 × 4 = 68 pkt.</p>
   <p><b>Bonus za czas.</b> Zegar 5:00 rusza po wpisaniu pierwszej litery danego poziomu i nie zatrzymuje się po wyjściu z gry. Bonus maleje płynnie z każdą sekundą: na starcie wynosi 20 pkt na poziomie 1, 40 pkt na poziomie 2 i 60 pkt na poziomie 3, a po 5 minutach spada do zera. Pasek pod zegarem pokazuje, ile jeszcze zostało. Po 5 minutach usłyszysz sygnał i grasz dalej, już bez bonusu za czas.</p>
@@ -706,7 +707,7 @@ function showHelp(){
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 14.1 · 2026-11-11</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 15 · 2026-11-12</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
@@ -778,9 +779,24 @@ function updJoker(){const b=$('bJoker'),st=$('jstrip');if(!b)return;
   if(can&&k===2&&day.jp[lvl]!=null){st.hidden=false;st.innerHTML='Joker:'+[...answer].map((c,i)=>`<i class="${i===day.jp[lvl]?'on':''}">${i===day.jp[lvl]?c:''}</i>`).join('')}
   else st.hidden=true}
 function jokerPos(){const known=new Set();guesses.forEach(g=>g.s.forEach((x,i)=>{if(x==='hit')known.add(i)}));for(let i=0;i<5;i++)if(!known.has(i))return i;return 0}
-function shareGame(){const text='Zagraj ze mną w Literiadę! Codziennie 3 hasła, punkty jak w Scrabble i premia za szybkość.';
-  try{if(navigator.share)return navigator.share({title:'Literiada',text,url:BASE()}).catch(()=>{})}catch(e){}
-  try{navigator.clipboard.writeText(text+' '+BASE())}catch(e){}return Promise.resolve('copied')}
+// ---- v15: zaproszenia (link z identyfikatorem zapraszającego, liczone po ukończeniu 1. poziomu przez zaproszonego)
+async function inviteURL(){let u=FBUID;if(!u){try{u=(await Promise.race([fb(),new Promise((_,r)=>setTimeout(()=>r(0),2500))])).uid}catch(e){u=null}}
+  return BASE()+(u?'?z='+encodeURIComponent(u):'')}
+const INV_TXT='Gram w Literiadę: codziennie 3 hasła, punkty jak w Scrabble, ranking graczy i pojedynki. Zagrasz ze mną?';
+async function shareGame(){const url=await inviteURL();
+  try{if(navigator.share)return navigator.share({title:'Literiada',text:INV_TXT+' 👉 '+url}).catch(()=>{})}catch(e){}
+  try{navigator.clipboard.writeText(INV_TXT+' 👉 '+url)}catch(e){}return 'copied'}
+async function inviteFriends(){const url=await inviteURL(),t=INV_TXT+' 👉 '+url;
+  try{if(navigator.share){navigator.share({title:'Literiada',text:t}).catch(e=>{if(e&&e.name!=='AbortError')copy2(t)});return}}catch(e){}copy2(t)}
+function copy2(t){try{navigator.clipboard.writeText(t).then(()=>toast('Zaproszenie skopiowane! Wklej je znajomym w Messengerze lub SMS-ie',2600),()=>fallback(t))}catch(e){fallback(t)}}
+// zaproszony: zapamiętaj, kto zaprosił (tylko nowy gracz), zapisz po ukończeniu pierwszego poziomu
+(function(){try{const q=new URLSearchParams(location.search),z=q.get('z');if(!z)return;
+  if(!store.get('sd2_ref_from','')&&!Object.keys(store.get('sd2_hist',{})).length)store.set('sd2_ref_from',z.slice(0,64));
+  q.delete('z');const rest=q.toString();history.replaceState(null,'',location.pathname+(rest?'?'+rest:'')+location.hash)}catch(e){}})();
+async function refPush(){const z=store.get('sd2_ref_from','');if(!z||store.get('sd2_ref_sent',false))return;
+  try{const {F,db,uid}=await fb();if(z===uid){store.set('sd2_ref_sent',true);return}
+    await F.setDoc(F.doc(db,'invites',uid),{ref:z,ts:Date.now()});store.set('sd2_ref_sent',true)}
+  catch(e){if(String(e&&e.code||'').includes('permission'))store.set('sd2_ref_sent',true);console.warn('zaproszenie',e)}}
 function jokerClick(){if(done||busy)return;const k=day.jk[lvl];
   if(k===0){open(`<h2>${ic('joker',22)} Joker</h2><p>Joker odsłania jedną literę hasła. Kosztuje tyle punktów, ile ta litera jest warta w Scrabble: odejmę je od wyniku poziomu.</p>
     <p><b>Jokera dostajesz za polecenie gry znajomemu.</b> Możesz wziąć jednego na poziom 2, 3 i weekendową niespodziankę.</p>
@@ -997,6 +1013,7 @@ $('sDuel').innerHTML=ic('swords',20)+'Pojedynek';$('sDuel').onclick=sideGo(showD
 $('sTrain').innerHTML=ic('train',20)+'Trening';$('sTrain').onclick=sideGo(showTrain);
 $('sHelp').innerHTML=ic('help',20)+'Jak grać';$('sHelp').onclick=sideGo(showHelp);
 $('sMove').innerHTML=ic('move',20)+'Przenieś wyniki';$('sMove').onclick=sideGo(showMove);
+$('sInv').innerHTML=ic('send',20)+'Zaproś do gry';$('sInv').onclick=sideGo(()=>inviteFriends());
 if(mqWide.addEventListener)mqWide.addEventListener('change',()=>sideSet(isWide()&&store.get('sd2_side',true)));
 if(isWide()&&store.get('sd2_side',true))sideSet(true);
 $('bJoker').onclick=jokerClick;$('bSnd').onclick=()=>{SFX.unlock();SFX.toggle();sndIcon()};sndIcon();$('bStats').onclick=()=>{setMode('day');toast('Wracasz do haseł dnia')};
