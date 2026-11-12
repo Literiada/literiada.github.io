@@ -281,6 +281,8 @@ body.side-on #side{transform:none;visibility:visible}
 .rjoin button{border:0;border-radius:8px;padding:10px;font:800 .95rem var(--body);background:#12a150;color:#fff;cursor:pointer}
 .rjoin button.linkbtn{background:none;border:0;padding:2px 0;color:#0b3d22;font:600 .85rem var(--body);text-decoration:underline}
 .invbtn{width:100%;border:2px solid #12a150;border-radius:8px;padding:11px;font:800 .95rem var(--body);background:var(--panel);color:#0f7a3d;cursor:pointer;display:inline-flex;gap:6px;justify-content:center;align-items:center}
+body.relax .ptsblock{display:none!important}
+.relaxnote{background:#e8f6ee;border:1.5px solid #12a150;color:#0b3d22;border-radius:10px;padding:10px 12px;font-weight:600;font-size:.9rem}
 .dlog{display:flex;flex-direction:column;gap:4px;font-size:.88rem}
 .dlog div{border-bottom:1px solid var(--line);padding:5px 0;display:flex;justify-content:space-between;gap:8px}
 .rkbtn{width:100%;border:2px solid #ff8a00;border-radius:8px;padding:11px;font:800 .95rem var(--body);background:var(--panel);color:#b45309;cursor:pointer;display:inline-flex;gap:6px;justify-content:center;align-items:center}
@@ -316,10 +318,11 @@ body.embed .iab{display:none!important}
   <button class="sitem" id="sInv"></button>
   <a class="sitem" id="sX" href="https://x.com/Literiada" target="_blank" rel="noopener" style="text-decoration:none"></a>
   <button class="sitem" id="sTrain"></button>
+  <button class="sitem" id="sRelax"></button>
   <div class="ssep"></div>
   <button class="sitem" id="sHelp"></button>
   <button class="sitem" id="sMove"></button>
-  <div class="sfoot">Literiada · wersja 16 · 2026-11-12</div>
+  <div class="sfoot">Literiada · wersja 17.1 · 2026-11-12</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -461,7 +464,7 @@ function paintLevels(){
   $('bStats').hidden=mode==='day';
   const isWon=play?day.res[L0]==='won':(guesses.length&&guesses[guesses.length-1].w===answer);
   const att=done?(isWon?'Odgadnięte':'Hasło: '+answer.toUpperCase()):attemptLabel();
-  $('lvSub').innerHTML=(mode==='arch'?'Archiwum '+shortDate(archKey)+' · ':mode==='free'?(duel?'':'Trening · '):'')+'<span class="lvl">'+lvTxt+'</span> · '+att+(play?' · <span style="white-space:nowrap">'+(mode==='day'?'dziś ':'ten dzień ')+day.pts.reduce((a,b)=>a+b,0)+' pkt</span>':'');
+  $('lvSub').innerHTML=(mode==='arch'?'Archiwum '+shortDate(archKey)+' · ':mode==='free'?(duel?'':'Trening · '):'')+'<span class="lvl">'+lvTxt+'</span> · '+att+(play&&!RX()?' · <span style="white-space:nowrap">'+(mode==='day'?'dziś ':'ten dzień ')+day.pts.reduce((a,b)=>a+b,0)+' pkt</span>':'');
 }
 const COL={hit:'#12a150',near:'#ff8a00',miss:'#6b7280'};
 function setImp(el,prop,v){el.style.setProperty(prop,v,'important')}
@@ -531,7 +534,7 @@ function finish(won){
   let p=0;
   if(mode!=='free'){
     const e=day.t[lvl]?Date.now()-day.t[lvl]:null;day.te[lvl]=e;
-    const tb=won&&e!=null?bonusFor(lvl,e):0;day.tb[lvl]=tb;
+    const tb=won&&e!=null&&!RX()?bonusFor(lvl,e):0;day.tb[lvl]=tb;
     p=won?Math.max(0,pointsFor(answer,guesses.length)+tb-(day.jk[lvl]===2?day.jc[lvl]:0)):0;
     day.res[lvl]=won?'won':'lost';day.pts[lvl]=p;saveDay();
     const h=store.get('sd2_hist',{});h[curKey()]=day.pts.slice();store.set('sd2_hist',h);
@@ -544,10 +547,12 @@ function finish(won){
   setTimeout(()=>{showResult(won,p);if(won)confetti(mode==='free'?70:(lvl>=2?240:120))},900);
 }
 function grid(g){return g.map(x=>x.s.map(s=>s==='hit'?'🟩':s==='near'?'🟧':'⬜').join('')).join('\n')}
+const RX=()=>!!store.get('sd2_relax',false);
 const SHARE_URL='literiada.github.io · @Literiada';
 const medE=n=>n<=2?'🥇':n<=4?'🥈':'🥉';
 function shareLines(withGrid){
   if(mode==='free'){const won=(guesses.length&&guesses[guesses.length-1].w===answer);return 'Literiada (trening) '+(won?guesses.length:'X')+'/6\n'+grid(guesses)+'\n👉 '+SHARE_URL}
+  if(RX()){let t='Literiada #'+(curN()+1)+' 🌿 na luzie\n';day.res.forEach((r,i)=>{if(!r)return;const g=day.g[i]||[];t+='\n'+(i===3?'🎁 P4':'P'+(i+1))+' '+(r==='won'?(g.length||'✓')+'/6':'X/6');if(withGrid&&g.length)t+='\n'+grid(g)});return t+'\n\n👉 '+SHARE_URL}
   const tot=day.pts.reduce((a,b)=>a+b,0);let t='Literiada #'+(curN()+1)+' · '+tot+' pkt'+(done3(day)&&day.res.slice(0,3).every(r=>r==='won')?' 🏆':'')+'\n';
   day.res.forEach((r,i)=>{if(!r)return;const g=day.g[i]||[];
     t+='\n'+(i===3?'🎁 P4':'P'+(i+1))+' '+(r==='won'?medE(g.length||6)+' '+(g.length||'✓')+'/6':'❌ X/6')+' · '+day.pts[i]+' pkt'+(day.te&&day.te[i]!=null&&r==='won'?' · ⏱'+fmtT(day.te[i]):'');
@@ -580,10 +585,15 @@ function showResult(won,p){
   const mk=won?medalKind(guesses.length):null;
   const tbNow=(mode!=='free'&&day.tb)?day.tb[lvl]:0;
   const bolt=won&&mode!=='free'&&tbNow>=TMAX[lvl]/2?`<span class="bolt">${ic('bolt',14)} Błyskawica! Ponad połowa bonusu za czas</span>`:'';
-  const cel=won?`<div class="cel">${medal(mk)}<div class="msg">${pick(CHEER[mk])}<small>${medalName[mk][0].toUpperCase()+medalName[mk].slice(1)} za ${guesses.length}. próbę</small>${bolt}</div></div>`
+  const cel=won&&RX()&&mode!=='free'?`<div class="cel"><span style="font-size:64px;line-height:1">🌿</span><div class="msg">${pick(CHEER[mk])}<small>Odgadnięte w ${guesses.length}. próbie</small></div></div>`
+    :won?`<div class="cel">${medal(mk)}<div class="msg">${pick(CHEER[mk])}<small>${medalName[mk][0].toUpperCase()+medalName[mk].slice(1)} za ${guesses.length}. próbę</small>${bolt}</div></div>`
     :`<div class="cel"><span style="color:var(--near)">${ic('sun',64)}</span><div class="msg">${pick(CHEER.lost)}<small>${mode==='arch'?'W archiwum czekają kolejne dni.':'Każdy dzień to nowe hasła.'}</small></div></div>`;
   const full=won&&mode!=='free'&&lvl===2?`<div class="full">Komplet! Wszystkie 3 hasła ${mode==='arch'?'tego dnia':'dnia'} odgadnięte.</div>`:'';
-  if(mode!=='free'){
+  if(mode!=='free'&&RX()){
+    const okN=day.res.filter(r=>r==='won').length;
+    body=`<p>${word}</p><p class="sub">Dziś odgadnięte: <b>${okN} z ${day.res.filter(Boolean).length}</b>${won?'':' · Kolejne hasło jutro.'}</p>`;
+  }
+  if(mode!=='free'&&!RX()){
     const tb=day.tb?day.tb[lvl]:0,te=day.te?day.te[lvl]:null,base=pointsFor(answer,guesses.length),jc=day.jk[lvl]===2?day.jc[lvl]:0;
     body=won?`<p>${word}</p><p>Wartość słowa ${v} pkt × premia ${7-guesses.length} (za ${guesses.length}. próbę) = ${base} pkt</p>`
       +(tb?`<p>Bonus za czas (${fmtT(te)}): +${tb} pkt</p>`:(te!=null?`<p class="sub">Czas ${fmtT(te)}: bez bonusu za czas.</p>`:''))
@@ -591,6 +601,8 @@ function showResult(won,p){
       +`<p>Razem za poziom: <b>${p} pkt</b></p>`
             :`<p>Hasło: ${word} (${v} pkt)</p><p>Tym razem 0 pkt.${lvl<2?(mode==='arch'?' Kolejne poziomy tego dnia zostają zablokowane.':' Kolejny poziom odblokujesz jutro.'):''}</p>`;
     body+=`<p class="sub">${mode==='arch'?'Ten dzień razem':'Dziś razem'}: <b>${day.pts.reduce((a,b)=>a+b,0)} pkt</b></p>`;
+  }
+  if(mode!=='free'){
     const gift=!(won&&lvl<2)&&lvl<3&&isWknd(curKey())&&!day.res[3];
     btns=(won&&lvl<2)?`<button class="main" id="aNext">Dalej: Poziom ${lvl+2}</button>`
       :gift?`<button class="main" id="aP4">Tak, poproszę!</button><button id="aNo">Nie, dziękuję</button>`
@@ -637,27 +649,27 @@ function showStats(){
     const word=r?w:(unlocked(i)?'…':ic('lock',15));const note=r==='won'?(g.length?'odgadnięte w '+g.length+'. próbie':'odgadnięte'):r==='lost'?'nie odgadnięte':unlocked(i)?(g.length?'w trakcie · dotknij, żeby grać':'dotknij, żeby grać'):i===3?'po zakończeniu poziomu 3':'zablokowane';
     const mini=g.length&&r?`<span class="mini" hidden>${g.map(x=>`<span class="mr">${[...x.w].map((ch,j)=>`<i style="background:${COL[x.s[j]]}">${ch}</i>`).join('')}</span>`).join('')}</span>`:'';
     const act=g.length&&r?` data-tog="${i}" role="button" tabindex="0" aria-expanded="false"`:(!r&&unlocked(i))?` data-play="${i}" role="button" tabindex="0"`:'';
-    return `<div${act} class="${r==='lost'?'lostr':''}"><span class="lvn">${i===3?'P4':'P'+(i+1)}</span><span class="w">${word}<small>${note}${day.te&&day.te[i]!=null&&r?' · '+ic('clock',12)+' '+fmtT(day.te[i])+(day.tb[i]?' (+'+day.tb[i]+')':''):''}</small></span><span class="pt">${r==='won'&&g.length?medal(medalKind(g.length),18):''}${day.pts[i]} pkt${mini?' <span class="chev">'+ic('chev',16)+'</span>':''}</span>${mini}</div>`}).join('');
+    return `<div${act} class="${r==='lost'?'lostr':''}"><span class="lvn">${i===3?'P4':'P'+(i+1)}</span><span class="w">${word}<small>${note}${!RX()&&day.te&&day.te[i]!=null&&r?' · '+ic('clock',12)+' '+fmtT(day.te[i])+(day.tb[i]?' (+'+day.tb[i]+')':''):''}</small></span><span class="pt">${RX()?'':(r==='won'&&g.length?medal(medalKind(g.length),18):'')+day.pts[i]+' pkt'}${mini?' <span class="chev">'+ic('chev',16)+'</span>':''}</span>${mini}</div>`}).join('');
   const boards=day.g.some(x=>x&&x.length)?LVA.map((l,i)=>{const g=day.g[i]||[],r=day.res[i];if(!g.length)return '';const w=wordFor(i,curN());
-    return `<div class="bl"><div class="bh"><span>${l.n} · <span class="w">${r?w:'w trakcie'}</span></span><span>${r==='won'?medal(medalKind(g.length),18):''}${day.pts[i]} pkt</span></div><span class="mini">${g.map(x=>`<span class="mr">${[...x.w].map((ch,j)=>`<i style="background:${COL[x.s[j]]}">${ch}</i>`).join('')}</span>`).join('')}</span></div>`}).join('')
+    return `<div class="bl"><div class="bh"><span>${l.n} · <span class="w">${r?w:'w trakcie'}</span></span><span>${RX()?(r==='won'?g.length+'/6':''):(r==='won'?medal(medalKind(g.length),18):'')+day.pts[i]+' pkt'}</span></div><span class="mini">${g.map(x=>`<span class="mr">${[...x.w].map((ch,j)=>`<i style="background:${COL[x.s[j]]}">${ch}</i>`).join('')}</span>`).join('')}</span></div>`}).join('')
     :'<p class="sub">Plansze z tego dnia nie zostały zapisane: ten dzień rozegrano w starszej wersji gry, która zapamiętywała tylko wynik. Punkty są policzone.</p>';
   const pend=archPending();
   const allDone=done3(day)&&!p4going(day);
   const anyB=day.g.some(x=>x&&x.length)||day.res.some(Boolean);
   const p4b=p4open()&&!day.res[3]?`<button class="p4btn" id="aP4">${ic('gift',18)} ${day.g[3].length?'Wróć do weekendowej niespodzianki':'Weekendowa niespodzianka: zagraj!'}</button>`:'';
-  const askRk=mode==='day'&&done3(day)&&!store.get('sd2_nick','')&&!store.get('sd2_rk_never',false)&&store.get('sd2_rk_ask','')!==todayKey();
+  const askRk=!RX()&&mode==='day'&&done3(day)&&!store.get('sd2_nick','')&&!store.get('sd2_rk_never',false)&&store.get('sd2_rk_ask','')!==todayKey();
   const rkInv=askRk?`<div class="rjoin" id="rkInv"><b>${ic('trophy',18)} Sprawdź swoje miejsce w rankingu!</b><span style="font-size:.85rem">Dziś masz ${day.pts.reduce((a,b)=>a+b,0)} pkt. Podaj pseudonim, a Twoje punkty trafią do wspólnego rankingu graczy. Bez maila i hasła.</span><input id="rIn" maxlength="20" placeholder="np. Radek z Pręgowa" autocomplete="off"><button id="rJoin">Dołącz do rankingu</button><span class="dbad" id="rErr" hidden></span><span style="display:flex;justify-content:space-between;gap:8px"><button class="linkbtn" id="rkLater" style="padding:0;color:#0b3d22">Nie teraz</button><button class="linkbtn" id="rkNever" style="padding:0;color:#0b3d22">Nie pytaj więcej</button></span></div>`:'';
   open(`${logo()}<div class="step">${mode==='arch'?'Archiwum · ':''}Strona 4 z 4 · Podsumowanie</div><h2>${mode==='arch'?'Dzień '+shortDate(archKey):'Podsumowanie dnia'}</h2>${rkInv}
   ${day.g.some(x=>x&&x.length)?'<p class="sub">Dotknij paska poziomu, żeby rozwinąć jego planszę.</p>':''}<div class="daysum">${dayRows}</div>
-  <div class="total"><span>${mode==='arch'?'Ten dzień razem':'Dziś razem'}</span><span>${day.pts.reduce((a,b)=>a+b,0)} pkt</span></div>
+  ${RX()?'<div class="relaxnote">🌿 Grasz na luzie: bez zegara, punktów i rankingu. Wyłączysz to w menu ☰.</div>':''}<div class="total ptsblock"><span>${mode==='arch'?'Ten dzień razem':'Dziś razem'}</span><span>${day.pts.reduce((a,b)=>a+b,0)} pkt</span></div>
   ${day.res.some(Boolean)?shareBtns('S'):''}
   ${p4b}<button class="invbtn" id="aInv">${ic('send',18)} Zaproś znajomych do gry</button><button class="rkbtn" id="aRank">${ic('trophy',18)} Ranking graczy</button><button class="duelbtn" id="aDuel">${ic('swords',18)} Wyzwij znajomego na pojedynek</button><div class="actions">${anyB?'<button id="aBoards">Zobacz plansze</button>':''}${!allDone?'<button id="aBack">Wróć do gry</button>':''}<button id="aArch">${ic('cal',16)} Archiwum${pend?' ('+pend+')':''}</button></div>
   <div class="boards" id="boards" hidden>${boards}</div>
   ${pend?`<p class="sub">Zaległe dni w archiwum: <b>${pend}</b>. Możesz je nadrobić, punkty liczą się do dnia, którego dotyczą.</p>`:''}
-  <h2>Twoje punkty</h2>
-  <div class="stats"><div><b>${sumRange(h,t,t)}</b><span>dziś</span></div><div><b>${sumRange(h,wFrom,wFrom+6*DAY)}</b><span>ten tydzień</span></div><div><b>${sumRange(h,mFrom,t)}</b><span>${month}</span></div><div><b>${all}</b><span>łącznie</span></div></div>
-  <div class="week">${days.map((d,i)=>{const s=sumP(d.p);return `<div>${s||''}<i style="height:${s/mx*80}%">${d.p.map((p,j)=>p?`<s class="c${j+1}" style="height:${p/s*100}%"></s>`:'').join('')}</i>${names[i]}</div>`}).join('')}</div>
-  <div class="legend"><span style="--c:var(--hit)">Poziom 1</span><span style="--c:var(--near)">Poziom 2</span><span style="--c:var(--ink)">Poziom 3</span>${played[3]?'<span style="--c:#8b5cf6">Niespodzianka</span>':''}</div>
+  <h2 class="ptsblock">Twoje punkty</h2>
+  <div class="stats ptsblock"><div><b>${sumRange(h,t,t)}</b><span>dziś</span></div><div><b>${sumRange(h,wFrom,wFrom+6*DAY)}</b><span>ten tydzień</span></div><div><b>${sumRange(h,mFrom,t)}</b><span>${month}</span></div><div><b>${all}</b><span>łącznie</span></div></div>
+  <div class="week ptsblock">${days.map((d,i)=>{const s=sumP(d.p);return `<div>${s||''}<i style="height:${s/mx*80}%">${d.p.map((p,j)=>p?`<s class="c${j+1}" style="height:${p/s*100}%"></s>`:'').join('')}</i>${names[i]}</div>`}).join('')}</div>
+  <div class="legend ptsblock"><span style="--c:var(--hit)">Poziom 1</span><span style="--c:var(--near)">Poziom 2</span><span style="--c:var(--ink)">Poziom 3</span>${played[3]?'<span style="--c:#8b5cf6">Niespodzianka</span>':''}</div>
   <div class="lvres">${LVA.map((l,i)=>i===3&&!played[3]?'':`<div><span>${l.n} (${l.r})</span><b>${won[i]} z ${played[i]} odgadniętych</b></div>`).join('')}</div>
   <p class="sub">Tydzień liczony od poniedziałku. Wyniki zapisują się w tej przeglądarce. Przeniesiesz je na inne urządzenie w menu: Przenieś wyniki.</p>
   <h2>Trening</h2>${trainPicker()}
@@ -699,6 +711,7 @@ function showHelp(){
   <p><b>Weekendowa niespodzianka.</b> W sobotę i niedzielę, po zakończeniu poziomu 3, gra zaproponuje dodatkowe hasło o trudności poziomu 3. Masz na nie 10 minut na bonus za czas (do 60 pkt) i możesz dorobić sobie ekstra punkty. Jeśli odmówisz, przycisk niespodzianki czeka w podsumowaniu do końca dnia.</p>
   <p><b>Pojedynek.</b> W menu wybierz Pojedynek: wymyśl 5-literowe hasło, a gra zrobi z niego link do wysłania znajomemu (Messenger, SMS, WhatsApp). Znajomy zgaduje Twoje słowo w 6 próbach, bez zegara i jokerów, a potem może odesłać Ci link ze swoim wynikiem i planszą. Pojedynki nie wpływają na punkty gry dnia.</p>
   <p><b>Ranking graczy.</b> W menu ☰ wybierz Ranking graczy i podaj pseudonim (bez maila i hasła). Twoje punkty trafią do wspólnego rankingu: dziś, w tym tygodniu, w miesiącu i łącznie. Jest tam też tabela pojedynków. Ranking jest dobrowolny i w każdej chwili możesz się z niego usunąć.</p>
+  <p><b>Gra na luzie 🌿.</b> Wolisz grać bez presji? W menu ☰ włącz „Grę na luzie”: znika zegar, punkty, medale i ranking, zostają same słowa. Wyłączysz to w każdej chwili.</p>
   <p><b>Literiada na X.</b> Obserwuj @Literiada (x.com/Literiada): nowości, wyzwania i najlepsze wyniki graczy. Wrzucając wynik na X, oznacz @Literiada.</p>
   <p><b>Zaproś znajomych.</b> W menu ☰ albo w podsumowaniu dnia kliknij „Zaproś do gry” i wyślij link w Messengerze, SMS-ie lub WhatsAppie.</p>
   <p><b>Joker.</b> Na poziomie 2, 3 i w niespodziance możesz odsłonić jedną literę hasła. Jokera dostajesz za polecenie gry znajomemu (jeden na poziom). Odsłonięta litera kosztuje tyle punktów, ile jest warta w Scrabble.</p>
@@ -709,7 +722,7 @@ function showHelp(){
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 16 · 2026-11-12</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 17.1 · 2026-11-12</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
@@ -734,7 +747,7 @@ const fmtT=ms=>{const x=Math.max(0,Math.floor(ms/1000));return Math.floor(x/60)+
 const bonusFor=(L0,ms)=>ms>=tl(L0)*1000?0:Math.max(0,Math.ceil(TMAX[L0]*(1-ms/(tl(L0)*1000))));
 let timeupFired=null;
 function updTimer(){const el=$('timer');if(!el)return;
-  if(mode==='free'||!day||!day.t){el.hidden=true;return}
+  if(mode==='free'||!day||!day.t||RX()){el.hidden=true;return}
   el.hidden=false;el.className='timer';
   const st=day.t[lvl],te=day.te[lvl];
   if(done){if(te==null){el.hidden=true;return}
@@ -954,7 +967,7 @@ function fb(){if(window.__FBMOCK)return window.__FBMOCK().then(x=>{FBUID=x.uid;r
   fbP.catch(()=>{fbP=null});return fbP}
 const rsum=a=>Array.isArray(a)?a.reduce((x,y)=>x+(+y||0),0):0;
 let rankBusy=false,rankAgain=false;
-async function rankSync(){const nick=store.get('sd2_nick','');if(!nick)return;if(rankBusy){rankAgain=true;return}rankBusy=true;
+async function rankSync(){const nick=store.get('sd2_nick','');if(!nick||RX())return;if(rankBusy){rankAgain=true;return}rankBusy=true;
   try{const {F,db,uid}=await fb();const h=store.get('sd2_hist',{}),cut=keyToUTC(todayKey())-62*DAY,days={};let all=0;
     for(const k in h){const s=Math.round(rsum(h[k]));all+=s;if(s>0&&keyToUTC(k)>=cut)days[k]=s}
     await F.setDoc(F.doc(db,'players',uid),{nick,all:Math.round(all),days,upd:Date.now()})}catch(e){console.warn('ranking',e)}
@@ -993,7 +1006,10 @@ function rankBind(){document.querySelectorAll('[data-rt]').forEach(b=>b.onclick=
     if(v.length<2){$('rErr').hidden=false;$('rErr').textContent='Pseudonim musi mieć co najmniej 2 znaki.';return}
     store.set('sd2_nick',v);if(!store.get('sd2_duel_name',''))store.set('sd2_duel_name',v);$('rJoin').textContent='Dołączam…';await rankSync();rankLoad()};
   if($('rNick'))$('rNick').onclick=()=>{store.set('sd2_nick','');rankDraw();setTimeout(()=>{const i=$('rIn');if(i)i.focus()},50)};
-  if($('rOut'))$('rOut').onclick=async()=>{try{const {F,db,uid}=await fb();await F.deleteDoc(F.doc(db,'players',uid))}catch(e){}store.set('sd2_nick','');toast('Usunięto Cię z rankingu',2000);rankLoad()}}
+  if($('rOut'))$('rOut').onclick=async()=>{let nd=0;try{const {F,db,uid}=await fb();await F.deleteDoc(F.doc(db,'players',uid));
+      const qs=await Promise.all([F.getDocs(F.query(F.collection(db,'duels'),F.where('su','==',uid))),F.getDocs(F.query(F.collection(db,'duels'),F.where('au','==',uid)))]);
+      const seen=new Set();for(const q of qs)for(const d of q.docs){if(seen.has(d.id))continue;seen.add(d.id);try{await F.deleteDoc(F.doc(db,'duels',d.id));nd++}catch(e){}}}catch(e){}
+    store.set('sd2_nick','');toast('Usunięto Cię z rankingu'+(nd?' i z tabeli pojedynków ('+nd+')':''),2600);rankLoad()}}
 function rankDraw(){if($('ov').hidden||!$('card').querySelector('.rtabs'))return;$('card').innerHTML=rankHTML();const c=$('aClose');if(c)c.onclick=close;rankBind()}
 async function rankLoad(){RK.rows=null;rankDraw();
   try{const {F,db,uid}=await fb();
@@ -1042,6 +1058,14 @@ $('sDuel').innerHTML=ic('swords',20)+'Pojedynek';$('sDuel').onclick=sideGo(showD
 $('sTrain').innerHTML=ic('train',20)+'Trening';$('sTrain').onclick=sideGo(showTrain);
 $('sHelp').innerHTML=ic('help',20)+'Jak grać';$('sHelp').onclick=sideGo(showHelp);
 $('sMove').innerHTML=ic('move',20)+'Przenieś wyniki';$('sMove').onclick=sideGo(showMove);
+function relaxLabel(){$('sRelax').innerHTML='<span style="width:20px;text-align:center">🌿</span>Gra na luzie: <b style="margin-left:4px">'+(RX()?'włączona':'wyłączona')+'</b>'}
+async function rankHide(){try{const {F,db,uid}=await fb();await F.deleteDoc(F.doc(db,'players',uid))}catch(e){console.warn('ranking',e)}}
+function setRelax(on){store.set('sd2_relax',on);document.body.classList.toggle('relax',on);relaxLabel();paintLevels();updTimer();
+  const nk=store.get('sd2_nick','');
+  if(on){if(nk)rankHide();toast('Gra na luzie: bez zegara, punktów i rankingu 🌿',2600)}
+  else{rankSync();toast(nk?'Gra na punkty ⏱ Wracasz do rankingu jako '+nk:'Wracasz do gry na punkty i czas ⏱',2800)}}
+relaxLabel();if(RX())document.body.classList.add('relax');
+$('sRelax').onclick=sideGo(()=>setRelax(!RX()));
 $('sInv').innerHTML=ic('send',20)+'Zaproś do gry';$('sX').innerHTML='<span style="font:900 1.15rem var(--body);width:20px;text-align:center">𝕏</span>Obserwuj nas na X';$('sInv').onclick=sideGo(()=>inviteFriends());
 if(mqWide.addEventListener)mqWide.addEventListener('change',()=>sideSet(isWide()&&store.get('sd2_side',true)));
 if(isWide()&&store.get('sd2_side',true))sideSet(true);
