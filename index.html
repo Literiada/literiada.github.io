@@ -314,11 +314,12 @@ body.embed .iab{display:none!important}
   <button class="sitem" id="sArch"></button>
   <button class="sitem" id="sDuel"></button>
   <button class="sitem" id="sInv"></button>
+  <a class="sitem" id="sX" href="https://x.com/Literiada" target="_blank" rel="noopener" style="text-decoration:none"></a>
   <button class="sitem" id="sTrain"></button>
   <div class="ssep"></div>
   <button class="sitem" id="sHelp"></button>
   <button class="sitem" id="sMove"></button>
-  <div class="sfoot">Literiada · wersja 15 · 2026-11-12</div>
+  <div class="sfoot">Literiada · wersja 16 · 2026-11-12</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -543,7 +544,7 @@ function finish(won){
   setTimeout(()=>{showResult(won,p);if(won)confetti(mode==='free'?70:(lvl>=2?240:120))},900);
 }
 function grid(g){return g.map(x=>x.s.map(s=>s==='hit'?'🟩':s==='near'?'🟧':'⬜').join('')).join('\n')}
-const SHARE_URL='literiada.github.io';
+const SHARE_URL='literiada.github.io · @Literiada';
 const medE=n=>n<=2?'🥇':n<=4?'🥈':'🥉';
 function shareLines(withGrid){
   if(mode==='free'){const won=(guesses.length&&guesses[guesses.length-1].w===answer);return 'Literiada (trening) '+(won?guesses.length:'X')+'/6\n'+grid(guesses)+'\n👉 '+SHARE_URL}
@@ -698,6 +699,7 @@ function showHelp(){
   <p><b>Weekendowa niespodzianka.</b> W sobotę i niedzielę, po zakończeniu poziomu 3, gra zaproponuje dodatkowe hasło o trudności poziomu 3. Masz na nie 10 minut na bonus za czas (do 60 pkt) i możesz dorobić sobie ekstra punkty. Jeśli odmówisz, przycisk niespodzianki czeka w podsumowaniu do końca dnia.</p>
   <p><b>Pojedynek.</b> W menu wybierz Pojedynek: wymyśl 5-literowe hasło, a gra zrobi z niego link do wysłania znajomemu (Messenger, SMS, WhatsApp). Znajomy zgaduje Twoje słowo w 6 próbach, bez zegara i jokerów, a potem może odesłać Ci link ze swoim wynikiem i planszą. Pojedynki nie wpływają na punkty gry dnia.</p>
   <p><b>Ranking graczy.</b> W menu ☰ wybierz Ranking graczy i podaj pseudonim (bez maila i hasła). Twoje punkty trafią do wspólnego rankingu: dziś, w tym tygodniu, w miesiącu i łącznie. Jest tam też tabela pojedynków. Ranking jest dobrowolny i w każdej chwili możesz się z niego usunąć.</p>
+  <p><b>Literiada na X.</b> Obserwuj @Literiada (x.com/Literiada): nowości, wyzwania i najlepsze wyniki graczy. Wrzucając wynik na X, oznacz @Literiada.</p>
   <p><b>Zaproś znajomych.</b> W menu ☰ albo w podsumowaniu dnia kliknij „Zaproś do gry” i wyślij link w Messengerze, SMS-ie lub WhatsAppie.</p>
   <p><b>Joker.</b> Na poziomie 2, 3 i w niespodziance możesz odsłonić jedną literę hasła. Jokera dostajesz za polecenie gry znajomemu (jeden na poziom). Odsłonięta litera kosztuje tyle punktów, ile jest warta w Scrabble.</p>
   <p>Wynik = wartość słowa × premia za szybkość: 6 za odgadnięcie w 1. próbie, 5 w 2., i tak dalej do 1 w 6. próbie. Przykład: ŻÓŁTY (17 pkt) odgadnięty w 3. próbie daje 17 × 4 = 68 pkt.</p>
@@ -707,7 +709,7 @@ function showHelp(){
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 15 · 2026-11-12</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 16 · 2026-11-12</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
@@ -783,11 +785,20 @@ function jokerPos(){const known=new Set();guesses.forEach(g=>g.s.forEach((x,i)=>
 async function inviteURL(){let u=FBUID;if(!u){try{u=(await Promise.race([fb(),new Promise((_,r)=>setTimeout(()=>r(0),2500))])).uid}catch(e){u=null}}
   return BASE()+(u?'?z='+encodeURIComponent(u):'')}
 const INV_TXT='Gram w Literiadę: codziennie 3 hasła, punkty jak w Scrabble, ranking graczy i pojedynki. Zagrasz ze mną?';
-async function shareGame(){const url=await inviteURL();
-  try{if(navigator.share)return navigator.share({title:'Literiada',text:INV_TXT+' 👉 '+url}).catch(()=>{})}catch(e){}
-  try{navigator.clipboard.writeText(INV_TXT+' 👉 '+url)}catch(e){}return 'copied'}
-async function inviteFriends(){const url=await inviteURL(),t=INV_TXT+' 👉 '+url;
-  try{if(navigator.share){navigator.share({title:'Literiada',text:t}).catch(e=>{if(e&&e.name!=='AbortError')copy2(t)});return}}catch(e){}copy2(t)}
+const isTouch=()=>{try{return matchMedia('(pointer:coarse)').matches}catch(e){return false}};
+async function invCount(){try{const {F,db,uid}=await fb();await F.setDoc(F.doc(db,'invsent',uid),{n:F.increment(1),upd:Date.now()},{merge:true})}catch(e){console.warn('licznik zaproszeń',e)}}
+async function shareGame(){const url=await inviteURL(),t=INV_TXT+' 👉 '+url;invCount();
+  if(isTouch()){try{if(navigator.share)return navigator.share({title:'Literiada',text:t}).catch(()=>{})}catch(e){}}
+  try{await navigator.clipboard.writeText(t)}catch(e){}return 'copied'}
+async function inviteFriends(){const url=await inviteURL(),t=INV_TXT+' 👉 '+url;invCount();
+  if(isTouch()){try{if(navigator.share){navigator.share({title:'Literiada',text:t}).catch(e=>{if(e&&e.name!=='AbortError')copy2(t)});return}}catch(e){}}
+  let ok=true;try{await navigator.clipboard.writeText(t)}catch(e){ok=false}
+  open(`<div class="step">Zaproś do gry</div><h2>${ic('send',22)} ${ok?'Zaproszenie skopiowane ✓':'Skopiuj zaproszenie'}</h2>
+  <p>${ok?'Wklej je znajomemu w Messengerze, WhatsAppie, mailu lub SMS-ie (Ctrl+V).':'Zaznacz tekst poniżej i skopiuj (Ctrl+C).'}</p>
+  <textarea readonly rows="4" id="invT" style="width:100%;box-sizing:border-box;font:.85rem var(--body);padding:8px;border:2px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink)"></textarea>
+  <div class="actions">${navigator.share?'<button id="invMore">Więcej opcji</button>':''}<button class="main" id="aClose">Gotowe</button></div>`);
+  $('invT').value=t;if(!ok)$('invT').select();
+  if($('invMore'))$('invMore').onclick=()=>{try{navigator.share({title:'Literiada',text:t}).catch(()=>{})}catch(e){}}}
 function copy2(t){try{navigator.clipboard.writeText(t).then(()=>toast('Zaproszenie skopiowane! Wklej je znajomym w Messengerze lub SMS-ie',2600),()=>fallback(t))}catch(e){fallback(t)}}
 // zaproszony: zapamiętaj, kto zaprosił (tylko nowy gracz), zapisz po ukończeniu pierwszego poziomu
 (function(){try{const q=new URLSearchParams(location.search),z=q.get('z');if(!z)return;
@@ -991,6 +1002,24 @@ async function rankLoad(){RK.rows=null;rankDraw();
   catch(e){console.warn('ranking',e);RK.err=e;RK.rows=null}
   rankDraw()}
 function showRanking(tab){if(tab)RK.tab=tab;open(rankHTML());rankBind();rankLoad()}
+// ---- v16: statystyki zaproszeń i rankingu (literiada.github.io/#statystyki)
+async function showAdminStats(){open(`<div class="step">Statystyki</div><h2>${ic('chart',22)} Statystyki Literiady</h2><p class="sub">Wczytuję…</p><div class="actions"><button id="aClose">Zamknij</button></div>`);
+  try{const {F,db}=await fb();const g=c=>F.getDocs(F.collection(db,c));
+    const [ps,iv,is,ds]=await Promise.all([g('players'),g('invites'),g('invsent'),g('duels')]);
+    const nick={};ps.docs.forEach(d=>nick[d.id]=d.data().nick);
+    const sent={};let sentAll=0;is.docs.forEach(d=>{const n=+d.data().n||0;sent[d.id]=n;sentAll+=n});
+    const ok={};iv.docs.forEach(d=>{const r=d.data().ref;ok[r]=(ok[r]||0)+1});
+    const ids=[...new Set([...Object.keys(sent),...Object.keys(ok)])].sort((a,b)=>(ok[b]||0)-(ok[a]||0)||(sent[b]||0)-(sent[a]||0));
+    const tk=todayKey();let today=0;ps.docs.forEach(d=>{if((d.data().days||{})[tk])today++});
+    const box=(v,l)=>`<div><b style="font:800 1.6rem var(--display)">${v}</b><span style="display:block;font-size:.78rem;color:var(--muted)">${l}</span></div>`;
+    const rows=ids.slice(0,30).map(id=>`<div><span>${esc(nick[id]||'gracz spoza rankingu')}</span><span style="white-space:nowrap">${sent[id]||0} wysł. · <b>${ok[id]||0} udanych</b></span></div>`).join('')||'<p class="sub">Jeszcze nikt nie zapraszał.</p>';
+    $('card').innerHTML=`<div class="step">Statystyki</div><h2>${ic('chart',22)} Statystyki Literiady</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:center">${box(ps.docs.length,'graczy w rankingu')}${box(today,'grało dziś (z rankingu)')}${box(is.docs.length,'osób, które zapraszały')}${box(sentAll,'kliknięć „Zaproś”')}${box(iv.docs.length,'udanych zaproszeń')}${box(ds.docs.length,'rozegranych pojedynków')}</div>
+    <p><b>Zapraszający</b> <span class="sub">(udane = zaproszony ukończył 1. poziom)</span></p><div class="dlog">${rows}</div>
+    <p class="sub">„Kliknięcia Zaproś” liczą otwarcia zaproszenia (także przy jokerze), nie wiemy, czy wiadomość faktycznie wysłano.</p>
+    <div class="actions"><button id="aRef2">Odśwież</button><button class="main" id="aClose">Zamknij</button></div>`;
+    $('aClose').onclick=close;$('aRef2').onclick=showAdminStats}
+  catch(e){$('card').querySelector('.sub').textContent='Statystyki chwilowo niedostępne (sprawdź internet).'}}
 function newFree(){const pool=L[freeLvl];let a;do{a=pool[Math.floor(Math.random()*pool.length)]}while(a===answer);answer=a;guesses=[];cur='';done=false;paint();fitBoard()}
 function setMode(m){mode=m;close();endDuel();
   if(m==='day'){loadDay();loadDayLevel()}else{freeLvl=lvl;newFree()}}
@@ -1013,7 +1042,7 @@ $('sDuel').innerHTML=ic('swords',20)+'Pojedynek';$('sDuel').onclick=sideGo(showD
 $('sTrain').innerHTML=ic('train',20)+'Trening';$('sTrain').onclick=sideGo(showTrain);
 $('sHelp').innerHTML=ic('help',20)+'Jak grać';$('sHelp').onclick=sideGo(showHelp);
 $('sMove').innerHTML=ic('move',20)+'Przenieś wyniki';$('sMove').onclick=sideGo(showMove);
-$('sInv').innerHTML=ic('send',20)+'Zaproś do gry';$('sInv').onclick=sideGo(()=>inviteFriends());
+$('sInv').innerHTML=ic('send',20)+'Zaproś do gry';$('sX').innerHTML='<span style="font:900 1.15rem var(--body);width:20px;text-align:center">𝕏</span>Obserwuj nas na X';$('sInv').onclick=sideGo(()=>inviteFriends());
 if(mqWide.addEventListener)mqWide.addEventListener('change',()=>sideSet(isWide()&&store.get('sd2_side',true)));
 if(isWide()&&store.get('sd2_side',true))sideSet(true);
 $('bJoker').onclick=jokerClick;$('bSnd').onclick=()=>{SFX.unlock();SFX.toggle();sndIcon()};sndIcon();$('bStats').onclick=()=>{setMode('day');toast('Wracasz do haseł dnia')};
@@ -1029,12 +1058,13 @@ fitScale();addEventListener('resize',()=>{fitScale();fitBoard()});
 buildBoard();buildKb();loadDay();loadDayLevel();fitBoard();addEventListener('resize',fitBoard);if(window.visualViewport)visualViewport.addEventListener('resize',fitBoard);setTimeout(fitBoard,300);
 updBadge();showIab();
 if(location.hash==='#ranking'){clearHash();store.set('sd2_seen',true);showRanking()}
+else if(location.hash==='#statystyki'){clearHash();store.set('sd2_seen',true);showAdminStats()}
 else if(startDuelFromHash()||startResultFromHash()){store.set('sd2_seen',true)}
 else if(!store.get('sd2_seen',false)){store.set('sd2_seen',true);showHelp()}
 else if(done3(day)&&lvl!==3)showStats();
 else setTimeout(menuHint,800);
 if(store.get('sd2_nick',''))setTimeout(rankSync,3000);
-addEventListener('hashchange',()=>{if(location.hash==='#ranking'){clearHash();showRanking()}else if(/^#p=/.test(location.hash)){close();startDuelFromHash()}else if(/^#r=/.test(location.hash)){close();startResultFromHash()}});
+addEventListener('hashchange',()=>{if(location.hash==='#statystyki'){clearHash();showAdminStats()}else if(location.hash==='#ranking'){clearHash();showRanking()}else if(/^#p=/.test(location.hash)){close();startDuelFromHash()}else if(/^#r=/.test(location.hash)){close();startResultFromHash()}});
 </script>
 
 </body>
