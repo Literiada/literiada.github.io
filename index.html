@@ -322,7 +322,7 @@ body.embed .iab{display:none!important}
   <div class="ssep"></div>
   <button class="sitem" id="sHelp"></button>
   <button class="sitem" id="sMove"></button>
-  <div class="sfoot">Literiada · wersja 17.1 · 2026-11-12</div>
+  <div class="sfoot">Literiada · wersja 17.4 · 2026-11-13</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -548,20 +548,25 @@ function finish(won){
 }
 function grid(g){return g.map(x=>x.s.map(s=>s==='hit'?'🟩':s==='near'?'🟧':'⬜').join('')).join('\n')}
 const RX=()=>!!store.get('sd2_relax',false);
-const SHARE_URL='literiada.github.io · @Literiada';
+const SHARE_URL='https://literiada.github.io · @Literiada';
 const medE=n=>n<=2?'🥇':n<=4?'🥈':'🥉';
-function shareLines(withGrid){
+function shareLines(withGrid){const G=i=>Array.isArray(withGrid)?!!withGrid[i]:!!withGrid;
   if(mode==='free'){const won=(guesses.length&&guesses[guesses.length-1].w===answer);return 'Literiada (trening) '+(won?guesses.length:'X')+'/6\n'+grid(guesses)+'\n👉 '+SHARE_URL}
-  if(RX()){let t='Literiada #'+(curN()+1)+' 🌿 na luzie\n';day.res.forEach((r,i)=>{if(!r)return;const g=day.g[i]||[];t+='\n'+(i===3?'🎁 P4':'P'+(i+1))+' '+(r==='won'?(g.length||'✓')+'/6':'X/6');if(withGrid&&g.length)t+='\n'+grid(g)});return t+'\n\n👉 '+SHARE_URL}
+  if(RX()){let t='Literiada #'+(curN()+1)+' 🌿 na luzie\n';day.res.forEach((r,i)=>{if(!r)return;const g=day.g[i]||[];t+='\n'+(i===3?'🎁 P4':'P'+(i+1))+' '+(r==='won'?(g.length||'✓')+'/6':'X/6');if(G(i)&&g.length)t+='\n'+grid(g)});return t+'\n\n👉 '+SHARE_URL}
   const tot=day.pts.reduce((a,b)=>a+b,0);let t='Literiada #'+(curN()+1)+' · '+tot+' pkt'+(done3(day)&&day.res.slice(0,3).every(r=>r==='won')?' 🏆':'')+'\n';
   day.res.forEach((r,i)=>{if(!r)return;const g=day.g[i]||[];
     t+='\n'+(i===3?'🎁 P4':'P'+(i+1))+' '+(r==='won'?medE(g.length||6)+' '+(g.length||'✓')+'/6':'❌ X/6')+' · '+day.pts[i]+' pkt'+(day.te&&day.te[i]!=null&&r==='won'?' · ⏱'+fmtT(day.te[i]):'');
-    if(withGrid&&g.length)t+='\n'+grid(g)});
+    if(G(i)&&g.length)t+='\n'+grid(g)});
   return t+'\n\n👉 '+SHARE_URL}
-function shareText(){return shareLines(true)}
+function shareText(){return xText()}
 // długość wg zasad X: emoji liczą się podwójnie
-const xLen=t=>[...t].reduce((n,c)=>n+(c.codePointAt(0)>0x2000?2:1),0);
-function xText(){const f=shareLines(true);return xLen(f)<=275?f:shareLines(false)}
+// długość wg zasad X: emoji = 2, znaki spoza łaciny/cyrylicy = 2, adres strony liczony jako link (23)
+const xW=c=>{const n=c.codePointAt(0);return (n<=4351||(n>=8192&&n<=8205)||(n>=8208&&n<=8223)||(n>=8242&&n<=8247))?1:2};
+const xLen=t=>{t=t.replace(/(https?:\/\/)?literiada\.github\.io\S*/g,'x'.repeat(23));let n=0;
+  const segs=(typeof Intl!=='undefined'&&Intl.Segmenter)?[...new Intl.Segmenter().segment(t)].map(x=>x.segment):[...t];
+  for(const g of segs){if(/\p{Extended_Pictographic}|\p{Regional_Indicator}/u.test(g))n+=2;else for(const c of g)n+=xW(c)}return n};
+function xText(){const L=270,m=[false,false,false,false];if(mode==='free'){const f=shareLines(true);return xLen(f)<=L?f:shareLines(false)}
+  for(let i=0;i<4;i++){m[i]=true;if(xLen(shareLines(m))>L)m[i]=false}return shareLines(m)}
 function shareResult(){const t=shareText();
   try{if(navigator.share){navigator.share({text:t}).catch(e=>{if(e&&e.name!=='AbortError')copy(t)});return}}catch(e){}
   copy(t)}
@@ -722,7 +727,7 @@ function showHelp(){
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 17.1 · 2026-11-12</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 17.4 · 2026-11-13</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
@@ -804,13 +809,16 @@ async function shareGame(){const url=await inviteURL(),t=INV_TXT+' 👉 '+url;in
   if(isTouch()){try{if(navigator.share)return navigator.share({title:'Literiada',text:t}).catch(()=>{})}catch(e){}}
   try{await navigator.clipboard.writeText(t)}catch(e){}return 'copied'}
 async function inviteFriends(){const url=await inviteURL(),t=INV_TXT+' 👉 '+url;invCount();
-  if(isTouch()){try{if(navigator.share){navigator.share({title:'Literiada',text:t}).catch(e=>{if(e&&e.name!=='AbortError')copy2(t)});return}}catch(e){}}
-  let ok=true;try{await navigator.clipboard.writeText(t)}catch(e){ok=false}
-  open(`<div class="step">Zaproś do gry</div><h2>${ic('send',22)} ${ok?'Zaproszenie skopiowane ✓':'Skopiuj zaproszenie'}</h2>
-  <p>${ok?'Wklej je znajomemu w Messengerze, WhatsAppie, mailu lub SMS-ie (Ctrl+V).':'Zaznacz tekst poniżej i skopiuj (Ctrl+C).'}</p>
+  const tg='https://t.me/share/url?url='+encodeURIComponent(url)+'&text='+encodeURIComponent(INV_TXT);
+  let ok=false;if(!isTouch()){try{await navigator.clipboard.writeText(t);ok=true}catch(e){}}
+  open(`<div class="step">Zaproś do gry</div><h2>${ic('send',22)} ${ok?'Zaproszenie skopiowane ✓':'Wyślij zaproszenie'}</h2>
+  <p>${ok?'Wklej je znajomemu w Messengerze, WhatsAppie, mailu lub SMS-ie (Ctrl+V) albo wyślij przez Telegram.':'Wybierz, jak chcesz wysłać zaproszenie.'}</p>
   <textarea readonly rows="4" id="invT" style="width:100%;box-sizing:border-box;font:.85rem var(--body);padding:8px;border:2px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink)"></textarea>
-  <div class="actions">${navigator.share?'<button id="invMore">Więcej opcji</button>':''}<button class="main" id="aClose">Gotowe</button></div>`);
-  $('invT').value=t;if(!ok)$('invT').select();
+  <div class="actions"><button id="invTg" style="background:#229ED9;color:#fff;border-color:#229ED9">${ic('send',16)} Telegram</button>${navigator.share?'<button id="invMore">Więcej opcji</button>':''}<button id="invCp">Kopiuj</button></div>
+  <div class="actions"><button class="main" id="aClose">Gotowe</button></div>`);
+  $('invT').value=t;
+  $('invTg').onclick=()=>{try{const w=window.open(tg,'_blank');if(w){try{w.opener=null}catch(e){}}else location.href=tg}catch(e){location.href=tg}};
+  $('invCp').onclick=()=>{copy2(t);$('invT').select()};
   if($('invMore'))$('invMore').onclick=()=>{try{navigator.share({title:'Literiada',text:t}).catch(()=>{})}catch(e){}}}
 function copy2(t){try{navigator.clipboard.writeText(t).then(()=>toast('Zaproszenie skopiowane! Wklej je znajomym w Messengerze lub SMS-ie',2600),()=>fallback(t))}catch(e){fallback(t)}}
 // zaproszony: zapamiętaj, kto zaprosił (tylko nowy gracz), zapisz po ukończeniu pierwszego poziomu
