@@ -316,6 +316,10 @@ body.relax .ptsblock{display:none!important}
 .streak small{display:block;font-weight:400;font-size:.8rem}
 .chb .cl{display:inline}
 @media (max-width:480px){.chb .cl{display:none}.chb{padding:5px 8px}}
+/* v18.1: twórca gry i narzędzia admina */
+.adm-b{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;background:#ff8a00;color:#1a1000;font:800 .66rem var(--body);letter-spacing:.3px;vertical-align:middle;white-space:nowrap}
+.admx{border:1.5px solid #e5484d;background:var(--panel);color:#b42318;border-radius:999px;font:800 .74rem var(--body);padding:4px 8px;cursor:pointer;margin-left:4px}
+.rlist .acts{display:inline-flex;align-items:center}
 /* v14 – progi szerokości (mobile first):
    baza: telefon 375–480 px · tablet 481–1099 px · komputer od 1100 px (stałe menu z boku)
    duże ekrany od 1800×1000 px i 4K: cała gra skalowana proporcjonalnie (JS: fitScale) */
@@ -354,7 +358,8 @@ body.embed .iab{display:none!important}
   <div class="ssep"></div>
   <button class="sitem" id="sHelp"></button>
   <button class="sitem" id="sMove"></button>
-  <div class="sfoot">Literiada · wersja 18.0.1 · 2026-11-14</div>
+  <button class="sitem" id="sAdm" hidden></button>
+  <div class="sfoot">Literiada · wersja 18.1 · 2026-11-14</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -783,7 +788,7 @@ function showHelp(){
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 18.0.1 · 2026-11-14</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 18.1 · 2026-11-14</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
@@ -1039,12 +1044,12 @@ function fb(){if(window.__FBMOCK)return window.__FBMOCK().then(x=>{FBUID=x.uid;r
     FBUID=auth.currentUser.uid;return {F,db,uid:FBUID}})();
   fbP.catch(()=>{fbP=null});return fbP}
 const rsum=a=>Array.isArray(a)?a.reduce((x,y)=>x+(+y||0),0):0;
-let rankBusy=false,rankAgain=false;
+let rankBusy=false,rankAgain=false,rankOk=true;
 async function rankSync(){const nick=store.get('sd2_nick','');if(!nick||RX())return;if(rankBusy){rankAgain=true;return}rankBusy=true;
   try{const {F,db,uid}=await fb();const h=store.get('sd2_hist',{}),cut=keyToUTC(todayKey())-62*DAY,days={};let all=0;
     for(const k in h){const s=Math.round(rsum(h[k]));all+=s;if(s>0&&keyToUTC(k)>=cut)days[k]=s}
     const one=(k,v)=>v>0?{[k]:v}:{};
-    await F.setDoc(F.doc(db,'players',uid),{nick,all:Math.round(all),days,dd:one(todayKey(),myVal('d')),ww:one(rkWk(),myVal('w')),mm:one(rkMk(),myVal('m')),upd:Date.now()});RK.cache={}}catch(e){console.warn('ranking',e)}
+    await F.setDoc(F.doc(db,'players',uid),{nick,all:Math.round(all),days,dd:one(todayKey(),myVal('d')),ww:one(rkWk(),myVal('w')),mm:one(rkMk(),myVal('m')),upd:Date.now()});RK.cache={};rankOk=true}catch(e){console.warn('ranking',e);rankOk=false}
   rankBusy=false;if(rankAgain){rankAgain=false;rankSync()}}
 async function duelPush(sn,won){try{if(!duel)return;const {F,db,uid}=await fb();
   const id=String(duel.code||'x').replace(/[^A-Za-z0-9_-]/g,'').slice(0,40)+'_'+uid;
@@ -1066,7 +1071,7 @@ function rankHTML(){const tab=RK.tab,nick=store.get('sd2_nick','');
   if(RK.err)body=`<p class="dbad">Ranking jest chwilowo niedostępny. Sprawdź połączenie z internetem i spróbuj ponownie.</p><div class="actions"><button id="rRetry">Spróbuj ponownie</button></div>`;
   else if(!RK.rows)body='<p class="sub">Wczytuję ranking…</p>';
   else if(tab==='p'){
-    const line=d=>`<div><span><b>${esc(d.sn)}</b> ${d.res==='won'?'odgadł(a)':'nie odgadł(a)'} zagadki od <b>${esc(d.an)}</b></span><span style="white-space:nowrap">${d.res==='won'?d.tries+'. próba · '+d.pts+' pkt':'—'}</span></div>`;
+    const line=d=>`<div><span><b>${esc(d.sn)}</b>${admB(d.su)} ${d.res==='won'?'odgadł(a)':'nie odgadł(a)'} zagadki od <b>${esc(d.an)}</b>${admB(d.au)}</span><span style="white-space:nowrap">${d.res==='won'?d.tries+'. próba · '+d.pts+' pkt':'—'}${ADM.me&&d.id?`<button class="admx" data-dd="${esc(d.id)}" title="Usuń wpis">🗑</button>`:''}</span></div>`;
     const mine=(RK.mine||[]).sort((a,b)=>b.ts-a.ts).slice(0,20);
     body=(FBUID?`<p><b>Wyniki Twoich zagadek</b></p><div class="dlog">${mine.length?mine.map(line).join(''):'<p class="sub">Nikt jeszcze nie odesłał wyniku Twojej zagadki. Wyślij nową w menu: Pojedynek.</p>'}</div>`:'')
       +`<p><b>Ostatnie pojedynki</b></p><div class="dlog">${(RK.duels||[]).length?RK.duels.map(line).join(''):'<p class="sub">Brak pojedynków. Bądź pierwszy!</p>'}</div>`;
@@ -1074,7 +1079,7 @@ function rankHTML(){const tab=RK.tab,nick=store.get('sd2_nick','');
     const list=RK.rows.map(r=>({id:r.id,nick:r.nick||'?',v:rankVal(r,tab)})).filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
     const meAll=list.findIndex(r=>r.id===FBUID);if(meAll>=50)RK.mePos=meAll+1;list.length=Math.min(list.length,50);
     const me=list.findIndex(r=>r.id===FBUID),myPos=me>=0?me+1:RK.mePos;
-    const row=(r,i)=>`<div class="${r.id===FBUID?'me':''}"><span class="pos">${i<3?medal(['gold','silver','bronze'][i],22):i+1}</span><span class="nk">${esc(r.nick)}</span><span class="pt">${r.v} pkt</span><span>${chBtn(r)}</span></div>`;
+    const row=(r,i)=>`<div class="${r.id===FBUID?'me':''}"><span class="pos">${i<3?medal(['gold','silver','bronze'][i],22):i+1}</span><span class="nk">${esc(r.nick)}${admB(r.id)}</span><span class="pt">${r.v} pkt</span><span class="acts">${chBtn(r)}${admDelBtn(r)}</span></div>`;
     const meRow=me<0&&RK.mePos&&nick?'<span class="gap">…</span>'+row({id:FBUID,nick,v:myVal(tab)},RK.mePos-1):'';
     body=list.length?`<div class="rlist">${list.map(row).join('')}${meRow}</div>`:'<p class="sub">Nikt jeszcze nie zdobył punktów w tym okresie. Twoja szansa!</p>';
     body+=`<p class="sub">${RK.cnt!=null?'Graczy w rankingu: '+RK.cnt:''}${list.length>=50?' · pokazujemy pierwszą 50':''}${myPos?' · Twoje miejsce: <b>'+myPos+'</b>':''}</p>`;
@@ -1084,10 +1089,12 @@ function rankHTML(){const tab=RK.tab,nick=store.get('sd2_nick','');
   return `<div class="step">Ranking</div><h2>${ic('trophy',24)} Ranking graczy</h2>${join}<div class="rtabs">${tabs}</div>${body}${nick&&tab!=='p'?'<p class="sub">Przycisk „Wyzwij” wysyła graczowi Twoje hasło do odgadnięcia. Jedno wyzwanie dziennie do tej samej osoby.</p>':''}<div class="actions"><button id="aClose">Zamknij</button></div><p class="sub">Link do rankingu: literiada.github.io/#ranking</p>`}
 function rankBind(){document.querySelectorAll('[data-rt]').forEach(b=>b.onclick=()=>{RK.tab=b.dataset.rt;rankLoad()});
   document.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{const r=(RK.rows||[]).find(x=>x.id===b.dataset.ch);if(r)chNew(r)});
+  document.querySelectorAll('[data-ad]').forEach(b=>b.onclick=()=>{const r=(RK.rows||[]).find(x=>x.id===b.dataset.ad);if(r)admAsk(r)});
+  document.querySelectorAll('[data-dd]').forEach(b=>b.onclick=()=>admDelDuel(b.dataset.dd));
   if($('rRetry'))$('rRetry').onclick=()=>{RK.err=null;rankLoad(true)};
   if($('rJoin'))$('rJoin').onclick=async()=>{const v=$('rIn').value.replace(/\s+/g,' ').trim().slice(0,20);
     if(v.length<2){$('rErr').hidden=false;$('rErr').textContent='Pseudonim musi mieć co najmniej 2 znaki.';return}
-    store.set('sd2_nick',v);if(!store.get('sd2_duel_name',''))store.set('sd2_duel_name',v);$('rJoin').textContent='Dołączam…';await rankSync();RK.cache={};rankLoad(true)};
+    store.set('sd2_nick',v);if(!store.get('sd2_duel_name',''))store.set('sd2_duel_name',v);$('rJoin').textContent='Dołączam…';await rankSync();if(!rankOk&&await admBanned()){store.set('sd2_nick','');rankDraw();toast('Ten profil został zablokowany w rankingu przez administratora gry',3600);return}RK.cache={};rankLoad(true)};
   if($('rNick'))$('rNick').onclick=()=>{store.set('sd2_nick','');rankDraw();setTimeout(()=>{const i=$('rIn');if(i)i.focus()},50)};
   if($('rOut'))$('rOut').onclick=async()=>{let nd=0;try{const {F,db,uid}=await fb();await F.deleteDoc(F.doc(db,'players',uid));
       const qs=await Promise.all([F.getDocs(F.query(F.collection(db,'duels'),F.where('su','==',uid))),F.getDocs(F.query(F.collection(db,'duels'),F.where('au','==',uid)))]);
@@ -1095,12 +1102,12 @@ function rankBind(){document.querySelectorAll('[data-rt]').forEach(b=>b.onclick=
       await chWipe()}catch(e){}
     store.set('sd2_nick','');RK.cache={};toast('Usunięto Cię z rankingu'+(nd?' i z tabeli pojedynków ('+nd+')':''),2600);rankLoad(true)}}
 function rankDraw(){if($('ov').hidden||!$('card').querySelector('.rtabs'))return;$('card').innerHTML=rankHTML();const c=$('aClose');if(c)c.onclick=close;rankBind()}
-async function rankLoad(force){const tab=RK.tab,c=RK.cache[tab];
+async function rankLoad(force){const tab=RK.tab,c=RK.cache[tab];await admLoad();
   if(!force&&c&&Date.now()-c.ts<180000){RK.rows=c.rows;RK.mePos=c.mePos;if(tab==='p'){RK.duels=c.duels;RK.mine=c.mine}RK.err=null;rankDraw();return}
   RK.rows=null;RK.err=null;rankDraw();
   try{const {F,db,uid}=await fb();const col=F.collection(db,'players');let rows=[],duels=null,mine=null,mePos=null;
     if(tab==='p'){const [ds,ms]=await Promise.all([F.getDocs(F.query(F.collection(db,'duels'),F.orderBy('ts','desc'),F.limit(30))),F.getDocs(F.query(F.collection(db,'duels'),F.where('au','==',uid),F.limit(40)))]);
-      duels=ds.docs.map(d=>d.data());mine=ms.docs.map(d=>d.data())}
+      duels=ds.docs.map(d=>Object.assign({id:d.id},d.data()));mine=ms.docs.map(d=>Object.assign({id:d.id},d.data()))}
     else{if(RK.cnt==null){try{RK.cnt=(await F.getCountFromServer(col)).data().count}catch(e){console.warn('ranking',e)}}
       let big=RK.cnt!=null&&RK.cnt>250,f=rkField(tab),fp=f.length>1?new F.FieldPath(f[0],f[1]):f[0];
       if(big){try{const ps=await F.getDocs(F.query(col,F.orderBy(fp,'desc'),F.limit(50)));rows=ps.docs.map(d=>Object.assign({id:d.id},d.data()))}catch(e){console.warn('ranking',e);big=false}}
@@ -1131,8 +1138,9 @@ async function showAdminStats(){open(`<div class="step">Statystyki</div><h2>${ic
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:center">${box(ps.docs.length,'graczy w rankingu')}${box(today,'grało dziś (z rankingu)')}${box(is.docs.length,'osób, które zapraszały')}${box(sentAll,'kliknięć „Zaproś”')}${box(iv.docs.length,'udanych zaproszeń')}${box(ds.docs.length,'rozegranych pojedynków')}</div>
     <p><b>Zapraszający</b> <span class="sub">(udane = zaproszony ukończył 1. poziom)</span></p><div class="dlog">${rows}</div>
     <p class="sub">„Kliknięcia Zaproś” liczą otwarcia zaproszenia (także przy jokerze), nie wiemy, czy wiadomość faktycznie wysłano.</p>
+    ${await admPanel()}
     <div class="actions"><button id="aRef2">Odśwież</button><button class="main" id="aClose">Zamknij</button></div>`;
-    $('aClose').onclick=close;$('aRef2').onclick=showAdminStats}
+    $('aClose').onclick=close;$('aRef2').onclick=showAdminStats;admPanelBind()}
   catch(e){$('card').querySelector('.sub').textContent='Statystyki chwilowo niedostępne (sprawdź internet).'}}
 
 // ---- v17.6: Menu w podsumowaniach i sekcja „Co dalej?”
@@ -1185,7 +1193,7 @@ function chNew(r){const me=store.get('sd2_nick','');
     catch(e){console.warn('wyzwanie',e);$('chSend').disabled=false;$('chSend').textContent='Wyślij wyzwanie';
       info.className='dbad';info.textContent=String(e&&e.code||'').includes('permission')?'Nie da się wysłać: ten gracz nie przyjmuje wyzwań, zmienił nick albo wysłałeś mu już dziś wyzwanie. Sprawdź też, czy data i godzina w telefonie są ustawione automatycznie.':'Nie udało się wysłać. Sprawdź internet i spróbuj ponownie.'}};
   setTimeout(()=>wi.focus(),50)}
-async function chLoad(){try{const {F,db,uid}=await fb();
+async function chLoad(){try{const {F,db,uid}=await fb();await admLoad();
     const [a,b]=await Promise.all([F.getDocs(F.query(F.collection(db,'challenges'),F.where('tu','==',uid))),F.getDocs(F.query(F.collection(db,'challenges'),F.where('fu','==',uid)))]);
     const old=Date.now()-7*DAY,keep=[];
     for(const d of [...a.docs,...b.docs]){const x=Object.assign({id:d.id},d.data());if((+x.ts||0)<old){F.deleteDoc(F.doc(db,'challenges',d.id)).catch(()=>{})}else keep.push(x)}
@@ -1203,7 +1211,7 @@ async function showChallenges(){open(`<div class="step">Wyzwania</div><h2>${ic('
   const ok=await chLoad();
   if(!ok){$('card').querySelector('.sub').textContent='Wyzwania są chwilowo niedostępne. Sprawdź internet i spróbuj ponownie.';return}
   const inP=chInPending(),inRest=CH.inb.filter(c=>!inP.includes(c)).sort((a,b)=>b.ts-a.ts).slice(0,10),out=CH.out.slice().sort((a,b)=>b.ts-a.ts).slice(0,15);
-  const inH=inP.map(c=>`<div class="chi"><div class="row2"><span>od: <b>${esc(c.fn)}</b></span><span class="sub">${new Date(c.ts).toLocaleDateString('pl-PL')}</span></div><span class="sub">5-literowe hasło do odgadnięcia w 6 próbach</span><div class="actions"><button class="main" data-acc="${esc(c.id)}">Przyjmij</button><button data-rej="${esc(c.id)}">Odrzuć</button></div></div>`).join('')||'<p class="sub">Brak nowych wyzwań.</p>';
+  const inH=inP.map(c=>`<div class="chi"><div class="row2"><span>od: <b>${esc(c.fn)}</b>${admB(c.fu)}</span><span class="sub">${new Date(c.ts).toLocaleDateString('pl-PL')}</span></div><span class="sub">5-literowe hasło do odgadnięcia w 6 próbach</span><div class="actions"><button class="main" data-acc="${esc(c.id)}">Przyjmij</button><button data-rej="${esc(c.id)}">Odrzuć</button></div></div>`).join('')||'<p class="sub">Brak nowych wyzwań.</p>';
   const accH=CH.inb.filter(c=>c.st==='acc').map(c=>`<div class="chi"><div class="row2"><span>od: <b>${esc(c.fn)}</b></span><span class="st acc">w grze</span></div><div class="actions"><button class="main" data-acc="${esc(c.id)}">Graj dalej</button></div></div>`).join('');
   const rvOk=!!store.get('sd2_nick','')&&!RX();
   const restH=inRest.filter(c=>c.st!=='acc').map(c=>`<div><span>od: <b>${esc(c.fn)}</b></span><span style="display:inline-flex;gap:6px;align-items:center">${chStatus(c)}${rvOk&&c.st==='done'?`<button class="chb" data-rv="${esc(c.fu)}" data-rn="${esc(c.fn)}">${ic('rapier',13)} Rewanż</button>`:''}</span></div>`).join('');
@@ -1235,6 +1243,37 @@ function chOptLabel(){$('sChOpt').innerHTML=ic('rapier',20)+'Przyjmuję wyzwania
 async function chOptToggle(){const on=!chOk();store.set('sd2_ch_ok',on);chOptLabel();
   try{const {F,db,uid}=await fb();if(on)await F.deleteDoc(F.doc(db,'chset',uid));else await F.setDoc(F.doc(db,'chset',uid),{off:true,upd:Date.now()})}catch(e){console.warn('wyzwania',e)}
   toast(on?'Przyjmujesz wyzwania od graczy z rankingu':'Nie przyjmujesz wyzwań. Inni zobaczą wyszarzony przycisk',2600)}
+
+// ---- v18.1: twórca gry (admin). Lista adminów: kolekcja Firestore "admins", dokument = identyfikator urządzenia
+let ADM={set:new Set(),loaded:false,me:false};
+async function admLoad(){if(ADM.loaded)return;try{const {F,db,uid}=await fb();
+  const c=store.get('sd2_adm',null);let ids;
+  if(c&&Date.now()-c.ts<6*3600e3)ids=c.ids;else{const q=await F.getDocs(F.collection(db,'admins'));ids=q.docs.map(d=>d.id);if(ids.length)store.set('sd2_adm',{ts:Date.now(),ids})}
+  ADM.set=new Set(ids);ADM.me=ADM.set.has(uid);ADM.loaded=true;admMenu()}catch(e){console.warn('admin',e)}}
+const admB=id=>id&&ADM.set.has(id)?'<span class="adm-b" title="Twórca gry">TWÓRCA</span>':'';
+const admDelBtn=r=>ADM.me&&r.id!==FBUID?`<button class="admx" data-ad="${esc(r.id)}" title="Usuń z rankingu">🗑</button>`:'';
+function admMenu(){const b=$('sAdm');if(!b)return;b.hidden=!ADM.me;b.innerHTML=ic('chart',20)+'Panel twórcy gry';b.onclick=sideGo(showAdminStats)}
+function admAsk(r){open(`<div class="step">Panel twórcy gry</div><h2>Usunąć gracza z rankingu?</h2>
+  <p>Gracz: <b>${esc(r.nick)}</b></p><p class="sub">Usunę jego wpis w rankingu i jego wyniki w tabeli pojedynków. „Usuń i zablokuj” dodatkowo nie pozwoli mu wrócić do rankingu z tego urządzenia.</p>
+  <div class="actions"><button class="main" id="adDel">Usuń</button><button id="adBan" style="border-color:#e5484d;color:#b42318">Usuń i zablokuj</button><button id="adNo">Anuluj</button></div>`);
+  $('adNo').onclick=()=>showRanking();$('adDel').onclick=()=>admDel(r,false);$('adBan').onclick=()=>admDel(r,true)}
+async function admDel(r,ban){try{const {F,db,uid}=await fb();
+    if(ban)await F.setDoc(F.doc(db,'bans',r.id),{nick:String(r.nick||'').slice(0,20),by:uid,ts:Date.now()});
+    await F.deleteDoc(F.doc(db,'players',r.id));let nd=0;
+    const q=await F.getDocs(F.query(F.collection(db,'duels'),F.where('su','==',r.id)));for(const d of q.docs){try{await F.deleteDoc(F.doc(db,'duels',d.id));nd++}catch(e){}}
+    RK.cache={};toast((ban?'Usunięto i zablokowano: ':'Usunięto: ')+r.nick+(nd?' (pojedynki: '+nd+')':''),2800)}
+  catch(e){console.warn('admin',e);toast('Nie udało się usunąć. Sprawdź, czy zasady Firestore v18.1 są opublikowane.',3600)}
+  showRanking()}
+async function admDelDuel(id){try{const {F,db}=await fb();await F.deleteDoc(F.doc(db,'duels',id));RK.cache={};toast('Wpis pojedynku usunięty',1800)}catch(e){toast('Nie udało się usunąć wpisu',2400)}rankLoad(true)}
+async function admBanned(){try{const {F,db,uid}=await fb();const d=await F.getDoc(F.doc(db,'bans',uid));return d.exists()}catch(e){return false}}
+async function admPanel(){let uid='';try{uid=(await fb()).uid}catch(e){}await admLoad();
+  let bans='';if(ADM.me){try{const {F,db}=await fb();const q=await F.getDocs(F.collection(db,'bans'));
+    bans=q.docs.map(d=>`<div><span>${esc(d.data().nick||d.id)}</span><button class="linkbtn" data-unban="${esc(d.id)}" style="padding:0">Odblokuj</button></div>`).join('')||'<p class="sub">Nikt nie jest zablokowany.</p>'}catch(e){bans='<p class="sub">Nie udało się wczytać blokad.</p>'}}
+  return `<p><b>Identyfikator tego urządzenia</b></p><div class="dlog"><div><code style="font-size:.78rem;word-break:break-all">${esc(uid||'brak połączenia')}</code>${uid?'<button class="linkbtn" id="admCp" style="padding:0">Kopiuj</button>':''}</div></div>
+  <p class="sub">${ADM.me?'✓ To urządzenie ma uprawnienia twórcy gry: znaczek TWÓRCA przy nicku i przycisk 🗑 przy graczach w rankingu.':'To urządzenie nie ma uprawnień twórcy gry. Żeby je nadać, dodaj ten identyfikator w Firebase: Firestore → kolekcja admins → nowy dokument o tym identyfikatorze.'}</p>
+  ${ADM.me?`<p><b>Zablokowani w rankingu</b></p><div class="dlog">${bans}</div>`:''}`}
+function admPanelBind(){const c=$('admCp');if(c)c.onclick=()=>{const t=$('card').querySelector('code').textContent;try{navigator.clipboard.writeText(t).then(()=>toast('Skopiowano identyfikator',1800),()=>fallback(t))}catch(e){fallback(t)}};
+  document.querySelectorAll('[data-unban]').forEach(b=>b.onclick=async()=>{try{const {F,db}=await fb();await F.deleteDoc(F.doc(db,'bans',b.dataset.unban));toast('Odblokowano',1800)}catch(e){toast('Nie udało się odblokować',2400)}showAdminStats()})}
 function newFree(){const pool=L[freeLvl];let a;do{a=pool[Math.floor(Math.random()*pool.length)]}while(a===answer);answer=a;guesses=[];cur='';done=false;paint();fitBoard()}
 function setMode(m){mode=m;close();endDuel();
   if(m==='day'){loadDay();loadDayLevel()}else{freeLvl=lvl;newFree()}}
@@ -1290,6 +1329,7 @@ else if(done3(day)&&lvl!==3)showStats();
 else setTimeout(menuHint,800);
 if(store.get('sd2_nick',''))setTimeout(rankSync,3000);
 setTimeout(chNotify,3500);
+setTimeout(()=>{if(store.get('sd2_adm',null))admLoad()},2500);
 addEventListener('hashchange',()=>{if(location.hash==='#statystyki'){clearHash();showAdminStats()}else if(location.hash==='#ranking'){clearHash();showRanking()}else if(/^#p=/.test(location.hash)){close();startDuelFromHash()}else if(/^#r=/.test(location.hash)){close();startResultFromHash()}});
 </script>
 
