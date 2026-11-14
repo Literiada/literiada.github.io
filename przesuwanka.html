@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Literiada – Przesuwanka (wersja testowa)</title>
+<style>
+  :root{--bg:#f6f5f1;--ink:#111;--muted:#555;--card:#fff;--line:#d8d6cf;
+        --g:#8fd18a;--y:#f3d65e;--x:#cfd2d6;--T:58px;--G:6px}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  main{max-width:520px;margin:0 auto;padding:12px 8px 40px}
+  h1{font-size:21px;margin:2px 0 2px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:10px}
+  details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:15px;line-height:1.45}
+  summary{font-weight:600;cursor:pointer}
+  .legend{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 2px;font-size:14px}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .sw{width:18px;height:18px;border-radius:4px;display:inline-block;border:1px solid #0002}
+  .bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;font-size:15px}
+  select,button{font:inherit;color:var(--ink)}
+  button{background:var(--card);border:1px solid #bbb;border-radius:8px;padding:8px 11px;cursor:pointer}
+  button:active{transform:scale(.96)}
+  button.primary{background:#222;color:#fff;border-color:#222}
+  .status{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;margin:6px 2px 8px;font-variant-numeric:tabular-nums}
+  #delta{font-weight:800;opacity:0;transition:opacity .4s}
+  #delta.up{color:#111;background:var(--g);padding:1px 7px;border-radius:6px}
+  #delta.down{color:#111;background:var(--x);padding:1px 7px;border-radius:6px}
+  .status .sp{margin-left:auto}
+  /* plansza */
+  .game{display:grid;grid-template-columns:34px auto 34px;grid-template-rows:34px auto 34px;justify-content:center;gap:4px;user-select:none}
+  .arr{display:flex;gap:var(--G)}
+  .arr.v{flex-direction:column}
+  .arr button{padding:0;border-radius:7px;font-size:15px;color:#333;background:#fff}
+  .arr.h button{width:var(--T);height:34px}
+  .arr.v button{height:var(--T);width:34px}
+  .arr button.hint{background:#222;color:#fff;border-color:#222;animation:pulse 1s infinite}
+  @keyframes pulse{50%{transform:scale(1.08)}}
+  #board{position:relative;width:calc(5*var(--T) + 4*var(--G));height:calc(5*var(--T) + 4*var(--G));
+         overflow:hidden;touch-action:none;border-radius:8px}
+  .tile{position:absolute;left:0;top:0;width:var(--T);height:var(--T);border-radius:8px;border:1px solid #0002;
+        display:flex;align-items:center;justify-content:center;font-weight:800;font-size:calc(var(--T)*.5);color:#111;
+        transition:transform .22s ease-out, background-color .25s}
+  .tile.g{background:var(--g)} .tile.y{background:var(--y)} .tile.x{background:var(--x)}
+  .tile.noanim{transition:none}
+  .tile.done{box-shadow:inset 0 0 0 3px #2c7a2c}
+  .tile .in{display:block}
+  .tile.bounce .in{animation:bounce .5s}
+  @keyframes bounce{40%{transform:translateY(-22%) scale(1.15)}}
+  .tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  #msg{min-height:24px;margin:0 2px 8px;font-size:15px;font-weight:600}
+  .win{background:#e6f6e4;border:1px solid #8fd18a;border-radius:8px;padding:8px 10px}
+  #words{display:none;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-top:10px;font-size:15px;letter-spacing:1px}
+  label.ck{display:inline-flex;gap:5px;align-items:center;font-size:14px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Literiada – Przesuwanka</h1>
+  <div class="sub">Wersja testowa · plansza 5×5 · każdy rząd to ukryte słowo · przesuwaj palcem rzędy i kolumny</div>
+  <div class="sub"><a href="https://literiada.github.io/" style="color:inherit">← Wróć do Literiady</a></div>
+
+  <details>
+    <summary>Jak grać</summary>
+    <p style="margin:8px 0">Każdy <b>rząd</b> to ukryte 5-literowe słowo. Litery zostały pomieszane przesuwaniem rzędów i kolumn.</p>
+    <p style="margin:8px 0"><b>Przesuń palcem</b> rząd w bok albo kolumnę w górę lub w dół (albo użyj strzałek). Litera, która wyjedzie z jednej strony, wraca z drugiej, jak na taśmie.</p>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--g)"></i>na swoim miejscu</span>
+      <span><i class="sw" style="background:var(--y)"></i>jest w słowie tego rzędu, ale gdzie indziej</span>
+      <span><i class="sw" style="background:var(--x)"></i>nie pasuje do tego rzędu</span>
+    </div>
+    <p style="margin:8px 0">Dźwięki: wyższy ton, gdy przybywa zielonych, niższy, gdy ubywa. Melodyjka, gdy ułożysz całe słowo. Cel: cała plansza zielona.</p>
+  </details>
+
+  <div class="bar">
+    <label>Mieszanie:
+      <select id="lvl">
+        <option value="2" selected>2 ruchy (nauka)</option>
+        <option value="3">3 ruchy</option>
+        <option value="5">5 ruchów</option>
+        <option value="8">8 ruchów</option>
+        <option value="15">15 ruchów</option>
+      </select>
+    </label>
+    <button class="primary" id="newBtn">Nowa gra</button>
+    <label class="ck"><input type="checkbox" id="showScr" checked> pokaż mieszanie</label>
+  </div>
+
+  <div class="status">
+    <span id="greens">Zielone: 0/25</span><span id="delta"></span>
+    <span class="sp" id="mcount">Ruchy: 0</span>
+    <button id="snd" title="Dźwięk">🔊</button>
+  </div>
+
+  <div id="msg"></div>
+  <div class="game">
+    <div></div><div class="arr h" id="aTop"></div><div></div>
+    <div class="arr v" id="aLeft"></div><div id="board"></div><div class="arr v" id="aRight"></div>
+    <div></div><div class="arr h" id="aBot"></div><div></div>
+  </div>
+
+  <div class="tools">
+    <button id="undoBtn">↶ Cofnij</button>
+    <button id="hintBtn">💡 Podpowiedź</button>
+    <button id="wordsBtn">👁 Pokaż słowa</button>
+  </div>
+  <div id="words"></div>
+</main>
+
+<script>
+const WORDS=["ZAMEK","LAMPA","MLEKO","RYBKA","KREDA","MOTYL","SOSNA","DROGA","RZEKA","KWIAT","OGRÓD","CHLEB","MASŁO",
+ "SERCE","SZAFA","KONIK","BURZA","NIEBO","TĘCZA","PLAŻA","MORZE","ŁÓDKA","KAJAK","ROWER","DOMEK","KLUCZ","ZEGAR","KUBEK",
+ "ŁYŻKA","MISKA","SZKŁO","KASZA","BANAN","TRAWA","OSIOŁ","KOGUT","WRONA","SROKA","ZEBRA","KOALA","PANDA","PIÓRO","FARBA",
+ "OBRAZ","BĘBEN","KOLEJ","PERON","BILET","WYSPA","LASEK","GÓRKA","ŚWIAT","SANKI","NARTY","PIŁKA"].filter(w=>[...w].length===5);
+const N=5;
+let T=58, G=6;
+let board=[], sol=[], history=[], scrLen=0, moves=0, busy=false, won=false, showWords=false, idc=0;
+const boardEl=document.getElementById("board");
+
+// ---------- dźwięk ----------
+let ac=null, soundOn=true;
+function audio(){ if(!ac){ try{ ac=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } if(ac&&ac.state==="suspended") ac.resume(); return ac; }
+function tone(f,dur,type="sine",vol=.12,at=0,f2=null){
+  if(!soundOn) return; const a=audio(); if(!a) return;
+  const t=a.currentTime+at, o=a.createOscillator(), g=a.createGain();
+  o.type=type; o.frequency.setValueAtTime(f,t); if(f2) o.frequency.exponentialRampToValueAtTime(f2,t+dur);
+  g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(vol,t+.015); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t+dur+.02);
+}
+const sMove=()=>tone(320,.09,"triangle",.06,0,180);
+const sGood=()=>{tone(660,.12,"sine",.12,.05);tone(880,.16,"sine",.12,.15);};
+const sBad =()=>{tone(260,.16,"triangle",.10,.05);tone(200,.2,"triangle",.09,.18);};
+const sWord=()=>{[523,659,784,1047].forEach((f,i)=>tone(f,.18,"sine",.13,.08+i*.09));};
+const sWin =()=>{[523,659,784,1047,784,1047].forEach((f,i)=>tone(f,.22,"sine",.14,.1+i*.12)); [523,659,784].forEach(f=>tone(f,.9,"sine",.06,.85));};
+
+// ---------- logika ----------
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function colors(){
+  const out=[];
+  for(let r=0;r<N;r++){
+    const w=[...sol[r]], cur=board[r].map(t=>t.ch), res=Array(N).fill("x"), left={};
+    for(let i=0;i<N;i++){ if(cur[i]===w[i]) res[i]="g"; else left[w[i]]=(left[w[i]]||0)+1; }
+    for(let i=0;i<N;i++){ if(res[i]!=="g"&&left[cur[i]]>0){res[i]="y";left[cur[i]]--;} }
+    out.push(res);
+  }
+  return out;
+}
+function stats(){ const c=colors(); let g=0, rows=new Set(); c.forEach((row,r)=>{ const n=row.filter(x=>x==="g").length; g+=n; if(n===N) rows.add(r); }); return {c,g,rows}; }
+
+function xy(r,c){ return `translate(${c*(T+G)}px,${r*(T+G)}px)`; }
+function place(t,r,c,anim=true){ t.el.classList.toggle("noanim",!anim); t.el.style.transform=xy(r,c); }
+
+function paint(){ const {c,g,rows}=stats();
+  for(let r=0;r<N;r++) for(let k=0;k<N;k++){ const el=board[r][k].el; el.classList.remove("g","y","x"); el.classList.add(c[r][k]); el.classList.toggle("done",rows.has(r)); }
+  document.getElementById("greens").textContent=`Zielone: ${g}/25`;
+  document.getElementById("mcount").textContent=`Ruchy: ${moves}`;
+  return {g,rows};
+}
+
+// przesunięcie: t='r' (rząd) albo 'c' (kolumna), i = indeks, d = +1 (prawo/dół) lub -1 (lewo/góra)
+function shift(t,i,d,anim=true){
+  if(t==="r"){
+    const old=board[i].slice();
+    for(let c=0;c<N;c++) board[i][c]=old[(c-d+N)%N];
+    for(let c=0;c<N;c++){
+      const tile=board[i][c], wrapped=(d>0&&c===0)||(d<0&&c===N-1);
+      if(wrapped&&anim){ ghost(tile, i, d>0?N-1:0, i, d>0?N:-1); place(tile,i,d>0?-1:N,false); tile.el.offsetWidth; }
+      place(tile,i,c,anim);
+    }
+  } else {
+    const old=board.map(row=>row[i]);
+    for(let r=0;r<N;r++) board[r][i]=old[(r-d+N)%N];
+    for(let r=0;r<N;r++){
+      const tile=board[r][i], wrapped=(d>0&&r===0)||(d<0&&r===N-1);
+      if(wrapped&&anim){ ghost(tile, d>0?N-1:0, i, d>0?N:-1, i); place(tile,d>0?-1:N,i,false); tile.el.offsetWidth; }
+      place(tile,r,i,anim);
+    }
+  }
+}
+// kopia kafelka, która wyjeżdża za krawędź (żeby było widać „taśmę”)
+function ghost(tile,r0,c0,r1,c1){
+  const g=tile.el.cloneNode(true); g.classList.add("noanim"); g.style.transform=xy(r0,c0); boardEl.appendChild(g);
+  g.offsetWidth; g.classList.remove("noanim"); g.style.transform=xy(r1,c1); setTimeout(()=>g.remove(),260);
+}
+
+function userMove(t,i,d){
+  if(busy) return; audio(); busy=true;
+  const before=stats();
+  shift(t,i,d,true); sMove(); moves++;
+  const last=history[history.length-1];
+  if(last&&last.t===t&&last.i===i&&last.d===-d){ history.pop(); if(history.length<scrLen) scrLen=history.length; }
+  else history.push({t,i,d});
+  clearHints();
+  setTimeout(()=>{
+    const after=paint(); busy=false;
+    const diff=after.g-before.g; showDelta(diff);
+    const newRows=[...after.rows].filter(r=>!before.rows.has(r));
+    if(after.g===25&&!won){ won=true; bounceRows([0,1,2,3,4]); sWin(); document.getElementById("msg").innerHTML=`<div class="win">🎉 Ułożone w ${moves} ruch${moves===1?"u":"ach"}! Słowa: ${sol.join(", ")}</div>`; }
+    else if(newRows.length){ bounceRows(newRows); sWord(); document.getElementById("msg").textContent=`✔ Ułożone słowo: ${newRows.map(r=>sol[r]).join(", ")}`; }
+    else if(diff>0) sGood(); else if(diff<0) sBad();
+  },230);
+}
+function bounceRows(rows){ rows.forEach(r=>board[r].forEach((t,k)=>{ setTimeout(()=>{ t.el.classList.remove("bounce"); t.el.offsetWidth; t.el.classList.add("bounce"); },k*70); })); }
+let dTimer; function showDelta(d){ const el=document.getElementById("delta"); clearTimeout(dTimer);
+  if(!d){ el.style.opacity=0; return; } el.className=d>0?"up":"down"; el.textContent=(d>0?"+":"−")+Math.abs(d); el.style.opacity=1; dTimer=setTimeout(()=>el.style.opacity=0,1300); }
+
+function build(){
+  boardEl.innerHTML="";
+  for(let r=0;r<N;r++) for(let c=0;c<N;c++){ const t=board[r][c]; t.el=document.createElement("div"); t.el.className="tile x"; t.el.innerHTML=`<span class="in">${t.ch}</span>`; boardEl.appendChild(t.el); place(t,r,c,false); }
+}
+
+function newGame(){
+  if(busy) return;
+  const w=shuffle(WORDS).slice(0,N); sol=w; board=w.map(word=>[...word].map(ch=>({ch,id:idc++})));
+  history=[]; moves=0; won=false; scrLen=0; document.getElementById("msg").textContent=""; clearHints();
+  build(); paint(); renderWords();
+  const n=+document.getElementById("lvl").value, seq=[]; let last=null;
+  for(let k=0;k<n;k++){ let m; do{ m={t:Math.random()<.5?"r":"c", i:Math.floor(Math.random()*N), d:Math.random()<.5?1:-1}; }while(last&&last.t===m.t&&last.i===m.i); seq.push(m); last=m; }
+  const show=document.getElementById("showScr").checked;
+  if(!show){ seq.forEach(m=>{shift(m.t,m.i,m.d,false); history.push(m);}); scrLen=seq.length; paint(); return; }
+  busy=true; document.getElementById("msg").textContent="Tak wygląda ułożona plansza… patrz, jak się miesza.";
+  const step=n<=3?900:n<=5?600:300;
+  seq.forEach((m,k)=>setTimeout(()=>{ shift(m.t,m.i,m.d,true); history.push(m); sMove(); markArrow(m); setTimeout(()=>{paint();},230); },1600+k*step));
+  setTimeout(()=>{ scrLen=seq.length; busy=false; clearHints(); document.getElementById("msg").textContent="Twoja kolej: przywróć słowa."; },1600+n*step+300);
+}
+
+// ---------- strzałki ----------
+function mkArrows(){
+  const def=[["aTop","c",-1,"▲"],["aBot","c",1,"▼"],["aLeft","r",-1,"◀"],["aRight","r",1,"▶"]];
+  for(const [id,t,d,s] of def){ const box=document.getElementById(id); box.innerHTML="";
+    for(let i=0;i<N;i++){ const b=document.createElement("button"); b.textContent=s; b.dataset.k=`${t}${i}${d}`; b.onclick=()=>userMove(t,i,d); box.appendChild(b); } }
+}
+function arrowFor(m){ return document.querySelector(`.arr button[data-k="${m.t}${m.i}${m.d}"]`); }
+function clearHints(){ document.querySelectorAll(".arr button.hint").forEach(b=>b.classList.remove("hint")); }
+function markArrow(m){ clearHints(); const b=arrowFor(m); b&&b.classList.add("hint"); }
+
+// ---------- przesuwanie palcem ----------
+let p0=null;
+boardEl.addEventListener("pointerdown",e=>{ audio(); const r=boardEl.getBoundingClientRect(); p0={x:e.clientX,y:e.clientY,r:Math.min(N-1,Math.floor((e.clientY-r.top)/(T+G))),c:Math.min(N-1,Math.floor((e.clientX-r.left)/(T+G)))}; boardEl.setPointerCapture(e.pointerId); });
+boardEl.addEventListener("pointerup",e=>{ if(!p0) return; const dx=e.clientX-p0.x, dy=e.clientY-p0.y;
+  if(Math.max(Math.abs(dx),Math.abs(dy))>18){ if(Math.abs(dx)>Math.abs(dy)) userMove("r",p0.r,dx>0?1:-1); else userMove("c",p0.c,dy>0?1:-1); }
+  p0=null; });
+boardEl.addEventListener("pointercancel",()=>p0=null);
+
+// ---------- przyciski ----------
+document.getElementById("newBtn").onclick=newGame;
+document.getElementById("undoBtn").onclick=()=>{
+  if(busy) return; if(history.length<=scrLen){ document.getElementById("msg").textContent="Nie ma Twoich ruchów do cofnięcia."; return; }
+  const m=history[history.length-1]; userMove(m.t,m.i,-m.d);
+};
+document.getElementById("hintBtn").onclick=()=>{
+  if(!history.length){ document.getElementById("msg").textContent="Plansza jest już ułożona."; return; }
+  const m=history[history.length-1]; markArrow({t:m.t,i:m.i,d:-m.d});
+  const kier=m.t==="r"?(m.d>0?"w lewo":"w prawo"):(m.d>0?"w górę":"w dół");
+  document.getElementById("msg").textContent=`💡 Przesuń ${m.t==="r"?(m.i+1)+". rząd":(m.i+1)+". kolumnę"} ${kier} (podświetlona strzałka).`;
+};
+document.getElementById("wordsBtn").onclick=()=>{ showWords=!showWords; document.getElementById("wordsBtn").textContent=showWords?"🙈 Ukryj słowa":"👁 Pokaż słowa"; renderWords(); };
+function renderWords(){ const el=document.getElementById("words"); el.style.display=showWords?"block":"none"; el.innerHTML=sol.map((w,i)=>`${i+1}. <b>${w}</b>`).join("<br>"); }
+document.getElementById("snd").onclick=()=>{ soundOn=!soundOn; document.getElementById("snd").textContent=soundOn?"🔊":"🔇"; if(soundOn){audio(); sGood();} };
+
+// ---------- rozmiar ----------
+function layout(){
+  const W=Math.min(window.innerWidth,520)-16;
+  T=Math.max(40,Math.min(72,Math.floor((W-2*34-2*4-4*G)/5)));
+  document.documentElement.style.setProperty("--T",T+"px");
+  for(let r=0;r<N;r++) for(let c=0;c<N;c++) board[r]&&board[r][c]&&place(board[r][c],r,c,false);
+}
+window.addEventListener("resize",layout);
+mkArrows(); layout(); newGame(); layout();
+</script>
+</body>
+</html>
