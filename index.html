@@ -311,6 +311,11 @@ body.relax .ptsblock{display:none!important}
 .chi .actions button{padding:9px}
 .st{font-size:.78rem;font-weight:700;border-radius:999px;padding:2px 8px;white-space:nowrap}
 .st.new{background:#fff3cd;color:#3d2e00}.st.acc{background:#dbeafe;color:#1e3a8a}.st.done{background:#d3e8d9;color:#0b3d22}.st.rej{background:#fde2e2;color:#7f1d1d}.st.exp{background:var(--key);color:var(--muted)}
+/* v18: seria dni, wąski ranking */
+.streak{display:flex;gap:10px;align-items:center;background:#fff1e0;color:#3d2400;border:1px solid #ffb766;border-radius:10px;padding:10px 12px}
+.streak small{display:block;font-weight:400;font-size:.8rem}
+.chb .cl{display:inline}
+@media (max-width:480px){.chb .cl{display:none}.chb{padding:5px 8px}}
 /* v14 – progi szerokości (mobile first):
    baza: telefon 375–480 px · tablet 481–1099 px · komputer od 1100 px (stałe menu z boku)
    duże ekrany od 1800×1000 px i 4K: cała gra skalowana proporcjonalnie (JS: fitScale) */
@@ -349,7 +354,7 @@ body.embed .iab{display:none!important}
   <div class="ssep"></div>
   <button class="sitem" id="sHelp"></button>
   <button class="sitem" id="sMove"></button>
-  <div class="sfoot">Literiada · wersja 17.9 · 2026-11-14</div>
+  <div class="sfoot">Literiada · wersja 18.0 · 2026-11-14</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -448,8 +453,8 @@ const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v)
 
 let mode='day', lvl=0, answer, guesses=[], cur='', done=false, busy=false;
 let day=null, freeLvl=0, archKey=null, duel=null;
-const curN=()=>mode==='arch'?Math.round((keyToUTC(archKey)-START)/DAY):dayNo();
-const curKey=()=>mode==='arch'?archKey:todayKey();
+const curN=()=>mode==='arch'?Math.round((keyToUTC(archKey)-START)/DAY):(day&&typeof day.d==='number'?day.d:dayNo());
+const curKey=()=>mode==='arch'?archKey:utcToKey(START+curN()*DAY);
 const shortDate=k=>{const p=k.split('-');return p[2]+'.'+p[1]};
 
 function score(g,a){
@@ -567,15 +572,21 @@ function finish(won){
     p=won?Math.max(0,pointsFor(answer,guesses.length)+tb-(day.jk[lvl]===2?day.jc[lvl]:0)):0;
     day.res[lvl]=won?'won':'lost';day.pts[lvl]=p;saveDay();
     const h=store.get('sd2_hist',{});h[curKey()]=day.pts.slice();store.set('sd2_hist',h);
+    if(mode==='day'){const ot=store.get('sd2_ontime',{});ot[curKey()]=1;const ks=Object.keys(ot).sort();while(ks.length>400)delete ot[ks.shift()];store.set('sd2_ontime',ot)}
     rankSync();refPush();
   }
   if(duel){duelSave({g:guesses,res:won?'won':'lost',pts:won?pointsFor(answer,guesses.length):0});const nk=store.get('sd2_nick','');
-    if(duel.ch){duelPush(nk||store.get('sd2_duel_name','')||'Gracz',won);chDone(duel.ch,won)}else if(nk)duelPush(nk,won)}
+    if(duel.ch){if(nk)duelPush(nk,won);chDone(duel.ch,won)}else if(nk)duelPush(nk,won)}
   paint();updTimer();
   if(won)SFX.win(0);else SFX.lose(0);
   toast(won?['Genialnie!','Wspaniale!','Świetnie!','Brawo!','Nieźle!','Uff, udało się!'][guesses.length-1]:'Hasło: '+answer.toUpperCase(),2000);
   setTimeout(()=>{showResult(won,p);if(won)confetti(mode==='free'?70:(lvl>=2?240:120))},900);
 }
+// ---- v18 (P1): seria dni z rzędu (liczą się dni rozegrane w swoim dniu, nie nadrabiane w archiwum)
+function streakN(){const lg=store.get('sd2_log',{}),a=store.get('sd2_arch',{}),ot=store.get('sd2_ontime',{});
+  const on=k=>!!ot[k]||((lg[k]||[]).some(Boolean)&&!(a[k]&&a[k].late));
+  let t=keyToUTC(todayKey());if(!on(utcToKey(t)))t-=DAY;let n=0;while(t>=START&&on(utcToKey(t))){n++;t-=DAY}return n}
+const dniPL=n=>n===1?'1 dzień':n+' dni';
 function grid(g){return g.map(x=>x.s.map(s=>s==='hit'?'🟩':s==='near'?'🟧':'⬜').join('')).join('\n')}
 const RX=()=>!!store.get('sd2_relax',false);
 const SHARE_URL='https://literiada.github.io · @Literiada';
@@ -583,7 +594,7 @@ const medE=n=>n<=2?'🥇':n<=4?'🥈':'🥉';
 function shareLines(withGrid,compact){const G=i=>Array.isArray(withGrid)?!!withGrid[i]:!!withGrid;
   if(mode==='free'){const won=(guesses.length&&guesses[guesses.length-1].w===answer);return 'Literiada (trening) '+(won?guesses.length:'X')+'/6\n'+grid(guesses)+'\n👉 '+SHARE_URL}
   if(RX()){let t='Literiada #'+(curN()+1)+' 🌿 na luzie\n';day.res.forEach((r,i)=>{if(!r)return;const g=day.g[i]||[];t+='\n'+(i===3?'🎁 P4':'P'+(i+1))+' '+(r==='won'?(g.length||'✓')+'/6':'X/6');if(G(i)&&g.length)t+='\n'+grid(g)});return t+'\n\n👉 '+SHARE_URL}
-  const tot=day.pts.reduce((a,b)=>a+b,0);let t='Literiada #'+(curN()+1)+' · '+tot+' pkt'+(done3(day)&&day.res.slice(0,3).every(r=>r==='won')?' 🏆':'')+'\n';
+  const tot=day.pts.reduce((a,b)=>a+b,0),sk=mode==='day'?streakN():0;let t='Literiada #'+(curN()+1)+' · '+tot+' pkt'+(done3(day)&&day.res.slice(0,3).every(r=>r==='won')?' 🏆':'')+(sk>=2?'\n🔥 '+dniPL(sk)+' z rzędu':'')+'\n';
   day.res.forEach((r,i)=>{if(!r)return;const g=day.g[i]||[];
     t+='\n'+(i===3?'🎁 P4':'P'+(i+1))+' '+(r==='won'?medE(g.length||6)+' '+(g.length||'✓')+'/6':'❌ X/6')+' · '+day.pts[i]+' pkt'+(!compact&&day.te&&day.te[i]!=null&&r==='won'?' · ⏱'+fmtT(day.te[i]):'');
     if(G(i)&&g.length)t+='\n'+grid(g)});
@@ -657,7 +668,8 @@ function showResult(won,p){
   } else if(duel){
     body=`<p>Hasło: ${word} (${v} pkt), zagadka od: ${esc(duel.f)}</p>`+(won?`<p>Twój wynik: <b>${pointsFor(answer,guesses.length)} pkt</b> (wartość słowa × premia ${7-guesses.length} za ${guesses.length}. próbę)</p>`:'<p>Tym razem się nie udało, ale możesz się zrewanżować!</p>');
     const nm=store.get('sd2_duel_name','')||store.get('sd2_nick','');
-    if(duel.ch){open(`<div class="step">Wyzwanie z rankingu · od: ${esc(duel.f)}</div><h2>${head}</h2>${cel}${body}<div class="relaxnote">${ic('rapier',16)} Wynik zobaczy autor wyzwania (${esc(duel.f)}), trafił też do tabeli pojedynków w rankingu.</div><div class="actions"><button class="main" id="aChBack">${ic('rapier',16)} Wyzwania</button><button id="aDay">Wróć do haseł dnia</button></div>${menuRow('Pokaż planszę')}`);
+    if(duel.ch){open(`<div class="step">Wyzwanie z rankingu · od: ${esc(duel.f)}</div><h2>${head}</h2>${cel}${body}<div class="relaxnote">${ic('rapier',16)} Wynik zobaczy autor wyzwania (${esc(duel.f)}), trafił też do tabeli pojedynków w rankingu.</div><div class="actions">${duel.u&&store.get('sd2_nick','')?`<button class="main" id="aRvg">${ic('rapier',16)} Rewanż: wyzwij ${esc(duel.f)}</button>`:''}<button id="aChBack">${ic('rapier',16)} Wyzwania</button><button id="aDay">Wróć do haseł dnia</button></div>${menuRow('Pokaż planszę')}`);
+      const rv={id:duel.u,nick:duel.f};if($('aRvg'))$('aRvg').onclick=()=>chNew(rv);
       $('aChBack').onclick=()=>showChallenges();$('aDay').onclick=()=>setMode('day');bindMenuRow();return}
     open(`<div class="step">Pojedynek · zagadka od: ${esc(duel.f)}</div><h2>${head}</h2>${cel}${body}
     <div class="dlink"><b>${ic('send',16)} Odeślij wynik do: ${esc(duel.f)}</b><span class="sub" style="color:inherit">${esc(duel.f)} zobaczy Twoją planszę i liczbę prób.</span>
@@ -705,6 +717,7 @@ function showStats(){
   open(`${logo()}<div class="step">${mode==='arch'?'Archiwum · ':''}Strona 4 z 4 · Podsumowanie</div><h2>${mode==='arch'?'Dzień '+shortDate(archKey):'Podsumowanie dnia'}</h2>${rkInv}
   ${day.g.some(x=>x&&x.length)?'<p class="sub">Dotknij paska poziomu, żeby rozwinąć jego planszę.</p>':''}<div class="daysum">${dayRows}</div>
   ${RX()?'<div class="relaxnote">🌿 Grasz na luzie: bez zegara, punktów i rankingu. Wyłączysz to w menu ☰.</div>':''}<div class="total ptsblock"><span>${mode==='arch'?'Ten dzień razem':'Dziś razem'}</span><span>${day.pts.reduce((a,b)=>a+b,0)} pkt</span></div>
+  ${mode==='day'&&streakN()?`<div class="streak"><span style="font-size:1.6rem;line-height:1">🔥</span><span><b>${dniPL(streakN())} z rzędu</b><small>${streakN()>=2?'Nie przerywaj serii, jutro nowe hasła.':'Wróć jutro, żeby zacząć serię.'}</small></span></div>`:''}
   ${day.res.some(Boolean)?shareBtns('S'):''}
   ${nextB}${extraB}<div class="actions"><button class="menub" id="aMenu">${ic('menu',16)} Menu</button>${anyB?'<button id="aBoards">Zobacz plansze</button>':''}${!allDone?'<button id="aBack">Wróć do gry</button>':''}<button id="aArch">${ic('cal',16)} Archiwum${pend?' ('+pend+')':''}</button></div>
   <div class="boards" id="boards" hidden>${boards}</div>
@@ -738,7 +751,8 @@ function askReset(){
   open(`<h2>Zacząć od nowa?</h2><p>Usunę wszystkie punkty, statystyki i dzisiejsze postępy na wszystkich poziomach. Tego nie da się cofnąć.</p>
   <div class="actions"><button class="main" id="aYes">Tak, wyzeruj</button><button id="aClose">Anuluj</button></div>`);
   $('aYes').onclick=()=>{['sd2_day','sd2_hist','sd2_log','sd2_arch'].forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});
-    close();setMode('day');toast('Wyniki wyzerowane. Powodzenia!',2000)};
+    try{localStorage.removeItem('sd2_ontime')}catch(e){}RK.cache={};
+    close();setMode('day');rankSync();toast('Wyniki wyzerowane. Powodzenia!',2000)};
 }
 function showHelp(){
   const ex=(w,s)=>`<div class="ex">${[...w].map((ch,i)=>`<div class="t ${s[i]||''}">${tileHTML(ch)}</div>`).join('')}</div>`;
@@ -756,6 +770,7 @@ function showHelp(){
   <p><b>Weekendowa niespodzianka.</b> W sobotę i niedzielę, po zakończeniu poziomu 3, gra zaproponuje dodatkowe hasło o trudności poziomu 3. Masz na nie 10 minut na bonus za czas (do 60 pkt) i możesz dorobić sobie ekstra punkty. Jeśli odmówisz, przycisk niespodzianki czeka w podsumowaniu do końca dnia.</p>
   <p><b>Pojedynek.</b> W menu wybierz Pojedynek: wymyśl 5-literowe hasło, a gra zrobi z niego link do wysłania znajomemu (Messenger, SMS, WhatsApp). Znajomy zgaduje Twoje słowo w 6 próbach, bez zegara i jokerów, a potem może odesłać Ci link ze swoim wynikiem i planszą. Pojedynki nie wpływają na punkty gry dnia.</p>
   <p><b>Wyzwania z rankingu.</b> Przy każdym graczu w rankingu jest przycisk „Wyzwij”: wpisujesz hasło, a gracz znajdzie je w menu ☰ → Wyzwania. Może je przyjąć albo odrzucić, a Ty dostaniesz informację o wyniku. Jedno wyzwanie dziennie do tej samej osoby, wyzwanie wygasa po 48 godzinach. Wyzwania wyłączysz w menu: Przyjmuję wyzwania.</p>
+  <p><b>Seria dni.</b> Każdy dzień rozegrany w swoim dniu przedłuża serię 🔥. Dni nadrabiane w archiwum serii nie przedłużają. Serię widać w podsumowaniu dnia i w udostępnianym wyniku.</p>
   <p><b>Ranking graczy.</b> W menu ☰ wybierz Ranking graczy i podaj pseudonim (bez maila i hasła). Twoje punkty trafią do wspólnego rankingu: dziś, w tym tygodniu, w miesiącu i łącznie. Jest tam też tabela pojedynków. Ranking jest dobrowolny i w każdej chwili możesz się z niego usunąć.</p>
   <p><b>Gra na luzie 🌿.</b> Wolisz grać bez presji? W menu ☰ włącz „Grę na luzie”: znika zegar, punkty, medale i ranking, zostają same słowa. Wyłączysz to w każdej chwili.</p>
   <p><b>Literiada na X.</b> Obserwuj @Literiada (x.com/Literiada): nowości, wyzwania i najlepsze wyniki graczy. Wrzucając wynik na X, oznacz @Literiada.</p>
@@ -768,7 +783,7 @@ function showHelp(){
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 17.9 · 2026-11-14</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 18.0 · 2026-11-14</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
@@ -808,6 +823,15 @@ function updTimer(){const el=$('timer');if(!el)return;
   el.innerHTML=ic('clock',14)+' '+fmtT(tl(lvl)*1000-e)+' · bonus <b>+'+bonusFor(lvl,e)+' pkt</b><span class="tbar"><i style="width:'+Math.max(0,100-e/(tl(lvl)*10))+'%"></i></span>';
 }
 setInterval(updTimer,250);
+// ---- v18 (K1): zmiana dnia przy otwartej karcie
+function dayCheck(force){if(!day||mode!=='day'||busy)return;if(day.d===dayNo())return;
+  if(guesses.length&&!done)return;           // trwający poziom kończy się na wczorajszych hasłach
+  if(!force&&!$('ov').hidden)return;         // nie zamykamy okna, które gracz właśnie czyta
+  close();loadDay();loadDayLevel();fitBoard();updBadge();
+  const t=$('toast');t.classList.add('big');toast('Nowy dzień, nowe hasła!',2600);setTimeout(()=>t.classList.remove('big'),2600)}
+setInterval(()=>dayCheck(false),60000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)dayCheck(true)});
+addEventListener('focus',()=>dayCheck(true));addEventListener('pageshow',()=>dayCheck(true));
 // ---- Archiwum poprzednich dni
 function loadArch(k){const a=store.get('sd2_arch',{}),lg=store.get('sd2_log',{}),h=store.get('sd2_hist',{});
   return norm(a[k]||{g:[],res:(lg[k]||[]).slice(),pts:(h[k]||[]).slice()})}
@@ -1019,16 +1043,22 @@ let rankBusy=false,rankAgain=false;
 async function rankSync(){const nick=store.get('sd2_nick','');if(!nick||RX())return;if(rankBusy){rankAgain=true;return}rankBusy=true;
   try{const {F,db,uid}=await fb();const h=store.get('sd2_hist',{}),cut=keyToUTC(todayKey())-62*DAY,days={};let all=0;
     for(const k in h){const s=Math.round(rsum(h[k]));all+=s;if(s>0&&keyToUTC(k)>=cut)days[k]=s}
-    await F.setDoc(F.doc(db,'players',uid),{nick,all:Math.round(all),days,upd:Date.now()})}catch(e){console.warn('ranking',e)}
+    const one=(k,v)=>v>0?{[k]:v}:{};
+    await F.setDoc(F.doc(db,'players',uid),{nick,all:Math.round(all),days,dd:one(todayKey(),myVal('d')),ww:one(rkWk(),myVal('w')),mm:one(rkMk(),myVal('m')),upd:Date.now()});RK.cache={}}catch(e){console.warn('ranking',e)}
   rankBusy=false;if(rankAgain){rankAgain=false;rankSync()}}
 async function duelPush(sn,won){try{if(!duel)return;const {F,db,uid}=await fb();
   const id=String(duel.code||'x').replace(/[^A-Za-z0-9_-]/g,'').slice(0,40)+'_'+uid;
   await F.setDoc(F.doc(db,'duels',id),{au:duel.u||null,an:String(duel.f).slice(0,20),sn:String(sn).slice(0,20),su:uid,res:won?'won':'lost',tries:guesses.length,pts:won?pointsFor(answer,guesses.length):0,ts:Date.now()})}catch(e){console.warn('pojedynek',e)}}
-let RK={tab:'d',rows:null,duels:null,mine:null,err:null};
+let RK={tab:'d',rows:null,duels:null,mine:null,err:null,cache:{},cnt:null,mePos:null,offTs:0};
 function rankRange(tab){const tk=todayKey(),t=keyToUTC(tk);if(tab==='d')return [t,t];
   if(tab==='w'){const dow=(new Date(t).getUTCDay()+6)%7;return [t-dow*DAY,t]}
   if(tab==='m')return [Date.UTC(+tk.slice(0,4),+tk.slice(5,7)-1,1),t];return null}
-function rankVal(r,tab){if(tab==='a')return +r.all||0;const [a,b]=rankRange(tab);let s=0;const d=r.days||{};for(const k in d){const x=keyToUTC(k);if(x>=a&&x<=b)s+=+d[k]||0}return s}
+const rkWk=()=>utcToKey(rankRange('w')[0]);
+const rkMk=()=>todayKey().slice(0,7);
+// v18: każdy gracz trzyma osobno punkty dnia (dd), tygodnia (ww) i miesiąca (mm); ranking pobiera tylko top 50
+function rkField(tab){return tab==='d'?['dd',todayKey()]:tab==='w'?['ww',rkWk()]:tab==='m'?['mm',rkMk()]:['all']}
+function rankVal(r,tab){if(tab==='a')return +r.all||0;const [m,k]=rkField(tab);return +((r[m]||{})[k])||0}
+function myVal(tab){const h=store.get('sd2_hist',{});if(tab==='a')return Math.round(sumRange(h,0,9e15));const [a,b]=rankRange(tab);return Math.round(sumRange(h,a,b))}
 function rankHTML(){const tab=RK.tab,nick=store.get('sd2_nick','');
   const tabs=[['d','Dziś'],['w','Tydzień'],['m',new Date(keyToUTC(todayKey())).toLocaleDateString('pl-PL',{month:'long',timeZone:'UTC'})],['a','Łącznie'],['p','Pojedynki']].map(([k,l])=>`<button data-rt="${k}" aria-pressed="${tab===k}">${l}</button>`).join('');
   let body='';
@@ -1040,35 +1070,46 @@ function rankHTML(){const tab=RK.tab,nick=store.get('sd2_nick','');
     body=(FBUID?`<p><b>Wyniki Twoich zagadek</b></p><div class="dlog">${mine.length?mine.map(line).join(''):'<p class="sub">Nikt jeszcze nie odesłał wyniku Twojej zagadki. Wyślij nową w menu: Pojedynek.</p>'}</div>`:'')
       +`<p><b>Ostatnie pojedynki</b></p><div class="dlog">${(RK.duels||[]).length?RK.duels.map(line).join(''):'<p class="sub">Brak pojedynków. Bądź pierwszy!</p>'}</div>`;
   } else {
-    const list=RK.rows.map(r=>({id:r.id,nick:r.nick||'?',v:rankVal(r,tab)})).filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
-    const me=list.findIndex(r=>r.id===FBUID);
+    const list=RK.rows.map(r=>({id:r.id,nick:r.nick||'?',v:rankVal(r,tab)})).filter(r=>r.v>0).sort((a,b)=>b.v-a.v).slice(0,50);
+    const me=list.findIndex(r=>r.id===FBUID),myPos=me>=0?me+1:RK.mePos;
     const row=(r,i)=>`<div class="${r.id===FBUID?'me':''}"><span class="pos">${i<3?medal(['gold','silver','bronze'][i],22):i+1}</span><span class="nk">${esc(r.nick)}</span><span class="pt">${r.v} pkt</span><span>${chBtn(r)}</span></div>`;
-    body=list.length?`<div class="rlist">${list.slice(0,50).map(row).join('')}${me>=50?'<span class="gap">…</span>'+row(list[me],me):''}</div>`:'<p class="sub">Nikt jeszcze nie zdobył punktów w tym okresie. Twoja szansa!</p>';
-    body+=`<p class="sub">Graczy w rankingu: ${RK.rows.length}${me>=0?' · Twoje miejsce: <b>'+(me+1)+'</b>':''}</p>`;
+    const meRow=me<0&&RK.mePos&&nick?'<span class="gap">…</span>'+row({id:FBUID,nick,v:myVal(tab)},RK.mePos-1):'';
+    body=list.length?`<div class="rlist">${list.map(row).join('')}${meRow}</div>`:'<p class="sub">Nikt jeszcze nie zdobył punktów w tym okresie. Twoja szansa!</p>';
+    body+=`<p class="sub">${RK.cnt!=null?'Graczy w rankingu: '+RK.cnt:''}${list.length>=50?' · pokazujemy pierwszą 50':''}${myPos?' · Twoje miejsce: <b>'+myPos+'</b>':''}</p>`;
   }
   const join=nick?`<p class="sub">Grasz jako <b>${esc(nick)}</b>. <button class="linkbtn" id="rNick" style="padding:0">Zmień nick</button> · <button class="linkbtn" id="rOut" style="padding:0">Usuń mnie z rankingu</button></p>`
     :`<div class="rjoin"><b>Dołącz do rankingu</b><span style="font-size:.85rem">Wpisz pseudonim, który zobaczą inni gracze. Bez maila i hasła, zapisujemy tylko pseudonim i punkty.</span><input id="rIn" maxlength="20" placeholder="np. Radek z Pręgowa" autocomplete="off"><button id="rJoin">Dołącz</button><span class="dbad" id="rErr" hidden></span></div>`;
   return `<div class="step">Ranking</div><h2>${ic('trophy',24)} Ranking graczy</h2>${join}<div class="rtabs">${tabs}</div>${body}${nick&&tab!=='p'?'<p class="sub">Przycisk „Wyzwij” wysyła graczowi Twoje hasło do odgadnięcia. Jedno wyzwanie dziennie do tej samej osoby.</p>':''}<div class="actions"><button id="aClose">Zamknij</button></div><p class="sub">Link do rankingu: literiada.github.io/#ranking</p>`}
-function rankBind(){document.querySelectorAll('[data-rt]').forEach(b=>b.onclick=()=>{RK.tab=b.dataset.rt;rankDraw()});
+function rankBind(){document.querySelectorAll('[data-rt]').forEach(b=>b.onclick=()=>{RK.tab=b.dataset.rt;rankLoad()});
   document.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{const r=(RK.rows||[]).find(x=>x.id===b.dataset.ch);if(r)chNew(r)});
-  if($('rRetry'))$('rRetry').onclick=()=>{RK.err=null;rankLoad()};
+  if($('rRetry'))$('rRetry').onclick=()=>{RK.err=null;rankLoad(true)};
   if($('rJoin'))$('rJoin').onclick=async()=>{const v=$('rIn').value.replace(/\s+/g,' ').trim().slice(0,20);
     if(v.length<2){$('rErr').hidden=false;$('rErr').textContent='Pseudonim musi mieć co najmniej 2 znaki.';return}
-    store.set('sd2_nick',v);if(!store.get('sd2_duel_name',''))store.set('sd2_duel_name',v);$('rJoin').textContent='Dołączam…';await rankSync();rankLoad()};
+    store.set('sd2_nick',v);if(!store.get('sd2_duel_name',''))store.set('sd2_duel_name',v);$('rJoin').textContent='Dołączam…';await rankSync();RK.cache={};rankLoad(true)};
   if($('rNick'))$('rNick').onclick=()=>{store.set('sd2_nick','');rankDraw();setTimeout(()=>{const i=$('rIn');if(i)i.focus()},50)};
   if($('rOut'))$('rOut').onclick=async()=>{let nd=0;try{const {F,db,uid}=await fb();await F.deleteDoc(F.doc(db,'players',uid));
       const qs=await Promise.all([F.getDocs(F.query(F.collection(db,'duels'),F.where('su','==',uid))),F.getDocs(F.query(F.collection(db,'duels'),F.where('au','==',uid)))]);
       const seen=new Set();for(const q of qs)for(const d of q.docs){if(seen.has(d.id))continue;seen.add(d.id);try{await F.deleteDoc(F.doc(db,'duels',d.id));nd++}catch(e){}}
       await chWipe()}catch(e){}
-    store.set('sd2_nick','');toast('Usunięto Cię z rankingu'+(nd?' i z tabeli pojedynków ('+nd+')':''),2600);rankLoad()}}
+    store.set('sd2_nick','');RK.cache={};toast('Usunięto Cię z rankingu'+(nd?' i z tabeli pojedynków ('+nd+')':''),2600);rankLoad(true)}}
 function rankDraw(){if($('ov').hidden||!$('card').querySelector('.rtabs'))return;$('card').innerHTML=rankHTML();const c=$('aClose');if(c)c.onclick=close;rankBind()}
-async function rankLoad(){RK.rows=null;rankDraw();
-  try{const {F,db,uid}=await fb();
-    const [ps,ds,ms]=await Promise.all([F.getDocs(F.collection(db,'players')),F.getDocs(F.query(F.collection(db,'duels'),F.orderBy('ts','desc'),F.limit(30))),F.getDocs(F.query(F.collection(db,'duels'),F.where('au','==',uid)))]);
-    RK.rows=ps.docs.map(d=>Object.assign({id:d.id},d.data()));RK.duels=ds.docs.map(d=>d.data());RK.mine=ms.docs.map(d=>d.data());RK.err=null;
-    try{const [cs,so]=await Promise.all([F.getDocs(F.collection(db,'chset')),F.getDocs(F.query(F.collection(db,'challenges'),F.where('fu','==',uid)))]);
-      RK.off=new Set(cs.docs.filter(d=>d.data().off===true).map(d=>d.id));CH.out=so.docs.map(d=>Object.assign({id:d.id},d.data()))}catch(e){console.warn('wyzwania',e);RK.off=new Set()}}
-  catch(e){console.warn('ranking',e);RK.err=e;RK.rows=null}
+async function rankLoad(force){const tab=RK.tab,c=RK.cache[tab];
+  if(!force&&c&&Date.now()-c.ts<180000){RK.rows=c.rows;RK.mePos=c.mePos;if(tab==='p'){RK.duels=c.duels;RK.mine=c.mine}RK.err=null;rankDraw();return}
+  RK.rows=null;RK.err=null;rankDraw();
+  try{const {F,db,uid}=await fb();const col=F.collection(db,'players');let rows=[],duels=null,mine=null,mePos=null;
+    if(tab==='p'){const [ds,ms]=await Promise.all([F.getDocs(F.query(F.collection(db,'duels'),F.orderBy('ts','desc'),F.limit(30))),F.getDocs(F.query(F.collection(db,'duels'),F.where('au','==',uid),F.limit(40)))]);
+      duels=ds.docs.map(d=>d.data());mine=ms.docs.map(d=>d.data())}
+    else{const f=rkField(tab),fp=f.length>1?new F.FieldPath(f[0],f[1]):f[0];
+      const ps=await F.getDocs(F.query(col,F.orderBy(fp,'desc'),F.limit(50)));rows=ps.docs.map(d=>Object.assign({id:d.id},d.data()));
+      const mv=myVal(tab);
+      if(store.get('sd2_nick','')&&!RX()&&mv>0&&!rows.some(r=>r.id===uid)){try{const q=await F.getCountFromServer(F.query(col,F.where(fp,'>',mv)));mePos=q.data().count+1}catch(e){console.warn('ranking',e)}}}
+    if(RK.cnt==null||force){try{RK.cnt=(await F.getCountFromServer(col)).data().count}catch(e){}}
+    if(Date.now()-RK.offTs>60000){try{const [cs,so]=await Promise.all([F.getDocs(F.collection(db,'chset')),F.getDocs(F.query(F.collection(db,'challenges'),F.where('fu','==',uid)))]);
+      RK.off=new Set(cs.docs.filter(d=>d.data().off===true).map(d=>d.id));CH.out=so.docs.map(d=>Object.assign({id:d.id},d.data()));RK.offTs=Date.now()}catch(e){console.warn('wyzwania',e);RK.off=RK.off||new Set()}}
+    RK.cache[tab]={ts:Date.now(),rows,mePos,duels,mine};
+    if(RK.tab!==tab)return;
+    RK.rows=rows;RK.mePos=mePos;if(tab==='p'){RK.duels=duels;RK.mine=mine}}
+  catch(e){console.warn('ranking',e);if(RK.tab!==tab)return;RK.err=e;RK.rows=null}
   rankDraw()}
 function showRanking(tab){if(tab)RK.tab=tab;open(rankHTML());rankBind();rankLoad()}
 // ---- v16: statystyki zaproszeń i rankingu (literiada.github.io/#statystyki)
@@ -1120,9 +1161,9 @@ const chOutNews=()=>{const s=chSeen();return CH.out.filter(c=>(c.st==='rej'||c.s
 const chCount=()=>CH.loaded?chInPending().length+chOutNews().length:0;
 const chOk=()=>store.get('sd2_ch_ok',true);
 function chBtn(r){const nk=store.get('sd2_nick','');if(!nk||!FBUID||r.id===FBUID||RX())return '';
-  if(RK.off&&RK.off.has(r.id))return `<button class="chb" disabled title="Ten gracz nie przyjmuje wyzwań">${ic('rapier',13)} Wyzwij</button>`;
-  const id=FBUID+'_'+r.id+'_'+todayKey();if(CH.out.some(c=>c.id===id))return `<button class="chb" disabled>Wysłano ✓</button>`;
-  return `<button class="chb" data-ch="${esc(r.id)}">${ic('rapier',13)} Wyzwij</button>`}
+  if(RK.off&&RK.off.has(r.id))return `<button class="chb" disabled title="Ten gracz nie przyjmuje wyzwań" aria-label="Wyzwij (wyłączone)">${ic('rapier',13)}<span class="cl"> Wyzwij</span></button>`;
+  const id=FBUID+'_'+r.id+'_'+todayKey();if(CH.out.some(c=>c.id===id))return `<button class="chb" disabled title="Wyzwanie wysłane" aria-label="Wyzwanie wysłane"><span class="cl">Wysłano </span>✓</button>`;
+  return `<button class="chb" data-ch="${esc(r.id)}" title="Wyzwij: ${esc(r.nick)}" aria-label="Wyzwij: ${esc(r.nick)}">${ic('rapier',13)}<span class="cl"> Wyzwij</span></button>`}
 function chNew(r){const me=store.get('sd2_nick','');
   open(`<div class="step">Wyzwanie z rankingu</div><h2>${ic('rapier',24)} Wyzwij: ${esc(r.nick)}</h2><p>Wpisz hasło, które <b>${esc(r.nick)}</b> ma odgadnąć w 6 próbach. Wyzwanie pojawi się w menu ☰ → Wyzwania i będzie ważne przez 48 godzin.</p>
   <div class="dform"><label>Hasło (5 liter)<input id="dWord" maxlength="5" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></label><p class="sub" id="dInfo">Wpisz słowo, sprawdzę, czy jest w słowniku.</p></div>
@@ -1138,18 +1179,20 @@ function chNew(r){const me=store.get('sd2_nick','');
       await F.setDoc(F.doc(db,'challenges',id),c);CH.out.push(Object.assign({id},c));store.set('sd2_ch_sent',true);
       toast('Wyzwanie wysłane do: '+r.nick,2400);showRanking()}
     catch(e){console.warn('wyzwanie',e);$('chSend').disabled=false;$('chSend').textContent='Wyślij wyzwanie';
-      info.className='dbad';info.textContent=String(e&&e.code||'').includes('permission')?'Nie da się wysłać: ten gracz nie przyjmuje wyzwań albo wysłałeś mu już dziś wyzwanie.':'Nie udało się wysłać. Sprawdź internet i spróbuj ponownie.'}};
+      info.className='dbad';info.textContent=String(e&&e.code||'').includes('permission')?'Nie da się wysłać: ten gracz nie przyjmuje wyzwań, zmienił nick albo wysłałeś mu już dziś wyzwanie. Sprawdź też, czy data i godzina w telefonie są ustawione automatycznie.':'Nie udało się wysłać. Sprawdź internet i spróbuj ponownie.'}};
   setTimeout(()=>wi.focus(),50)}
 async function chLoad(){try{const {F,db,uid}=await fb();
     const [a,b]=await Promise.all([F.getDocs(F.query(F.collection(db,'challenges'),F.where('tu','==',uid))),F.getDocs(F.query(F.collection(db,'challenges'),F.where('fu','==',uid)))]);
     const old=Date.now()-7*DAY,keep=[];
     for(const d of [...a.docs,...b.docs]){const x=Object.assign({id:d.id},d.data());if((+x.ts||0)<old){F.deleteDoc(F.doc(db,'challenges',d.id)).catch(()=>{})}else keep.push(x)}
-    CH.inb=keep.filter(x=>x.tu===uid);CH.out=keep.filter(x=>x.fu===uid);CH.loaded=true;updBadge();return true}
+    for(const x of keep)if(x.tu===uid&&x.st==='new'&&!VALID.has(String(x.w))){x.st='bad';F.updateDoc(F.doc(db,'challenges',x.id),{st:'rej',upd:Date.now()}).catch(()=>{})}
+    CH.inb=keep.filter(x=>x.tu===uid&&x.st!=='bad'&&VALID.has(String(x.w)));CH.out=keep.filter(x=>x.fu===uid);CH.loaded=true;updBadge();return true}
   catch(e){console.warn('wyzwania',e);return false}}
 async function chNotify(){if(!(store.get('sd2_nick','')||store.get('sd2_ch_sent',false)))return;if(!await chLoad())return;
   const pin=chInPending().length,news=chOutNews();
-  const msg=news.length===1?(news[0].st==='rej'?esc(news[0].tn)+' odrzucił(a) Twoje wyzwanie':news[0].st==='done'?esc(news[0].tn)+(news[0].res==='won'?' rozwiązał(a)':' nie rozwiązał(a)')+' Twoje wyzwanie':'Twoje wyzwanie dla '+esc(news[0].tn)+' wygasło'):news.length?'Masz '+news.length+' odpowiedzi na wyzwania':'';
-  const t=[pin?'Masz '+pin+(pin===1?' nowe wyzwanie':' nowe wyzwania')+' w menu ☰':'',msg].filter(Boolean).join(' · ');if(t&&$('ov').hidden)toast(t,3200)}
+  const msg=news.length===1?(news[0].st==='rej'?news[0].tn+' odrzucił(a) Twoje wyzwanie':news[0].st==='done'?news[0].tn+(news[0].res==='won'?' rozwiązał(a)':' nie rozwiązał(a)')+' Twoje wyzwanie':'Twoje wyzwanie dla '+news[0].tn+' wygasło'):news.length?'Masz '+news.length+' odpowiedzi na wyzwania':'';
+  const t=[pin?'Masz '+plWyz(pin)+' w menu ☰':'',msg].filter(Boolean).join(' · ');if(t&&$('ov').hidden)toast(t,3200)}
+const plWyz=n=>n+' '+(n===1?'nowe wyzwanie':(n%10>=2&&n%10<=4&&(n%100<12||n%100>14))?'nowe wyzwania':'nowych wyzwań');
 function chStatus(c){if(chExp(c))return '<span class="st exp">wygasło</span>';
   return {new:'<span class="st new">oczekuje</span>',acc:'<span class="st acc">przyjęte, w grze</span>',rej:'<span class="st rej">odrzucone</span>',done:'<span class="st done">'+(c.res==='won'?'odgadnięte: '+c.tries+'. próba · '+c.pts+' pkt':'nie odgadnięte')+'</span>'}[c.st]||''}
 async function showChallenges(){open(`<div class="step">Wyzwania</div><h2>${ic('rapier',24)} Wyzwania</h2><p class="sub">Wczytuję…</p><div class="actions"><button id="aClose">Zamknij</button></div>`);
@@ -1158,7 +1201,8 @@ async function showChallenges(){open(`<div class="step">Wyzwania</div><h2>${ic('
   const inP=chInPending(),inRest=CH.inb.filter(c=>!inP.includes(c)).sort((a,b)=>b.ts-a.ts).slice(0,10),out=CH.out.slice().sort((a,b)=>b.ts-a.ts).slice(0,15);
   const inH=inP.map(c=>`<div class="chi"><div class="row2"><span>od: <b>${esc(c.fn)}</b></span><span class="sub">${new Date(c.ts).toLocaleDateString('pl-PL')}</span></div><span class="sub">5-literowe hasło do odgadnięcia w 6 próbach</span><div class="actions"><button class="main" data-acc="${esc(c.id)}">Przyjmij</button><button data-rej="${esc(c.id)}">Odrzuć</button></div></div>`).join('')||'<p class="sub">Brak nowych wyzwań.</p>';
   const accH=CH.inb.filter(c=>c.st==='acc').map(c=>`<div class="chi"><div class="row2"><span>od: <b>${esc(c.fn)}</b></span><span class="st acc">w grze</span></div><div class="actions"><button class="main" data-acc="${esc(c.id)}">Graj dalej</button></div></div>`).join('');
-  const restH=inRest.filter(c=>c.st!=='acc').map(c=>`<div><span>od: <b>${esc(c.fn)}</b></span>${chStatus(c)}</div>`).join('');
+  const rvOk=!!store.get('sd2_nick','')&&!RX();
+  const restH=inRest.filter(c=>c.st!=='acc').map(c=>`<div><span>od: <b>${esc(c.fn)}</b></span><span style="display:inline-flex;gap:6px;align-items:center">${chStatus(c)}${rvOk&&c.st==='done'?`<button class="chb" data-rv="${esc(c.fu)}" data-rn="${esc(c.fn)}">${ic('rapier',13)} Rewanż</button>`:''}</span></div>`).join('');
   const outH=out.map(c=>`<div><span>do: <b>${esc(c.tn)}</b> · <b>${esc(String(c.w).toUpperCase())}</b></span>${chStatus(c)}</div>`).join('')||'<p class="sub">Nie wysłałeś jeszcze wyzwań. Zrób to w rankingu przyciskiem „Wyzwij”.</p>';
   $('card').innerHTML=`<div class="step">Wyzwania</div><h2>${ic('rapier',24)} Wyzwania</h2>
   ${chOk()?'':'<div class="relaxnote">Nie przyjmujesz teraz wyzwań. Włączysz je w menu: Przyjmuję wyzwania.</div>'}
@@ -1169,7 +1213,8 @@ async function showChallenges(){open(`<div class="step">Wyzwania</div><h2>${ic('
   $('aClose').onclick=close;$('chRank').onclick=()=>showRanking('d');
   const s=chSeen();CH.out.forEach(c=>{if(c.st==='rej'||c.st==='done'||chExp(c))s[c.id]=chExp(c)?'exp':c.st});store.set('sd2_ch_seen',s);updBadge();
   document.querySelectorAll('[data-acc]').forEach(b=>b.onclick=()=>chAccept(b.dataset.acc));
-  document.querySelectorAll('[data-rej]').forEach(b=>b.onclick=()=>chReject(b.dataset.rej))}
+  document.querySelectorAll('[data-rej]').forEach(b=>b.onclick=()=>chReject(b.dataset.rej));
+  document.querySelectorAll('[data-rv]').forEach(b=>b.onclick=()=>chNew({id:b.dataset.rv,nick:b.dataset.rn}))}
 async function chSet(id,data){const {F,db}=await fb();await F.updateDoc(F.doc(db,'challenges',id),Object.assign({upd:Date.now()},data));const c=CH.inb.find(x=>x.id===id);if(c)Object.assign(c,data)}
 async function chReject(id){try{await chSet(id,{st:'rej'});toast('Wyzwanie odrzucone',1800)}catch(e){toast('Nie udało się odrzucić, spróbuj ponownie',2400)}showChallenges()}
 async function chAccept(id){const c=CH.inb.find(x=>x.id===id);if(!c)return;
