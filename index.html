@@ -293,6 +293,14 @@ body.relax .ptsblock{display:none!important}
 .nx small{display:block;font-weight:400;color:var(--muted);font-size:.78rem;margin-top:1px}
 .nx .ico{flex:none}
 .nx.p4{background:#8b5cf6;color:#fff;border-color:#8b5cf6}.nx.p4 small{color:#ede9fe}
+.nx{border-width:2px;border-left-width:6px}
+.nx.c-arch{border-color:#3b82f6;background:rgba(59,130,246,.10)}.nx.c-arch .ico{color:#3b82f6}
+.nx.c-duel{border-color:#8b5cf6;background:rgba(139,92,246,.10)}
+.nx.c-rank{border-color:#ff8a00;background:rgba(255,138,0,.10)}.nx.c-rank .ico{color:#ff8a00}
+.nx.c-ch{border-color:#e5484d;background:rgba(229,72,77,.10)}.nx.c-ch .ico{color:#e5484d}
+.nx.c-inv{border-color:#12a150;background:rgba(18,161,80,.10)}.nx.c-inv .ico{color:#12a150}
+.actions .menub{background:var(--ink);color:var(--bg)}
+.actions button[id^="aX"]{background:#000;color:#fff}.actions button[id^="aCp"]{background:#ff8a00;color:#fff}#aBoards{background:#6b7280;color:#fff}#aBack{background:#12a150;color:#fff}#aArch{background:#3b82f6;color:#fff}
 .cdown{text-align:center;font-weight:600;color:var(--muted);font-size:.85rem;font-variant-numeric:tabular-nums}
 .menub{display:inline-flex;align-items:center;gap:6px}
 .rlist div{grid-template-columns:2.2em minmax(0,1fr) auto auto}
@@ -341,7 +349,7 @@ body.embed .iab{display:none!important}
   <div class="ssep"></div>
   <button class="sitem" id="sHelp"></button>
   <button class="sitem" id="sMove"></button>
-  <div class="sfoot">Literiada · wersja 17.6 · 2026-11-14</div>
+  <div class="sfoot">Literiada · wersja 17.8 · 2026-11-14</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -400,8 +408,9 @@ const SVG={
   chev:'<path d="M6 9.5l6 6 6-6"/>',
   send:'<path d="M3.5 11.5L20.5 4l-7.5 17-2.5-7z"/>',
   trophy:'<path d="M7.5 4h9v5a4.5 4.5 0 0 1-9 0z"/><path d="M7.5 6H4.5a3 3 0 0 0 3 4M16.5 6h3a3 3 0 0 1-3 4M12 13.5v3.5M8.5 20.5h7M9.5 17h5v3.5h-5z"/>',
+  rapier:'<path d="M7.2 16.8L20.5 3.5M16.8 16.8L3.5 3.5"/><path d="M4.2 13.8a3.4 3.4 0 0 0 6 6M19.8 13.8a3.4 3.4 0 0 1-6 6"/><path d="M6.4 17.6L3.5 20.5M17.6 17.6l2.9 2.9"/>',
   sun:'<path d="M3 18h18M6.5 18a5.5 5.5 0 0 1 11 0"/><path d="M12 6.5v2.5M5.2 9.7l1.8 1.8M18.8 9.7L17 11.5M3 14h1.5M19.5 14H21"/>'};
-const ic=(n,s=18)=>`<svg class="ico" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SVG[n]}</svg>`;
+const ic=(n,s=18)=>n==='fencer'?`<span class="ico emo" style="font-size:${Math.round(s*1.05)}px;width:${s}px;height:${s}px;line-height:${s}px;text-align:center;vertical-align:-3px" aria-hidden="true">🤺</span>`:`<svg class="ico" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SVG[n]}</svg>`;
 const MED={gold:['#f6cf45','#c99a06','#fff3b8'],silver:['#dfe3e8','#98a2ad','#ffffff'],bronze:['#e4a46a','#a5652e','#ffd9b5']};
 const medalKind=t=>t<=2?'gold':t<=4?'silver':'bronze';
 const medalName={gold:'złoty medal',silver:'srebrny medal',bronze:'brązowy medal'};
@@ -647,13 +656,13 @@ function showResult(won,p){
   } else if(duel){
     body=`<p>Hasło: ${word} (${v} pkt), zagadka od: ${esc(duel.f)}</p>`+(won?`<p>Twój wynik: <b>${pointsFor(answer,guesses.length)} pkt</b> (wartość słowa × premia ${7-guesses.length} za ${guesses.length}. próbę)</p>`:'<p>Tym razem się nie udało, ale możesz się zrewanżować!</p>');
     const nm=store.get('sd2_duel_name','')||store.get('sd2_nick','');
-    if(duel.ch){open(`<div class="step">Wyzwanie z rankingu · od: ${esc(duel.f)}</div><h2>${head}</h2>${cel}${body}<div class="relaxnote">${ic('trophy',16)} Wynik zobaczy autor wyzwania (${esc(duel.f)}), trafił też do tabeli pojedynków w rankingu.</div><div class="actions"><button class="main" id="aChBack">${ic('swords',16)} Wyzwania</button><button id="aDay">Wróć do haseł dnia</button></div>${menuRow('Pokaż planszę')}`);
+    if(duel.ch){open(`<div class="step">Wyzwanie z rankingu · od: ${esc(duel.f)}</div><h2>${head}</h2>${cel}${body}<div class="relaxnote">${ic('rapier',16)} Wynik zobaczy autor wyzwania (${esc(duel.f)}), trafił też do tabeli pojedynków w rankingu.</div><div class="actions"><button class="main" id="aChBack">${ic('rapier',16)} Wyzwania</button><button id="aDay">Wróć do haseł dnia</button></div>${menuRow('Pokaż planszę')}`);
       $('aChBack').onclick=()=>showChallenges();$('aDay').onclick=()=>setMode('day');bindMenuRow();return}
     open(`<div class="step">Pojedynek · zagadka od: ${esc(duel.f)}</div><h2>${head}</h2>${cel}${body}
     <div class="dlink"><b>${ic('send',16)} Odeślij wynik do: ${esc(duel.f)}</b><span class="sub" style="color:inherit">${esc(duel.f)} zobaczy Twoją planszę i liczbę prób.</span>
     <label style="display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:.85rem">Twój podpis<input id="rName" maxlength="20" value="${esc(nm)}" placeholder="np. Ania" autocomplete="off"></label>
     <button class="main" id="aRet" style="border:0;border-radius:8px;padding:10px;font-weight:700;background:#8b5cf6;color:#fff">Odeślij wynik</button><div id="rDone"></div></div>
-    <div class="actions"><button class="main" id="aRev">${ic('swords',16)} Odbij piłeczkę: wymyśl hasło w rewanżu</button></div><button class="duelbtn" id="aDay">Zagraj w Literiadę: 3 hasła dziennie</button>${menuRow('Pokaż planszę')}`);
+    <div class="actions"><button class="main" id="aRev">${ic('fencer',16)} Odbij piłeczkę: wymyśl hasło w rewanżu</button></div><button class="duelbtn" id="aDay">Zagraj w Literiadę: 3 hasła dziennie</button>${menuRow('Pokaż planszę')}`);
     bindMenuRow();$('aRev').onclick=showDuel;$('aDay').onclick=()=>setMode('day');$('aRet').onclick=()=>sendResult(won);
   } else {
     body=`<p>Hasło: ${word} · ${v} pkt</p><p class="sub">W treningu punkty się nie liczą.</p>`;
@@ -691,7 +700,7 @@ function showStats(){
   const askRk=!RX()&&mode==='day'&&done3(day)&&!store.get('sd2_nick','')&&!store.get('sd2_rk_never',false)&&store.get('sd2_rk_ask','')!==todayKey();
   const rkInv=askRk?`<div class="rjoin" id="rkInv"><b>${ic('trophy',18)} Sprawdź swoje miejsce w rankingu!</b><span style="font-size:.85rem">Dziś masz ${day.pts.reduce((a,b)=>a+b,0)} pkt. Podaj pseudonim, a Twoje punkty trafią do wspólnego rankingu graczy. Bez maila i hasła.</span><input id="rIn" maxlength="20" placeholder="np. Radek z Pręgowa" autocomplete="off"><button id="rJoin">Dołącz do rankingu</button><span class="dbad" id="rErr" hidden></span><span style="display:flex;justify-content:space-between;gap:8px"><button class="linkbtn" id="rkLater" style="padding:0;color:#0b3d22">Nie teraz</button><button class="linkbtn" id="rkNever" style="padding:0;color:#0b3d22">Nie pytaj więcej</button></span></div>`:'';
   const nextB=mode==='day'&&allDone?nextBox(pend):'';
-  const extraB=nextB?'':`${p4b}<button class="invbtn" id="aInv">${ic('send',18)} Zaproś znajomych do gry</button><button class="rkbtn" id="aRank">${ic('trophy',18)} Ranking graczy</button><button class="duelbtn" id="aDuel">${ic('swords',18)} Wyzwij znajomego na pojedynek</button>`;
+  const extraB=nextB?'':`${p4b}<button class="invbtn" id="aInv">${ic('send',18)} Zaproś znajomych do gry</button><button class="rkbtn" id="aRank">${ic('trophy',18)} Ranking graczy</button><button class="duelbtn" id="aDuel">${ic('fencer',18)} Wyzwij znajomego na pojedynek</button>`;
   open(`${logo()}<div class="step">${mode==='arch'?'Archiwum · ':''}Strona 4 z 4 · Podsumowanie</div><h2>${mode==='arch'?'Dzień '+shortDate(archKey):'Podsumowanie dnia'}</h2>${rkInv}
   ${day.g.some(x=>x&&x.length)?'<p class="sub">Dotknij paska poziomu, żeby rozwinąć jego planszę.</p>':''}<div class="daysum">${dayRows}</div>
   ${RX()?'<div class="relaxnote">🌿 Grasz na luzie: bez zegara, punktów i rankingu. Wyłączysz to w menu ☰.</div>':''}<div class="total ptsblock"><span>${mode==='arch'?'Ten dzień razem':'Dziś razem'}</span><span>${day.pts.reduce((a,b)=>a+b,0)} pkt</span></div>
@@ -758,7 +767,7 @@ function showHelp(){
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 17.6 · 2026-11-14</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 17.8 · 2026-11-14</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
@@ -888,17 +897,17 @@ function startDuelFromHash(){const m=location.hash.match(/^#p=([A-Za-z0-9_-]+)$/
   d.code=m[1].slice(0,60);const rec=store.get('sd2_duels_in',{})[d.code]||{};
   duel=d;mode='free';answer=d.w;guesses=rec.g||[];cur='';done=!!rec.res;document.body.classList.add('duel');paint();fitBoard();
   if(rec.res){showResult(rec.res==='won',rec.pts||0);return true}
-  open(`<h2>${ic('swords',26)} Pojedynek!</h2><p style="font-size:1.1rem"><b>${esc(d.f)}</b> ma dla Ciebie zagadkę w Literiadzie.</p><p>Odgadnij 5-literowe hasło w 6 próbach. Zielony: litera na swoim miejscu, pomarańczowy: litera jest, ale gdzie indziej, szary: brak litery.</p><div class="actions"><button class="main" id="aGo">${guesses.length?'Graj dalej':'Zagraj'}</button></div>`);
+  open(`<h2>${ic('fencer',26)} Pojedynek!</h2><p style="font-size:1.1rem"><b>${esc(d.f)}</b> ma dla Ciebie zagadkę w Literiadzie.</p><p>Odgadnij 5-literowe hasło w 6 próbach. Zielony: litera na swoim miejscu, pomarańczowy: litera jest, ale gdzie indziej, szary: brak litery.</p><div class="actions"><button class="main" id="aGo">${guesses.length?'Graj dalej':'Zagraj'}</button></div>`);
   $('aGo').onclick=()=>{SFX.unlock();close()};return true}
 function showDuel(){fb().catch(()=>{});
   const name=store.get('sd2_duel_name','');const out=store.get('sd2_duels_out',[]),inn=store.get('sd2_duels_in',{});
   const outL=out.slice(0,15).map(x=>`<div><span><b>${esc(x.w.toUpperCase())}</b></span><span>${new Date(x.ts).toLocaleDateString('pl-PL')}${(x.r||[]).map(r=>`<span class="dres">${esc(r.n)}: ${r.res==='won'?r.tries+'. próba · '+r.pts+' pkt':'nie odgadnięte'}</span>`).join('')}</span></div>`).join('')||'<p class="sub">Jeszcze nic nie wysłano.</p>';
   const inL=Object.values(inn).sort((a,b)=>b.ts-a.ts).slice(0,15).map(x=>`<div><span>od: <b>${esc(x.f)}</b></span><span>${x.res==='won'?'odgadnięte w '+x.g.length+'. próbie':x.res==='lost'?'nie udało się':'w trakcie'}</span></div>`).join('')||'<p class="sub">Jeszcze nikt Cię nie wyzwał.</p>';
-  open(`<h2>${ic('swords',24)} Pojedynek</h2><p>Wymyśl hasło dla znajomego i wyślij mu link. Odgaduje Twoje słowo w 6 próbach, jak w grze dnia, ale bez zegara i jokerów. Po rozwiązaniu może odesłać Ci link z wynikiem, który zobaczysz w „Wysłanych zagadkach”.</p>
+  open(`<h2>${ic('fencer',24)} Pojedynek</h2><p>Wymyśl hasło dla znajomego i wyślij mu link. Odgaduje Twoje słowo w 6 próbach, jak w grze dnia, ale bez zegara i jokerów. Po rozwiązaniu może odesłać Ci link z wynikiem, który zobaczysz w „Wysłanych zagadkach”.</p>
   <div class="dform"><label>Twój podpis<input id="dFrom" maxlength="20" value="${esc(name)}" placeholder="np. Radek" autocomplete="off"></label>
   <label>Hasło dla znajomego (5 liter)<input id="dWord" maxlength="5" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></label>
   <p class="sub" id="dInfo">Wpisz słowo, sprawdzę, czy jest w słowniku.</p></div>
-  <div class="actions"><button class="main" id="dSend">${ic('swords',16)} Wyślij zagadkę</button><button id="aClose">Zamknij</button></div><div id="dDone"></div>
+  <div class="actions"><button class="main" id="dSend">${ic('fencer',16)} Wyślij zagadkę</button><button id="aClose">Zamknij</button></div><div id="dDone"></div>
   <p><b>Wysłane zagadki</b></p><div class="dlist" id="dOut">${outL}</div><p><b>Odebrane zagadki</b></p><div class="dlist">${inL}</div>`);
   const wi=$('dWord'),info=$('dInfo');
   const chk=()=>{const w=wi.value.toLowerCase().replace(/[^a-ząćęłńóśźż]/g,'').slice(0,5);if(wi.value!==w)wi.value=w;
@@ -931,10 +940,10 @@ function startResultFromHash(){const m=location.hash.match(/^#r=([A-Za-z0-9_-]+)
   const out=store.get('sd2_duels_out',[]);let it=out.find(x=>x.w===o.w);const rr={n,res:won?'won':'lost',tries:g.length,pts,ts:Date.now()};
   if(it){it.r=(it.r||[]).filter(x=>x.n!==n);it.r.unshift(rr)}else out.unshift({w:o.w,ts:Date.now(),r:[rr]});store.set('sd2_duels_out',out.slice(0,50));
   const mini=`<span class="mini">${g.map(w=>{const s=score(w,o.w);return `<span class="mr">${[...w].map((ch,j)=>`<i style="background:${COL[s[j]]}">${ch}</i>`).join('')}</span>`}).join('')}</span>`;
-  open(`<div class="step">Pojedynek · wynik od: ${esc(n)}</div><h2>${ic('swords',24)} ${esc(n)}: ${won?'odgadnięte!':'tym razem bez trafienia'}</h2>
+  open(`<div class="step">Pojedynek · wynik od: ${esc(n)}</div><h2>${ic('fencer',24)} ${esc(n)}: ${won?'odgadnięte!':'tym razem bez trafienia'}</h2>
   ${won?`<div class="cel">${medal(medalKind(g.length))}<div class="msg">Hasło <span class="answer">${esc(o.w)}</span><small>${g.length}. próba · ${pts} pkt</small></div></div>`:`<p>Twoje hasło <span class="answer">${esc(o.w)}</span> okazało się za trudne: 6 prób bez trafienia.</p>`}
   <div class="boards" style="width:auto"><div class="bl">${mini}</div></div>
-  <div class="actions"><button class="main" id="aNewD">${ic('swords',16)} Wyślij kolejną zagadkę</button><button id="aClose">Zamknij</button></div>`);
+  <div class="actions"><button class="main" id="aNewD">${ic('fencer',16)} Wyślij kolejną zagadkę</button><button id="aClose">Zamknij</button></div>`);
   $('aNewD').onclick=showDuel;return true}
 // ---- Eksport i import wyników (przeprowadzka na inne urządzenie lub nowy adres)
 const MV_PRE='LITERIADA1:';
@@ -1090,12 +1099,12 @@ function untilMidnight(){const now=new Date(),p=new Intl.DateTimeFormat('en-GB',
 let cdownT=null;
 function nextBox(pend){const nk=store.get('sd2_nick',''),items=[];
   if(isWknd(curKey())&&!day.res[3])items.push(`<button class="nx p4" data-nx="p4">${ic('gift',20)}<span>Weekendowa niespodzianka<small>Dodatkowe hasło za 12+ pkt i 10 minut na bonus</small></span></button>`);
-  if(pend)items.push(`<button class="nx" data-nx="arch">${ic('cal',20)}<span>Zagraj w archiwum<small>Masz ${pend} ${pend===1?'zaległy dzień':'zaległe dni'}, zaczniesz od najstarszego</small></span></button>`);
-  items.push(`<button class="nx" data-nx="duel">${ic('swords',20)}<span>Rzuć wyzwanie znajomemu<small>Wymyśl hasło i wyślij je linkiem</small></span></button>`);
-  if(!RX())items.push(nk?`<button class="nx" data-nx="rank">${ic('trophy',20)}<span>Zobacz ranking dnia<small>Sprawdź swoje miejsce i wyzwij innych graczy</small></span></button>`
-    :`<button class="nx" data-nx="rank">${ic('trophy',20)}<span>Dołącz do rankingu<small>Porównaj się z innymi i odbieraj wyzwania</small></span></button>`);
-  if(chCount())items.push(`<button class="nx" data-nx="ch">${ic('swords',20)}<span>Wyzwania czekają: ${chCount()}<small>Ktoś rzucił Ci wyzwanie albo odpowiedział na Twoje</small></span></button>`);
-  items.push(`<button class="nx" data-nx="inv">${ic('send',20)}<span>Zaproś znajomego<small>Za polecenie dostajesz jokera na poziomie 2 lub 3</small></span></button>`);
+  if(pend)items.push(`<button class="nx c-arch" data-nx="arch">${ic('cal',20)}<span>Zagraj w archiwum<small>Masz ${pend} ${pend===1?'zaległy dzień':'zaległe dni'}, zaczniesz od najstarszego</small></span></button>`);
+  items.push(`<button class="nx c-duel" data-nx="duel">${ic('fencer',20)}<span>Rzuć wyzwanie znajomemu<small>Wymyśl hasło i wyślij je linkiem</small></span></button>`);
+  if(!RX())items.push(nk?`<button class="nx c-rank" data-nx="rank">${ic('trophy',20)}<span>Zobacz ranking dnia<small>Sprawdź swoje miejsce i wyzwij innych graczy</small></span></button>`
+    :`<button class="nx c-rank" data-nx="rank">${ic('trophy',20)}<span>Dołącz do rankingu<small>Porównaj się z innymi i odbieraj wyzwania</small></span></button>`);
+  if(chCount())items.push(`<button class="nx c-ch" data-nx="ch">${ic('rapier',20)}<span>Wyzwania czekają: ${chCount()}<small>Ktoś rzucił Ci wyzwanie albo odpowiedział na Twoje</small></span></button>`);
+  items.push(`<button class="nx c-inv" data-nx="inv">${ic('send',20)}<span>Zaproś znajomego<small>Za polecenie dostajesz jokera na poziomie 2 lub 3</small></span></button>`);
   return `<div class="nextbox"><h3>Co dalej?</h3>${items.slice(0,5).join('')}<div class="cdown" id="cdown">Nowe hasła za ${untilMidnight()}</div></div>`}
 function bindNext(){const act={p4:startP4,arch:()=>{const k=oldestPending();if(k)enterArch(k);else showArchive()},duel:showDuel,rank:()=>showRanking('d'),inv:()=>inviteFriends(),ch:()=>showChallenges()};
   document.querySelectorAll('[data-nx]').forEach(b=>b.onclick=act[b.dataset.nx]);
@@ -1110,13 +1119,13 @@ const chOutNews=()=>{const s=chSeen();return CH.out.filter(c=>(c.st==='rej'||c.s
 const chCount=()=>CH.loaded?chInPending().length+chOutNews().length:0;
 const chOk=()=>store.get('sd2_ch_ok',true);
 function chBtn(r){const nk=store.get('sd2_nick','');if(!nk||!FBUID||r.id===FBUID||RX())return '';
-  if(RK.off&&RK.off.has(r.id))return `<button class="chb" disabled title="Ten gracz nie przyjmuje wyzwań">${ic('swords',13)} Wyzwij</button>`;
+  if(RK.off&&RK.off.has(r.id))return `<button class="chb" disabled title="Ten gracz nie przyjmuje wyzwań">${ic('rapier',13)} Wyzwij</button>`;
   const id=FBUID+'_'+r.id+'_'+todayKey();if(CH.out.some(c=>c.id===id))return `<button class="chb" disabled>Wysłano ✓</button>`;
-  return `<button class="chb" data-ch="${esc(r.id)}">${ic('swords',13)} Wyzwij</button>`}
+  return `<button class="chb" data-ch="${esc(r.id)}">${ic('rapier',13)} Wyzwij</button>`}
 function chNew(r){const me=store.get('sd2_nick','');
-  open(`<div class="step">Wyzwanie z rankingu</div><h2>${ic('swords',24)} Wyzwij: ${esc(r.nick)}</h2><p>Wpisz hasło, które <b>${esc(r.nick)}</b> ma odgadnąć w 6 próbach. Wyzwanie pojawi się w menu ☰ → Wyzwania i będzie ważne przez 48 godzin.</p>
+  open(`<div class="step">Wyzwanie z rankingu</div><h2>${ic('rapier',24)} Wyzwij: ${esc(r.nick)}</h2><p>Wpisz hasło, które <b>${esc(r.nick)}</b> ma odgadnąć w 6 próbach. Wyzwanie pojawi się w menu ☰ → Wyzwania i będzie ważne przez 48 godzin.</p>
   <div class="dform"><label>Hasło (5 liter)<input id="dWord" maxlength="5" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></label><p class="sub" id="dInfo">Wpisz słowo, sprawdzę, czy jest w słowniku.</p></div>
-  <div class="actions"><button class="main" id="chSend">${ic('swords',16)} Wyślij wyzwanie</button><button id="chBack">Wróć do rankingu</button></div><p class="sub">Wysyłasz jako <b>${esc(me)}</b>.</p>`);
+  <div class="actions"><button class="main" id="chSend">${ic('rapier',16)} Wyślij wyzwanie</button><button id="chBack">Wróć do rankingu</button></div><p class="sub">Wysyłasz jako <b>${esc(me)}</b>.</p>`);
   const wi=$('dWord'),info=$('dInfo');
   const chk=()=>{const w=wi.value.toLowerCase().replace(/[^a-ząćęłńóśźż]/g,'').slice(0,5);if(wi.value!==w)wi.value=w;
     if(w.length<5){info.className='sub';info.textContent='Wpisz 5 liter ('+w.length+'/5).';return false}
@@ -1142,7 +1151,7 @@ async function chNotify(){if(!(store.get('sd2_nick','')||store.get('sd2_ch_sent'
   const t=[pin?'Masz '+pin+(pin===1?' nowe wyzwanie':' nowe wyzwania')+' w menu ☰':'',msg].filter(Boolean).join(' · ');if(t&&$('ov').hidden)toast(t,3200)}
 function chStatus(c){if(chExp(c))return '<span class="st exp">wygasło</span>';
   return {new:'<span class="st new">oczekuje</span>',acc:'<span class="st acc">przyjęte, w grze</span>',rej:'<span class="st rej">odrzucone</span>',done:'<span class="st done">'+(c.res==='won'?'odgadnięte: '+c.tries+'. próba · '+c.pts+' pkt':'nie odgadnięte')+'</span>'}[c.st]||''}
-async function showChallenges(){open(`<div class="step">Wyzwania</div><h2>${ic('swords',24)} Wyzwania</h2><p class="sub">Wczytuję…</p><div class="actions"><button id="aClose">Zamknij</button></div>`);
+async function showChallenges(){open(`<div class="step">Wyzwania</div><h2>${ic('rapier',24)} Wyzwania</h2><p class="sub">Wczytuję…</p><div class="actions"><button id="aClose">Zamknij</button></div>`);
   const ok=await chLoad();
   if(!ok){$('card').querySelector('.sub').textContent='Wyzwania są chwilowo niedostępne. Sprawdź internet i spróbuj ponownie.';return}
   const inP=chInPending(),inRest=CH.inb.filter(c=>!inP.includes(c)).sort((a,b)=>b.ts-a.ts).slice(0,10),out=CH.out.slice().sort((a,b)=>b.ts-a.ts).slice(0,15);
@@ -1150,7 +1159,7 @@ async function showChallenges(){open(`<div class="step">Wyzwania</div><h2>${ic('
   const accH=CH.inb.filter(c=>c.st==='acc').map(c=>`<div class="chi"><div class="row2"><span>od: <b>${esc(c.fn)}</b></span><span class="st acc">w grze</span></div><div class="actions"><button class="main" data-acc="${esc(c.id)}">Graj dalej</button></div></div>`).join('');
   const restH=inRest.filter(c=>c.st!=='acc').map(c=>`<div><span>od: <b>${esc(c.fn)}</b></span>${chStatus(c)}</div>`).join('');
   const outH=out.map(c=>`<div><span>do: <b>${esc(c.tn)}</b> · <b>${esc(String(c.w).toUpperCase())}</b></span>${chStatus(c)}</div>`).join('')||'<p class="sub">Nie wysłałeś jeszcze wyzwań. Zrób to w rankingu przyciskiem „Wyzwij”.</p>';
-  $('card').innerHTML=`<div class="step">Wyzwania</div><h2>${ic('swords',24)} Wyzwania</h2>
+  $('card').innerHTML=`<div class="step">Wyzwania</div><h2>${ic('rapier',24)} Wyzwania</h2>
   ${chOk()?'':'<div class="relaxnote">Nie przyjmujesz teraz wyzwań. Włączysz je w menu: Przyjmuję wyzwania.</div>'}
   <p><b>Wyzwania dla Ciebie</b></p>${accH}${inH}${restH?`<div class="dlog">${restH}</div>`:''}
   <p><b>Wysłane przez Ciebie</b></p><div class="dlog">${outH}</div>
@@ -1172,7 +1181,7 @@ async function chDone(id,won){try{await chSet(id,{st:'done',res:won?'won':'lost'
 async function chWipe(){try{const {F,db,uid}=await fb();
   const qs=await Promise.all([F.getDocs(F.query(F.collection(db,'challenges'),F.where('fu','==',uid))),F.getDocs(F.query(F.collection(db,'challenges'),F.where('tu','==',uid)))]);
   for(const q of qs)for(const d of q.docs){try{await F.deleteDoc(F.doc(db,'challenges',d.id))}catch(e){}}CH.inb=[];CH.out=[];updBadge()}catch(e){console.warn('wyzwania',e)}}
-function chOptLabel(){$('sChOpt').innerHTML=ic('swords',20)+'Przyjmuję wyzwania: <b style="margin-left:4px">'+(chOk()?'tak':'nie')+'</b>'}
+function chOptLabel(){$('sChOpt').innerHTML=ic('rapier',20)+'Przyjmuję wyzwania: <b style="margin-left:4px">'+(chOk()?'tak':'nie')+'</b>'}
 async function chOptToggle(){const on=!chOk();store.set('sd2_ch_ok',on);chOptLabel();
   try{const {F,db,uid}=await fb();if(on)await F.deleteDoc(F.doc(db,'chset',uid));else await F.setDoc(F.doc(db,'chset',uid),{off:true,upd:Date.now()})}catch(e){console.warn('wyzwania',e)}
   toast(on?'Przyjmujesz wyzwania od graczy z rankingu':'Nie przyjmujesz wyzwań. Inni zobaczą wyszarzony przycisk',2600)}
@@ -1194,8 +1203,8 @@ $('sClose').innerHTML=ic('back',20);$('sClose').onclick=()=>sideSet(false,true);
 $('sRank').innerHTML=ic('trophy',20)+'Ranking graczy';$('sRank').onclick=sideGo(()=>showRanking());
 $('sStats').innerHTML=ic('chart',20)+'Podsumowanie i wyniki';$('sStats').onclick=sideGo(()=>{if(mode==='free')setMode('day');showStats()});
 $('sArch').innerHTML=ic('cal',20)+'Archiwum<span class="badge" id="arBadge" hidden></span>';$('sArch').onclick=sideGo(showArchive);
-$('sDuel').innerHTML=ic('swords',20)+'Pojedynek';$('sDuel').onclick=sideGo(showDuel);
-$('sCh').innerHTML=ic('swords',20)+'Wyzwania<span class="badge" id="chBadge" hidden></span>';$('sCh').onclick=sideGo(()=>showChallenges());
+$('sDuel').innerHTML=ic('fencer',20)+'Pojedynek';$('sDuel').onclick=sideGo(showDuel);
+$('sCh').innerHTML=ic('rapier',20)+'Wyzwania<span class="badge" id="chBadge" hidden></span>';$('sCh').onclick=sideGo(()=>showChallenges());
 chOptLabel();$('sChOpt').onclick=sideGo(chOptToggle);
 $('sTrain').innerHTML=ic('train',20)+'Trening';$('sTrain').onclick=sideGo(showTrain);
 $('sHelp').innerHTML=ic('help',20)+'Jak grać';$('sHelp').onclick=sideGo(showHelp);
