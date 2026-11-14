@@ -286,6 +286,23 @@ body.relax .ptsblock{display:none!important}
 .dlog{display:flex;flex-direction:column;gap:4px;font-size:.88rem}
 .dlog div{border-bottom:1px solid var(--line);padding:5px 0;display:flex;justify-content:space-between;gap:8px}
 .rkbtn{width:100%;border:2px solid #ff8a00;border-radius:8px;padding:11px;font:800 .95rem var(--body);background:var(--panel);color:#b45309;cursor:pointer;display:inline-flex;gap:6px;justify-content:center;align-items:center}
+/* v17.6: menu w podsumowaniach, „Co dalej?”, wyzwania z rankingu */
+.nextbox{display:flex;flex-direction:column;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
+.nextbox h3{margin:0 0 2px;font:800 1.05rem var(--display)}
+.nx{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:10px 12px;font:700 .92rem var(--body);cursor:pointer}
+.nx small{display:block;font-weight:400;color:var(--muted);font-size:.78rem;margin-top:1px}
+.nx .ico{flex:none}
+.nx.p4{background:#8b5cf6;color:#fff;border-color:#8b5cf6}.nx.p4 small{color:#ede9fe}
+.cdown{text-align:center;font-weight:600;color:var(--muted);font-size:.85rem;font-variant-numeric:tabular-nums}
+.menub{display:inline-flex;align-items:center;gap:6px}
+.rlist div{grid-template-columns:2.2em minmax(0,1fr) auto auto}
+.chb{border:1.5px solid #8b5cf6;background:var(--panel);color:#6d28d9;border-radius:999px;font:800 .74rem var(--body);padding:4px 9px;cursor:pointer;display:inline-flex;gap:3px;align-items:center;white-space:nowrap}
+.chb:disabled{border-color:var(--line);color:var(--muted);cursor:default;opacity:.7}
+.chi{display:flex;flex-direction:column;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.chi .row2{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.chi .actions button{padding:9px}
+.st{font-size:.78rem;font-weight:700;border-radius:999px;padding:2px 8px;white-space:nowrap}
+.st.new{background:#fff3cd;color:#3d2e00}.st.acc{background:#dbeafe;color:#1e3a8a}.st.done{background:#d3e8d9;color:#0b3d22}.st.rej{background:#fde2e2;color:#7f1d1d}.st.exp{background:var(--key);color:var(--muted)}
 /* v14 – progi szerokości (mobile first):
    baza: telefon 375–480 px · tablet 481–1099 px · komputer od 1100 px (stałe menu z boku)
    duże ekrany od 1800×1000 px i 4K: cała gra skalowana proporcjonalnie (JS: fitScale) */
@@ -315,14 +332,16 @@ body.embed .iab{display:none!important}
   <button class="sitem" id="sStats"></button>
   <button class="sitem" id="sArch"></button>
   <button class="sitem" id="sDuel"></button>
+  <button class="sitem" id="sCh"></button>
   <button class="sitem" id="sInv"></button>
   <a class="sitem" id="sX" href="https://x.com/Literiada" target="_blank" rel="noopener" style="text-decoration:none"></a>
   <button class="sitem" id="sTrain"></button>
   <button class="sitem" id="sRelax"></button>
+  <button class="sitem" id="sChOpt"></button>
   <div class="ssep"></div>
   <button class="sitem" id="sHelp"></button>
   <button class="sitem" id="sMove"></button>
-  <div class="sfoot">Literiada · wersja 17.5 · 2026-11-13</div>
+  <div class="sfoot">Literiada · wersja 17.6 · 2026-11-14</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -540,7 +559,8 @@ function finish(won){
     const h=store.get('sd2_hist',{});h[curKey()]=day.pts.slice();store.set('sd2_hist',h);
     rankSync();refPush();
   }
-  if(duel){duelSave({g:guesses,res:won?'won':'lost',pts:won?pointsFor(answer,guesses.length):0});const nk=store.get('sd2_nick','');if(nk)duelPush(nk,won)}
+  if(duel){duelSave({g:guesses,res:won?'won':'lost',pts:won?pointsFor(answer,guesses.length):0});const nk=store.get('sd2_nick','');
+    if(duel.ch){duelPush(nk||store.get('sd2_duel_name','')||'Gracz',won);chDone(duel.ch,won)}else if(nk)duelPush(nk,won)}
   paint();updTimer();
   if(won)SFX.win(0);else SFX.lose(0);
   toast(won?['Genialnie!','Wspaniale!','Świetnie!','Brawo!','Nieźle!','Uff, udało się!'][guesses.length-1]:'Hasło: '+answer.toUpperCase(),2000);
@@ -582,7 +602,8 @@ function fallback(text){const a=document.createElement('textarea');a.value=text;
 function archPending(){const a=store.get('sd2_arch',{}),lg=store.get('sd2_log',{}),today=keyToUTC(todayKey());let n=0;
   for(let t=today-DAY;t>=START;t-=DAY){const k=utcToKey(t),e=a[k],res=(e&&e.res)||lg[k]||[null,null,null];if(!(res[2]||res.slice(0,3).includes('lost')))n++}return n}
 function updBadge(){const n=archPending(),b=$('arBadge');if(!b)return;b.hidden=!n;b.textContent=n;
-  $('sArch').title=n?'Archiwum · zaległe dni: '+n:'Archiwum poprzednich dni';const d=$('mDot');if(d)d.hidden=!n||document.body.classList.contains('side-on')}
+  $('sArch').title=n?'Archiwum · zaległe dni: '+n:'Archiwum poprzednich dni';const c=chCount(),cb=$('chBadge');if(cb){cb.hidden=!c;cb.textContent=c}
+  const d=$('mDot');if(d)d.hidden=!(n||c)||document.body.classList.contains('side-on')}
 function close(){$('ov').hidden=true;updBadge();setTimeout(menuHint,400)}
 function open(html){document.querySelectorAll('.hint').forEach(h=>h.remove());$('card').innerHTML=html;$('ov').hidden=false;const c=$('aClose');if(c)c.onclick=close}
 
@@ -617,8 +638,8 @@ function showResult(won,p){
       :`<button class="main" id="aSum">Podsumowanie dnia</button>`;
     if(gift)btns=`<div class="gift" style="width:100%">${ic('gift',44)}<div><b>Weekendowy prezent!</b><small>Masz ochotę na niespodziankę? Dodatkowe hasło za 12+ pkt, 10 minut na bonus i szansa na ekstra punkty.</small></div></div>`+btns;
     const endDay=done3(day)&&!(won&&lvl<2);
-    open(`<div class="step">${mode==='arch'?'Archiwum '+shortDate(archKey)+' · ':''}${lvl===3?'Weekendowa niespodzianka':'Strona '+(lvl+1)+' z 4 · '+LV[lvl].n}</div><h2>${head}</h2>${cel}${full}${body}${endDay?shareBtns('R'):''}<div class="actions">${btns}</div><button class="linkbtn" id="aClose">Pokaż planszę</button>`);
-    bindShare('R');
+    open(`<div class="step">${mode==='arch'?'Archiwum '+shortDate(archKey)+' · ':''}${lvl===3?'Weekendowa niespodzianka':'Strona '+(lvl+1)+' z 4 · '+LV[lvl].n}</div><h2>${head}</h2>${cel}${full}${body}${endDay?shareBtns('R'):''}<div class="actions">${btns}</div>${menuRow('Pokaż planszę')}`);
+    bindShare('R');bindMenuRow();
     if($('aNext'))$('aNext').onclick=()=>{close();lvl++;loadDayLevel()};
     if($('aSum'))$('aSum').onclick=showStats;
     if($('aP4'))$('aP4').onclick=startP4;
@@ -626,16 +647,18 @@ function showResult(won,p){
   } else if(duel){
     body=`<p>Hasło: ${word} (${v} pkt), zagadka od: ${esc(duel.f)}</p>`+(won?`<p>Twój wynik: <b>${pointsFor(answer,guesses.length)} pkt</b> (wartość słowa × premia ${7-guesses.length} za ${guesses.length}. próbę)</p>`:'<p>Tym razem się nie udało, ale możesz się zrewanżować!</p>');
     const nm=store.get('sd2_duel_name','')||store.get('sd2_nick','');
+    if(duel.ch){open(`<div class="step">Wyzwanie z rankingu · od: ${esc(duel.f)}</div><h2>${head}</h2>${cel}${body}<div class="relaxnote">${ic('trophy',16)} Wynik zobaczy autor wyzwania (${esc(duel.f)}), trafił też do tabeli pojedynków w rankingu.</div><div class="actions"><button class="main" id="aChBack">${ic('swords',16)} Wyzwania</button><button id="aDay">Wróć do haseł dnia</button></div>${menuRow('Pokaż planszę')}`);
+      $('aChBack').onclick=()=>showChallenges();$('aDay').onclick=()=>setMode('day');bindMenuRow();return}
     open(`<div class="step">Pojedynek · zagadka od: ${esc(duel.f)}</div><h2>${head}</h2>${cel}${body}
     <div class="dlink"><b>${ic('send',16)} Odeślij wynik do: ${esc(duel.f)}</b><span class="sub" style="color:inherit">${esc(duel.f)} zobaczy Twoją planszę i liczbę prób.</span>
     <label style="display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:.85rem">Twój podpis<input id="rName" maxlength="20" value="${esc(nm)}" placeholder="np. Ania" autocomplete="off"></label>
     <button class="main" id="aRet" style="border:0;border-radius:8px;padding:10px;font-weight:700;background:#8b5cf6;color:#fff">Odeślij wynik</button><div id="rDone"></div></div>
-    <div class="actions"><button class="main" id="aRev">${ic('swords',16)} Odbij piłeczkę: wymyśl hasło w rewanżu</button></div><button class="duelbtn" id="aDay">Zagraj w Literiadę: 3 hasła dziennie</button><button class="linkbtn" id="aClose">Pokaż planszę</button>`);
-    $('aRev').onclick=showDuel;$('aDay').onclick=()=>setMode('day');$('aRet').onclick=()=>sendResult(won);
+    <div class="actions"><button class="main" id="aRev">${ic('swords',16)} Odbij piłeczkę: wymyśl hasło w rewanżu</button></div><button class="duelbtn" id="aDay">Zagraj w Literiadę: 3 hasła dziennie</button>${menuRow('Pokaż planszę')}`);
+    bindMenuRow();$('aRev').onclick=showDuel;$('aDay').onclick=()=>setMode('day');$('aRet').onclick=()=>sendResult(won);
   } else {
     body=`<p>Hasło: ${word} · ${v} pkt</p><p class="sub">W treningu punkty się nie liczą.</p>`;
-    open(`<div class="step">Trening · ${LV[freeLvl].n}</div><h2>${head}</h2>${cel}${body}<div class="actions"><button class="main" id="aAgain">Nowe słowo</button></div>${trainPicker()}<button class="linkbtn" id="aDay">Wróć do haseł dnia</button>`);
-    $('aAgain').onclick=()=>{close();newFree()};bindTrain();$('aDay').onclick=()=>setMode('day');
+    open(`<div class="step">Trening · ${LV[freeLvl].n}</div><h2>${head}</h2>${cel}${body}<div class="actions"><button class="main" id="aAgain">Nowe słowo</button></div>${trainPicker()}<button class="linkbtn" id="aDay">Wróć do haseł dnia</button>${menuRow()}`);
+    bindMenuRow();$('aAgain').onclick=()=>{close();newFree()};bindTrain();$('aDay').onclick=()=>setMode('day');
   }
 }
 function trainPicker(){return `<p class="sub">Trening (bez punktów), wybierz poziom:</p><div class="trainlv">${LV.map((l,i)=>`<button data-tl="${i}">${l.n}<br><small>${l.r}</small></button>`).join('')}</div>`}
@@ -667,11 +690,13 @@ function showStats(){
   const p4b=p4open()&&!day.res[3]?`<button class="p4btn" id="aP4">${ic('gift',18)} ${day.g[3].length?'Wróć do weekendowej niespodzianki':'Weekendowa niespodzianka: zagraj!'}</button>`:'';
   const askRk=!RX()&&mode==='day'&&done3(day)&&!store.get('sd2_nick','')&&!store.get('sd2_rk_never',false)&&store.get('sd2_rk_ask','')!==todayKey();
   const rkInv=askRk?`<div class="rjoin" id="rkInv"><b>${ic('trophy',18)} Sprawdź swoje miejsce w rankingu!</b><span style="font-size:.85rem">Dziś masz ${day.pts.reduce((a,b)=>a+b,0)} pkt. Podaj pseudonim, a Twoje punkty trafią do wspólnego rankingu graczy. Bez maila i hasła.</span><input id="rIn" maxlength="20" placeholder="np. Radek z Pręgowa" autocomplete="off"><button id="rJoin">Dołącz do rankingu</button><span class="dbad" id="rErr" hidden></span><span style="display:flex;justify-content:space-between;gap:8px"><button class="linkbtn" id="rkLater" style="padding:0;color:#0b3d22">Nie teraz</button><button class="linkbtn" id="rkNever" style="padding:0;color:#0b3d22">Nie pytaj więcej</button></span></div>`:'';
+  const nextB=mode==='day'&&allDone?nextBox(pend):'';
+  const extraB=nextB?'':`${p4b}<button class="invbtn" id="aInv">${ic('send',18)} Zaproś znajomych do gry</button><button class="rkbtn" id="aRank">${ic('trophy',18)} Ranking graczy</button><button class="duelbtn" id="aDuel">${ic('swords',18)} Wyzwij znajomego na pojedynek</button>`;
   open(`${logo()}<div class="step">${mode==='arch'?'Archiwum · ':''}Strona 4 z 4 · Podsumowanie</div><h2>${mode==='arch'?'Dzień '+shortDate(archKey):'Podsumowanie dnia'}</h2>${rkInv}
   ${day.g.some(x=>x&&x.length)?'<p class="sub">Dotknij paska poziomu, żeby rozwinąć jego planszę.</p>':''}<div class="daysum">${dayRows}</div>
   ${RX()?'<div class="relaxnote">🌿 Grasz na luzie: bez zegara, punktów i rankingu. Wyłączysz to w menu ☰.</div>':''}<div class="total ptsblock"><span>${mode==='arch'?'Ten dzień razem':'Dziś razem'}</span><span>${day.pts.reduce((a,b)=>a+b,0)} pkt</span></div>
   ${day.res.some(Boolean)?shareBtns('S'):''}
-  ${p4b}<button class="invbtn" id="aInv">${ic('send',18)} Zaproś znajomych do gry</button><button class="rkbtn" id="aRank">${ic('trophy',18)} Ranking graczy</button><button class="duelbtn" id="aDuel">${ic('swords',18)} Wyzwij znajomego na pojedynek</button><div class="actions">${anyB?'<button id="aBoards">Zobacz plansze</button>':''}${!allDone?'<button id="aBack">Wróć do gry</button>':''}<button id="aArch">${ic('cal',16)} Archiwum${pend?' ('+pend+')':''}</button></div>
+  ${nextB}${extraB}<div class="actions"><button class="menub" id="aMenu">${ic('menu',16)} Menu</button>${anyB?'<button id="aBoards">Zobacz plansze</button>':''}${!allDone?'<button id="aBack">Wróć do gry</button>':''}<button id="aArch">${ic('cal',16)} Archiwum${pend?' ('+pend+')':''}</button></div>
   <div class="boards" id="boards" hidden>${boards}</div>
   ${pend?`<p class="sub">Zaległe dni w archiwum: <b>${pend}</b>. Możesz je nadrobić, punkty liczą się do dnia, którego dotyczą.</p>`:''}
   <h2 class="ptsblock">Twoje punkty</h2>
@@ -686,7 +711,9 @@ function showStats(){
   bindShare('S');
   if($('aBoards'))$('aBoards').onclick=()=>{const b=$('boards');b.hidden=!b.hidden;$('aBoards').textContent=b.hidden?'Zobacz plansze':'Ukryj plansze';if(!b.hidden)b.scrollIntoView({behavior:'smooth',block:'nearest'})};
   if($('aBack'))$('aBack').onclick=()=>{close();if(mode==='free')setMode('day')};
-  $('aArch').onclick=showArchive;$('aDuel').onclick=showDuel;$('aRank').onclick=()=>showRanking();$('aInv').onclick=()=>inviteFriends();
+  $('aArch').onclick=showArchive;$('aMenu').onclick=()=>sideSet(true);
+  if($('aDuel'))$('aDuel').onclick=showDuel;if($('aRank'))$('aRank').onclick=()=>showRanking();if($('aInv'))$('aInv').onclick=()=>inviteFriends();
+  if(nextB)bindNext();
   if($('rkInv')){
     $('rJoin').onclick=async()=>{const v=$('rIn').value.replace(/\s+/g,' ').trim().slice(0,20);
       if(v.length<2){$('rErr').hidden=false;$('rErr').textContent='Pseudonim musi mieć co najmniej 2 znaki.';return}
@@ -718,6 +745,7 @@ function showHelp(){
   <p>Poziomy idą po kolei: poziom 2 odblokowuje się po odgadnięciu hasła z poziomu 1, a poziom 3 po odgadnięciu hasła z poziomu 2. Na końcu czeka podsumowanie dnia ze statystykami.</p>
   <p><b>Weekendowa niespodzianka.</b> W sobotę i niedzielę, po zakończeniu poziomu 3, gra zaproponuje dodatkowe hasło o trudności poziomu 3. Masz na nie 10 minut na bonus za czas (do 60 pkt) i możesz dorobić sobie ekstra punkty. Jeśli odmówisz, przycisk niespodzianki czeka w podsumowaniu do końca dnia.</p>
   <p><b>Pojedynek.</b> W menu wybierz Pojedynek: wymyśl 5-literowe hasło, a gra zrobi z niego link do wysłania znajomemu (Messenger, SMS, WhatsApp). Znajomy zgaduje Twoje słowo w 6 próbach, bez zegara i jokerów, a potem może odesłać Ci link ze swoim wynikiem i planszą. Pojedynki nie wpływają na punkty gry dnia.</p>
+  <p><b>Wyzwania z rankingu.</b> Przy każdym graczu w rankingu jest przycisk „Wyzwij”: wpisujesz hasło, a gracz znajdzie je w menu ☰ → Wyzwania. Może je przyjąć albo odrzucić, a Ty dostaniesz informację o wyniku. Jedno wyzwanie dziennie do tej samej osoby, wyzwanie wygasa po 48 godzinach. Wyzwania wyłączysz w menu: Przyjmuję wyzwania.</p>
   <p><b>Ranking graczy.</b> W menu ☰ wybierz Ranking graczy i podaj pseudonim (bez maila i hasła). Twoje punkty trafią do wspólnego rankingu: dziś, w tym tygodniu, w miesiącu i łącznie. Jest tam też tabela pojedynków. Ranking jest dobrowolny i w każdej chwili możesz się z niego usunąć.</p>
   <p><b>Gra na luzie 🌿.</b> Wolisz grać bez presji? W menu ☰ włącz „Grę na luzie”: znika zegar, punkty, medale i ranking, zostają same słowa. Wyłączysz to w każdej chwili.</p>
   <p><b>Literiada na X.</b> Obserwuj @Literiada (x.com/Literiada): nowości, wyzwania i najlepsze wyniki graczy. Wrzucając wynik na X, oznacz @Literiada.</p>
@@ -730,7 +758,7 @@ function showHelp(){
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 17.5 · 2026-11-13</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 17.6 · 2026-11-14</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
@@ -1004,14 +1032,15 @@ function rankHTML(){const tab=RK.tab,nick=store.get('sd2_nick','');
   } else {
     const list=RK.rows.map(r=>({id:r.id,nick:r.nick||'?',v:rankVal(r,tab)})).filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
     const me=list.findIndex(r=>r.id===FBUID);
-    const row=(r,i)=>`<div class="${r.id===FBUID?'me':''}"><span class="pos">${i<3?medal(['gold','silver','bronze'][i],22):i+1}</span><span class="nk">${esc(r.nick)}</span><span class="pt">${r.v} pkt</span></div>`;
+    const row=(r,i)=>`<div class="${r.id===FBUID?'me':''}"><span class="pos">${i<3?medal(['gold','silver','bronze'][i],22):i+1}</span><span class="nk">${esc(r.nick)}</span><span class="pt">${r.v} pkt</span><span>${chBtn(r)}</span></div>`;
     body=list.length?`<div class="rlist">${list.slice(0,50).map(row).join('')}${me>=50?'<span class="gap">…</span>'+row(list[me],me):''}</div>`:'<p class="sub">Nikt jeszcze nie zdobył punktów w tym okresie. Twoja szansa!</p>';
     body+=`<p class="sub">Graczy w rankingu: ${RK.rows.length}${me>=0?' · Twoje miejsce: <b>'+(me+1)+'</b>':''}</p>`;
   }
   const join=nick?`<p class="sub">Grasz jako <b>${esc(nick)}</b>. <button class="linkbtn" id="rNick" style="padding:0">Zmień nick</button> · <button class="linkbtn" id="rOut" style="padding:0">Usuń mnie z rankingu</button></p>`
     :`<div class="rjoin"><b>Dołącz do rankingu</b><span style="font-size:.85rem">Wpisz pseudonim, który zobaczą inni gracze. Bez maila i hasła, zapisujemy tylko pseudonim i punkty.</span><input id="rIn" maxlength="20" placeholder="np. Radek z Pręgowa" autocomplete="off"><button id="rJoin">Dołącz</button><span class="dbad" id="rErr" hidden></span></div>`;
-  return `<div class="step">Ranking</div><h2>${ic('trophy',24)} Ranking graczy</h2>${join}<div class="rtabs">${tabs}</div>${body}<div class="actions"><button id="aClose">Zamknij</button></div><p class="sub">Link do rankingu: literiada.github.io/#ranking</p>`}
+  return `<div class="step">Ranking</div><h2>${ic('trophy',24)} Ranking graczy</h2>${join}<div class="rtabs">${tabs}</div>${body}${nick&&tab!=='p'?'<p class="sub">Przycisk „Wyzwij” wysyła graczowi Twoje hasło do odgadnięcia. Jedno wyzwanie dziennie do tej samej osoby.</p>':''}<div class="actions"><button id="aClose">Zamknij</button></div><p class="sub">Link do rankingu: literiada.github.io/#ranking</p>`}
 function rankBind(){document.querySelectorAll('[data-rt]').forEach(b=>b.onclick=()=>{RK.tab=b.dataset.rt;rankDraw()});
+  document.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{const r=(RK.rows||[]).find(x=>x.id===b.dataset.ch);if(r)chNew(r)});
   if($('rRetry'))$('rRetry').onclick=()=>{RK.err=null;rankLoad()};
   if($('rJoin'))$('rJoin').onclick=async()=>{const v=$('rIn').value.replace(/\s+/g,' ').trim().slice(0,20);
     if(v.length<2){$('rErr').hidden=false;$('rErr').textContent='Pseudonim musi mieć co najmniej 2 znaki.';return}
@@ -1019,13 +1048,16 @@ function rankBind(){document.querySelectorAll('[data-rt]').forEach(b=>b.onclick=
   if($('rNick'))$('rNick').onclick=()=>{store.set('sd2_nick','');rankDraw();setTimeout(()=>{const i=$('rIn');if(i)i.focus()},50)};
   if($('rOut'))$('rOut').onclick=async()=>{let nd=0;try{const {F,db,uid}=await fb();await F.deleteDoc(F.doc(db,'players',uid));
       const qs=await Promise.all([F.getDocs(F.query(F.collection(db,'duels'),F.where('su','==',uid))),F.getDocs(F.query(F.collection(db,'duels'),F.where('au','==',uid)))]);
-      const seen=new Set();for(const q of qs)for(const d of q.docs){if(seen.has(d.id))continue;seen.add(d.id);try{await F.deleteDoc(F.doc(db,'duels',d.id));nd++}catch(e){}}}catch(e){}
+      const seen=new Set();for(const q of qs)for(const d of q.docs){if(seen.has(d.id))continue;seen.add(d.id);try{await F.deleteDoc(F.doc(db,'duels',d.id));nd++}catch(e){}}
+      await chWipe()}catch(e){}
     store.set('sd2_nick','');toast('Usunięto Cię z rankingu'+(nd?' i z tabeli pojedynków ('+nd+')':''),2600);rankLoad()}}
 function rankDraw(){if($('ov').hidden||!$('card').querySelector('.rtabs'))return;$('card').innerHTML=rankHTML();const c=$('aClose');if(c)c.onclick=close;rankBind()}
 async function rankLoad(){RK.rows=null;rankDraw();
   try{const {F,db,uid}=await fb();
     const [ps,ds,ms]=await Promise.all([F.getDocs(F.collection(db,'players')),F.getDocs(F.query(F.collection(db,'duels'),F.orderBy('ts','desc'),F.limit(30))),F.getDocs(F.query(F.collection(db,'duels'),F.where('au','==',uid)))]);
-    RK.rows=ps.docs.map(d=>Object.assign({id:d.id},d.data()));RK.duels=ds.docs.map(d=>d.data());RK.mine=ms.docs.map(d=>d.data());RK.err=null}
+    RK.rows=ps.docs.map(d=>Object.assign({id:d.id},d.data()));RK.duels=ds.docs.map(d=>d.data());RK.mine=ms.docs.map(d=>d.data());RK.err=null;
+    try{const [cs,so]=await Promise.all([F.getDocs(F.collection(db,'chset')),F.getDocs(F.query(F.collection(db,'challenges'),F.where('fu','==',uid)))]);
+      RK.off=new Set(cs.docs.filter(d=>d.data().off===true).map(d=>d.id));CH.out=so.docs.map(d=>Object.assign({id:d.id},d.data()))}catch(e){console.warn('wyzwania',e);RK.off=new Set()}}
   catch(e){console.warn('ranking',e);RK.err=e;RK.rows=null}
   rankDraw()}
 function showRanking(tab){if(tab)RK.tab=tab;open(rankHTML());rankBind();rankLoad()}
@@ -1047,6 +1079,103 @@ async function showAdminStats(){open(`<div class="step">Statystyki</div><h2>${ic
     <div class="actions"><button id="aRef2">Odśwież</button><button class="main" id="aClose">Zamknij</button></div>`;
     $('aClose').onclick=close;$('aRef2').onclick=showAdminStats}
   catch(e){$('card').querySelector('.sub').textContent='Statystyki chwilowo niedostępne (sprawdź internet).'}}
+
+// ---- v17.6: Menu w podsumowaniach i sekcja „Co dalej?”
+const menuRow=lbl=>`<div style="display:flex;justify-content:center;gap:14px;flex-wrap:wrap">${lbl?`<button class="linkbtn" id="aClose">${lbl}</button>`:''}<button class="linkbtn menub" id="aMenuR">${ic('menu',15)} Menu</button></div>`;
+function bindMenuRow(){const b=$('aMenuR');if(b)b.onclick=()=>sideSet(true)}
+function oldestPending(){const a=store.get('sd2_arch',{}),lg=store.get('sd2_log',{}),today=keyToUTC(todayKey());let k0=null;
+  for(let t=today-DAY;t>=START;t-=DAY){const k=utcToKey(t),e=a[k],res=(e&&e.res)||lg[k]||[null,null,null];if(!(res[2]||res.slice(0,3).includes('lost')))k0=k}return k0}
+function untilMidnight(){const now=new Date(),p=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Warsaw',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).formatToParts(now),g=t=>+(p.find(x=>x.type===t)||{value:0}).value;
+  const left=24*3600-(g('hour')%24)*3600-g('minute')*60-g('second');const h=Math.floor(left/3600),m=Math.floor(left%3600/60);return h+':'+String(m).padStart(2,'0')}
+let cdownT=null;
+function nextBox(pend){const nk=store.get('sd2_nick',''),items=[];
+  if(isWknd(curKey())&&!day.res[3])items.push(`<button class="nx p4" data-nx="p4">${ic('gift',20)}<span>Weekendowa niespodzianka<small>Dodatkowe hasło za 12+ pkt i 10 minut na bonus</small></span></button>`);
+  if(pend)items.push(`<button class="nx" data-nx="arch">${ic('cal',20)}<span>Zagraj w archiwum<small>Masz ${pend} ${pend===1?'zaległy dzień':'zaległe dni'}, zaczniesz od najstarszego</small></span></button>`);
+  items.push(`<button class="nx" data-nx="duel">${ic('swords',20)}<span>Rzuć wyzwanie znajomemu<small>Wymyśl hasło i wyślij je linkiem</small></span></button>`);
+  if(!RX())items.push(nk?`<button class="nx" data-nx="rank">${ic('trophy',20)}<span>Zobacz ranking dnia<small>Sprawdź swoje miejsce i wyzwij innych graczy</small></span></button>`
+    :`<button class="nx" data-nx="rank">${ic('trophy',20)}<span>Dołącz do rankingu<small>Porównaj się z innymi i odbieraj wyzwania</small></span></button>`);
+  if(chCount())items.push(`<button class="nx" data-nx="ch">${ic('swords',20)}<span>Wyzwania czekają: ${chCount()}<small>Ktoś rzucił Ci wyzwanie albo odpowiedział na Twoje</small></span></button>`);
+  items.push(`<button class="nx" data-nx="inv">${ic('send',20)}<span>Zaproś znajomego<small>Za polecenie dostajesz jokera na poziomie 2 lub 3</small></span></button>`);
+  return `<div class="nextbox"><h3>Co dalej?</h3>${items.slice(0,5).join('')}<div class="cdown" id="cdown">Nowe hasła za ${untilMidnight()}</div></div>`}
+function bindNext(){const act={p4:startP4,arch:()=>{const k=oldestPending();if(k)enterArch(k);else showArchive()},duel:showDuel,rank:()=>showRanking('d'),inv:()=>inviteFriends(),ch:()=>showChallenges()};
+  document.querySelectorAll('[data-nx]').forEach(b=>b.onclick=act[b.dataset.nx]);
+  clearInterval(cdownT);cdownT=setInterval(()=>{const c=$('cdown');if(!c){clearInterval(cdownT);return}c.textContent='Nowe hasła za '+untilMidnight()},20000)}
+// ---- v17.6: Wyzwania z rankingu (Firestore: challenges, chset)
+const CH_TTL=48*3600e3;
+let CH={inb:[],out:[],loaded:false};
+const chExp=c=>c.st==='new'&&Date.now()>(+c.ts||0)+CH_TTL;
+const chSeen=()=>store.get('sd2_ch_seen',{});
+const chInPending=()=>CH.inb.filter(c=>c.st==='new'&&!chExp(c)).sort((a,b)=>b.ts-a.ts).slice(0,5);
+const chOutNews=()=>{const s=chSeen();return CH.out.filter(c=>(c.st==='rej'||c.st==='done'||chExp(c))&&s[c.id]!==(chExp(c)?'exp':c.st))};
+const chCount=()=>CH.loaded?chInPending().length+chOutNews().length:0;
+const chOk=()=>store.get('sd2_ch_ok',true);
+function chBtn(r){const nk=store.get('sd2_nick','');if(!nk||!FBUID||r.id===FBUID||RX())return '';
+  if(RK.off&&RK.off.has(r.id))return `<button class="chb" disabled title="Ten gracz nie przyjmuje wyzwań">${ic('swords',13)} Wyzwij</button>`;
+  const id=FBUID+'_'+r.id+'_'+todayKey();if(CH.out.some(c=>c.id===id))return `<button class="chb" disabled>Wysłano ✓</button>`;
+  return `<button class="chb" data-ch="${esc(r.id)}">${ic('swords',13)} Wyzwij</button>`}
+function chNew(r){const me=store.get('sd2_nick','');
+  open(`<div class="step">Wyzwanie z rankingu</div><h2>${ic('swords',24)} Wyzwij: ${esc(r.nick)}</h2><p>Wpisz hasło, które <b>${esc(r.nick)}</b> ma odgadnąć w 6 próbach. Wyzwanie pojawi się w menu ☰ → Wyzwania i będzie ważne przez 48 godzin.</p>
+  <div class="dform"><label>Hasło (5 liter)<input id="dWord" maxlength="5" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></label><p class="sub" id="dInfo">Wpisz słowo, sprawdzę, czy jest w słowniku.</p></div>
+  <div class="actions"><button class="main" id="chSend">${ic('swords',16)} Wyślij wyzwanie</button><button id="chBack">Wróć do rankingu</button></div><p class="sub">Wysyłasz jako <b>${esc(me)}</b>.</p>`);
+  const wi=$('dWord'),info=$('dInfo');
+  const chk=()=>{const w=wi.value.toLowerCase().replace(/[^a-ząćęłńóśźż]/g,'').slice(0,5);if(wi.value!==w)wi.value=w;
+    if(w.length<5){info.className='sub';info.textContent='Wpisz 5 liter ('+w.length+'/5).';return false}
+    if(!VALID.has(w)){info.className='dbad';info.textContent='Nie ma takiego słowa w słowniku gry.';return false}
+    const v=val(w);info.className='dok';info.textContent='✓ Słowo w słowniku · wartość '+v+' pkt · '+(v<=8?'łatwe':v<=11?'średnie':'trudne');return true};
+  wi.addEventListener('input',chk);$('chBack').onclick=()=>showRanking();
+  $('chSend').onclick=async()=>{if(!chk()){wi.focus();return}$('chSend').disabled=true;$('chSend').textContent='Wysyłam…';
+    try{const {F,db,uid}=await fb();const dk=todayKey(),id=uid+'_'+r.id+'_'+dk,c={fu:uid,fn:me.slice(0,20),tu:r.id,tn:String(r.nick||'').slice(0,20),w:wi.value,dk,st:'new',ts:Date.now()};
+      await F.setDoc(F.doc(db,'challenges',id),c);CH.out.push(Object.assign({id},c));store.set('sd2_ch_sent',true);
+      toast('Wyzwanie wysłane do: '+r.nick,2400);showRanking()}
+    catch(e){console.warn('wyzwanie',e);$('chSend').disabled=false;$('chSend').textContent='Wyślij wyzwanie';
+      info.className='dbad';info.textContent=String(e&&e.code||'').includes('permission')?'Nie da się wysłać: ten gracz nie przyjmuje wyzwań albo wysłałeś mu już dziś wyzwanie.':'Nie udało się wysłać. Sprawdź internet i spróbuj ponownie.'}};
+  setTimeout(()=>wi.focus(),50)}
+async function chLoad(){try{const {F,db,uid}=await fb();
+    const [a,b]=await Promise.all([F.getDocs(F.query(F.collection(db,'challenges'),F.where('tu','==',uid))),F.getDocs(F.query(F.collection(db,'challenges'),F.where('fu','==',uid)))]);
+    const old=Date.now()-7*DAY,keep=[];
+    for(const d of [...a.docs,...b.docs]){const x=Object.assign({id:d.id},d.data());if((+x.ts||0)<old){F.deleteDoc(F.doc(db,'challenges',d.id)).catch(()=>{})}else keep.push(x)}
+    CH.inb=keep.filter(x=>x.tu===uid);CH.out=keep.filter(x=>x.fu===uid);CH.loaded=true;updBadge();return true}
+  catch(e){console.warn('wyzwania',e);return false}}
+async function chNotify(){if(!(store.get('sd2_nick','')||store.get('sd2_ch_sent',false)))return;if(!await chLoad())return;
+  const pin=chInPending().length,news=chOutNews();
+  const msg=news.length===1?(news[0].st==='rej'?esc(news[0].tn)+' odrzucił(a) Twoje wyzwanie':news[0].st==='done'?esc(news[0].tn)+(news[0].res==='won'?' rozwiązał(a)':' nie rozwiązał(a)')+' Twoje wyzwanie':'Twoje wyzwanie dla '+esc(news[0].tn)+' wygasło'):news.length?'Masz '+news.length+' odpowiedzi na wyzwania':'';
+  const t=[pin?'Masz '+pin+(pin===1?' nowe wyzwanie':' nowe wyzwania')+' w menu ☰':'',msg].filter(Boolean).join(' · ');if(t&&$('ov').hidden)toast(t,3200)}
+function chStatus(c){if(chExp(c))return '<span class="st exp">wygasło</span>';
+  return {new:'<span class="st new">oczekuje</span>',acc:'<span class="st acc">przyjęte, w grze</span>',rej:'<span class="st rej">odrzucone</span>',done:'<span class="st done">'+(c.res==='won'?'odgadnięte: '+c.tries+'. próba · '+c.pts+' pkt':'nie odgadnięte')+'</span>'}[c.st]||''}
+async function showChallenges(){open(`<div class="step">Wyzwania</div><h2>${ic('swords',24)} Wyzwania</h2><p class="sub">Wczytuję…</p><div class="actions"><button id="aClose">Zamknij</button></div>`);
+  const ok=await chLoad();
+  if(!ok){$('card').querySelector('.sub').textContent='Wyzwania są chwilowo niedostępne. Sprawdź internet i spróbuj ponownie.';return}
+  const inP=chInPending(),inRest=CH.inb.filter(c=>!inP.includes(c)).sort((a,b)=>b.ts-a.ts).slice(0,10),out=CH.out.slice().sort((a,b)=>b.ts-a.ts).slice(0,15);
+  const inH=inP.map(c=>`<div class="chi"><div class="row2"><span>od: <b>${esc(c.fn)}</b></span><span class="sub">${new Date(c.ts).toLocaleDateString('pl-PL')}</span></div><span class="sub">5-literowe hasło do odgadnięcia w 6 próbach</span><div class="actions"><button class="main" data-acc="${esc(c.id)}">Przyjmij</button><button data-rej="${esc(c.id)}">Odrzuć</button></div></div>`).join('')||'<p class="sub">Brak nowych wyzwań.</p>';
+  const accH=CH.inb.filter(c=>c.st==='acc').map(c=>`<div class="chi"><div class="row2"><span>od: <b>${esc(c.fn)}</b></span><span class="st acc">w grze</span></div><div class="actions"><button class="main" data-acc="${esc(c.id)}">Graj dalej</button></div></div>`).join('');
+  const restH=inRest.filter(c=>c.st!=='acc').map(c=>`<div><span>od: <b>${esc(c.fn)}</b></span>${chStatus(c)}</div>`).join('');
+  const outH=out.map(c=>`<div><span>do: <b>${esc(c.tn)}</b> · <b>${esc(String(c.w).toUpperCase())}</b></span>${chStatus(c)}</div>`).join('')||'<p class="sub">Nie wysłałeś jeszcze wyzwań. Zrób to w rankingu przyciskiem „Wyzwij”.</p>';
+  $('card').innerHTML=`<div class="step">Wyzwania</div><h2>${ic('swords',24)} Wyzwania</h2>
+  ${chOk()?'':'<div class="relaxnote">Nie przyjmujesz teraz wyzwań. Włączysz je w menu: Przyjmuję wyzwania.</div>'}
+  <p><b>Wyzwania dla Ciebie</b></p>${accH}${inH}${restH?`<div class="dlog">${restH}</div>`:''}
+  <p><b>Wysłane przez Ciebie</b></p><div class="dlog">${outH}</div>
+  <p class="sub">Wyzwanie wygasa po 48 godzinach. Odrzucenie nie odbiera punktów i nie trafia do tabeli pojedynków.</p>
+  <div class="actions"><button id="chRank">${ic('trophy',16)} Ranking i wyzwij</button><button class="main" id="aClose">Zamknij</button></div>`;
+  $('aClose').onclick=close;$('chRank').onclick=()=>showRanking('d');
+  const s=chSeen();CH.out.forEach(c=>{if(c.st==='rej'||c.st==='done'||chExp(c))s[c.id]=chExp(c)?'exp':c.st});store.set('sd2_ch_seen',s);updBadge();
+  document.querySelectorAll('[data-acc]').forEach(b=>b.onclick=()=>chAccept(b.dataset.acc));
+  document.querySelectorAll('[data-rej]').forEach(b=>b.onclick=()=>chReject(b.dataset.rej))}
+async function chSet(id,data){const {F,db}=await fb();await F.updateDoc(F.doc(db,'challenges',id),Object.assign({upd:Date.now()},data));const c=CH.inb.find(x=>x.id===id);if(c)Object.assign(c,data)}
+async function chReject(id){try{await chSet(id,{st:'rej'});toast('Wyzwanie odrzucone',1800)}catch(e){toast('Nie udało się odrzucić, spróbuj ponownie',2400)}showChallenges()}
+async function chAccept(id){const c=CH.inb.find(x=>x.id===id);if(!c)return;
+  if(c.st==='new'){try{await chSet(id,{st:'acc'})}catch(e){toast('Nie udało się przyjąć, spróbuj ponownie',2400);return}}
+  if(mode==='arch')loadDay();
+  const code='c'+id.replace(/[^A-Za-z0-9_-]/g,'').slice(0,38),rec=store.get('sd2_duels_in',{})[code]||{};
+  duel={w:c.w,f:c.fn,u:c.fu,code,ch:id};mode='free';answer=c.w;guesses=rec.g||[];cur='';done=!!rec.res;document.body.classList.add('duel');
+  close();paint();fitBoard();if(rec.res)showResult(rec.res==='won',rec.pts||0);else toast('Wyzwanie od: '+c.fn,1800)}
+async function chDone(id,won){try{await chSet(id,{st:'done',res:won?'won':'lost',tries:guesses.length,pts:won?pointsFor(answer,guesses.length):0})}catch(e){console.warn('wyzwanie',e)}}
+async function chWipe(){try{const {F,db,uid}=await fb();
+  const qs=await Promise.all([F.getDocs(F.query(F.collection(db,'challenges'),F.where('fu','==',uid))),F.getDocs(F.query(F.collection(db,'challenges'),F.where('tu','==',uid)))]);
+  for(const q of qs)for(const d of q.docs){try{await F.deleteDoc(F.doc(db,'challenges',d.id))}catch(e){}}CH.inb=[];CH.out=[];updBadge()}catch(e){console.warn('wyzwania',e)}}
+function chOptLabel(){$('sChOpt').innerHTML=ic('swords',20)+'Przyjmuję wyzwania: <b style="margin-left:4px">'+(chOk()?'tak':'nie')+'</b>'}
+async function chOptToggle(){const on=!chOk();store.set('sd2_ch_ok',on);chOptLabel();
+  try{const {F,db,uid}=await fb();if(on)await F.deleteDoc(F.doc(db,'chset',uid));else await F.setDoc(F.doc(db,'chset',uid),{off:true,upd:Date.now()})}catch(e){console.warn('wyzwania',e)}
+  toast(on?'Przyjmujesz wyzwania od graczy z rankingu':'Nie przyjmujesz wyzwań. Inni zobaczą wyszarzony przycisk',2600)}
 function newFree(){const pool=L[freeLvl];let a;do{a=pool[Math.floor(Math.random()*pool.length)]}while(a===answer);answer=a;guesses=[];cur='';done=false;paint();fitBoard()}
 function setMode(m){mode=m;close();endDuel();
   if(m==='day'){loadDay();loadDayLevel()}else{freeLvl=lvl;newFree()}}
@@ -1066,6 +1195,8 @@ $('sRank').innerHTML=ic('trophy',20)+'Ranking graczy';$('sRank').onclick=sideGo(
 $('sStats').innerHTML=ic('chart',20)+'Podsumowanie i wyniki';$('sStats').onclick=sideGo(()=>{if(mode==='free')setMode('day');showStats()});
 $('sArch').innerHTML=ic('cal',20)+'Archiwum<span class="badge" id="arBadge" hidden></span>';$('sArch').onclick=sideGo(showArchive);
 $('sDuel').innerHTML=ic('swords',20)+'Pojedynek';$('sDuel').onclick=sideGo(showDuel);
+$('sCh').innerHTML=ic('swords',20)+'Wyzwania<span class="badge" id="chBadge" hidden></span>';$('sCh').onclick=sideGo(()=>showChallenges());
+chOptLabel();$('sChOpt').onclick=sideGo(chOptToggle);
 $('sTrain').innerHTML=ic('train',20)+'Trening';$('sTrain').onclick=sideGo(showTrain);
 $('sHelp').innerHTML=ic('help',20)+'Jak grać';$('sHelp').onclick=sideGo(showHelp);
 $('sMove').innerHTML=ic('move',20)+'Przenieś wyniki';$('sMove').onclick=sideGo(showMove);
@@ -1099,6 +1230,7 @@ else if(!store.get('sd2_seen',false)){store.set('sd2_seen',true);showHelp()}
 else if(done3(day)&&lvl!==3)showStats();
 else setTimeout(menuHint,800);
 if(store.get('sd2_nick',''))setTimeout(rankSync,3000);
+setTimeout(chNotify,3500);
 addEventListener('hashchange',()=>{if(location.hash==='#statystyki'){clearHash();showAdminStats()}else if(location.hash==='#ranking'){clearHash();showRanking()}else if(/^#p=/.test(location.hash)){close();startDuelFromHash()}else if(/^#r=/.test(location.hash)){close();startResultFromHash()}});
 </script>
 
