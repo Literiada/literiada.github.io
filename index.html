@@ -354,7 +354,7 @@ body.embed .iab{display:none!important}
   <div class="ssep"></div>
   <button class="sitem" id="sHelp"></button>
   <button class="sitem" id="sMove"></button>
-  <div class="sfoot">Literiada · wersja 18.0 · 2026-11-14</div>
+  <div class="sfoot">Literiada · wersja 18.0.1 · 2026-11-14</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -783,7 +783,7 @@ function showHelp(){
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 18.0 · 2026-11-14</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 18.0.1 · 2026-11-14</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
@@ -1057,7 +1057,8 @@ const rkWk=()=>utcToKey(rankRange('w')[0]);
 const rkMk=()=>todayKey().slice(0,7);
 // v18: każdy gracz trzyma osobno punkty dnia (dd), tygodnia (ww) i miesiąca (mm); ranking pobiera tylko top 50
 function rkField(tab){return tab==='d'?['dd',todayKey()]:tab==='w'?['ww',rkWk()]:tab==='m'?['mm',rkMk()]:['all']}
-function rankVal(r,tab){if(tab==='a')return +r.all||0;const [m,k]=rkField(tab);return +((r[m]||{})[k])||0}
+function rankVal(r,tab){if(tab==='a')return +r.all||0;const [m,k]=rkField(tab),nv=+((r[m]||{})[k])||0;
+  const [a,b]=rankRange(tab);let lv=0;const d=r.days||{};for(const x in d){const t=keyToUTC(x);if(t>=a&&t<=b)lv+=+d[x]||0}return Math.max(nv,lv)}
 function myVal(tab){const h=store.get('sd2_hist',{});if(tab==='a')return Math.round(sumRange(h,0,9e15));const [a,b]=rankRange(tab);return Math.round(sumRange(h,a,b))}
 function rankHTML(){const tab=RK.tab,nick=store.get('sd2_nick','');
   const tabs=[['d','Dziś'],['w','Tydzień'],['m',new Date(keyToUTC(todayKey())).toLocaleDateString('pl-PL',{month:'long',timeZone:'UTC'})],['a','Łącznie'],['p','Pojedynki']].map(([k,l])=>`<button data-rt="${k}" aria-pressed="${tab===k}">${l}</button>`).join('');
@@ -1070,7 +1071,8 @@ function rankHTML(){const tab=RK.tab,nick=store.get('sd2_nick','');
     body=(FBUID?`<p><b>Wyniki Twoich zagadek</b></p><div class="dlog">${mine.length?mine.map(line).join(''):'<p class="sub">Nikt jeszcze nie odesłał wyniku Twojej zagadki. Wyślij nową w menu: Pojedynek.</p>'}</div>`:'')
       +`<p><b>Ostatnie pojedynki</b></p><div class="dlog">${(RK.duels||[]).length?RK.duels.map(line).join(''):'<p class="sub">Brak pojedynków. Bądź pierwszy!</p>'}</div>`;
   } else {
-    const list=RK.rows.map(r=>({id:r.id,nick:r.nick||'?',v:rankVal(r,tab)})).filter(r=>r.v>0).sort((a,b)=>b.v-a.v).slice(0,50);
+    const list=RK.rows.map(r=>({id:r.id,nick:r.nick||'?',v:rankVal(r,tab)})).filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
+    const meAll=list.findIndex(r=>r.id===FBUID);if(meAll>=50)RK.mePos=meAll+1;list.length=Math.min(list.length,50);
     const me=list.findIndex(r=>r.id===FBUID),myPos=me>=0?me+1:RK.mePos;
     const row=(r,i)=>`<div class="${r.id===FBUID?'me':''}"><span class="pos">${i<3?medal(['gold','silver','bronze'][i],22):i+1}</span><span class="nk">${esc(r.nick)}</span><span class="pt">${r.v} pkt</span><span>${chBtn(r)}</span></div>`;
     const meRow=me<0&&RK.mePos&&nick?'<span class="gap">…</span>'+row({id:FBUID,nick,v:myVal(tab)},RK.mePos-1):'';
@@ -1099,10 +1101,12 @@ async function rankLoad(force){const tab=RK.tab,c=RK.cache[tab];
   try{const {F,db,uid}=await fb();const col=F.collection(db,'players');let rows=[],duels=null,mine=null,mePos=null;
     if(tab==='p'){const [ds,ms]=await Promise.all([F.getDocs(F.query(F.collection(db,'duels'),F.orderBy('ts','desc'),F.limit(30))),F.getDocs(F.query(F.collection(db,'duels'),F.where('au','==',uid),F.limit(40)))]);
       duels=ds.docs.map(d=>d.data());mine=ms.docs.map(d=>d.data())}
-    else{const f=rkField(tab),fp=f.length>1?new F.FieldPath(f[0],f[1]):f[0];
-      const ps=await F.getDocs(F.query(col,F.orderBy(fp,'desc'),F.limit(50)));rows=ps.docs.map(d=>Object.assign({id:d.id},d.data()));
+    else{if(RK.cnt==null){try{RK.cnt=(await F.getCountFromServer(col)).data().count}catch(e){console.warn('ranking',e)}}
+      let big=RK.cnt!=null&&RK.cnt>250,f=rkField(tab),fp=f.length>1?new F.FieldPath(f[0],f[1]):f[0];
+      if(big){try{const ps=await F.getDocs(F.query(col,F.orderBy(fp,'desc'),F.limit(50)));rows=ps.docs.map(d=>Object.assign({id:d.id},d.data()))}catch(e){console.warn('ranking',e);big=false}}
+      if(!big){const ps=await F.getDocs(col);rows=ps.docs.map(d=>Object.assign({id:d.id},d.data()))}
       const mv=myVal(tab);
-      if(store.get('sd2_nick','')&&!RX()&&mv>0&&!rows.some(r=>r.id===uid)){try{const q=await F.getCountFromServer(F.query(col,F.where(fp,'>',mv)));mePos=q.data().count+1}catch(e){console.warn('ranking',e)}}}
+      if(big&&store.get('sd2_nick','')&&!RX()&&mv>0&&!rows.some(r=>r.id===uid)){try{const q=await F.getCountFromServer(F.query(col,F.where(fp,'>',mv)));mePos=q.data().count+1}catch(e){console.warn('ranking',e)}}}
     if(RK.cnt==null||force){try{RK.cnt=(await F.getCountFromServer(col)).data().count}catch(e){}}
     if(Date.now()-RK.offTs>60000){try{const [cs,so]=await Promise.all([F.getDocs(F.collection(db,'chset')),F.getDocs(F.query(F.collection(db,'challenges'),F.where('fu','==',uid)))]);
       RK.off=new Set(cs.docs.filter(d=>d.data().off===true).map(d=>d.id));CH.out=so.docs.map(d=>Object.assign({id:d.id},d.data()));RK.offTs=Date.now()}catch(e){console.warn('wyzwania',e);RK.off=RK.off||new Set()}}
