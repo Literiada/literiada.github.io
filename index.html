@@ -18,6 +18,11 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://literiada.github.io/og.png">
 <meta name="theme-color" content="#12a150">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Literiada">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2312a150'/%3E%3Ctext x='32' y='47' font-size='44' font-family='Arial Black,Arial' font-weight='900' text-anchor='middle' fill='white'%3EL%3C/text%3E%3C/svg%3E">
 <style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}body{margin:0}[hidden]{display:none!important}</style>
 </head>
@@ -328,6 +333,40 @@ body.embed .iab{display:none!important}
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:40}
 .pt .ico{margin-right:3px}
 .tag{font-size:.68rem;background:var(--key);color:var(--ink);border-radius:4px;padding:1px 6px;margin-left:6px;font-weight:600}
+/* v19: zakładki poziomów, koło ratunkowe, pomocna dłoń, zaproszenia, instalacja */
+.lvtabs{display:flex;gap:4px;justify-content:center}
+.lvtabs button{flex:1;max-width:96px;min-width:0;border:1.5px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:3px 4px;font:800 .8rem var(--body);cursor:pointer;display:inline-flex;gap:3px;align-items:center;justify-content:center;white-space:nowrap;min-height:28px}
+.lvtabs button.won{background:var(--lvwon);border-color:#12a150}
+.lvtabs button.lost{background:var(--lvlost);color:var(--muted)}
+.lvtabs button.cur{border-color:#12a150;box-shadow:inset 0 0 0 1px #12a150}
+.lvtabs button.lock{opacity:.5;cursor:default}
+.lvtabs button[aria-current="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink);box-shadow:none}
+.lvtabs .dot{width:7px;height:7px;border-radius:50%;background:#12a150;display:inline-block}
+.pvbar{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#dbeafe;color:#1e3a8a;border:1.5px solid #3b82f6;border-radius:10px;padding:5px 6px 5px 10px;font:600 .82rem var(--body)}
+.pvbar button{border:0;background:#12a150;color:#fff;border-radius:8px;padding:6px 10px;font:800 .8rem var(--body);cursor:pointer;white-space:nowrap}
+.kb.off{opacity:.35;pointer-events:none}
+.kbtn{border:2px solid #e5484d;background:#e5484d;color:#fff;border-radius:999px;font:800 .82rem var(--body);padding:4px 12px;display:inline-flex;gap:5px;align-items:center;cursor:pointer;min-height:30px;animation:pulse 1.2s ease 3}
+.hbtn{border:1.5px solid #0ea5e9;background:var(--panel);color:#0369a1;border-radius:999px;font:800 .8rem var(--body);padding:3px 11px;display:inline-flex;gap:4px;align-items:center;cursor:pointer;min-height:28px}
+.hbtn.wait{background:#e0f2fe}
+.hbtn.got{background:#0ea5e9;color:#fff}
+.jstrip i.hp{background:#0ea5e9;color:#fff}
+.koloc{display:flex;gap:12px;align-items:center;background:#fde2e2;color:#7f1d1d;border:2px solid #e5484d;border-radius:10px;padding:12px}
+.koloc b{display:block;font-family:var(--display);font-size:1.1rem}
+.koloc small{display:block;margin-top:3px;font-size:.88rem;line-height:1.4}
+.c5{background:#3b82f6}
+.hlc{display:inline-flex;align-items:center;gap:2px;font:800 .74rem var(--body);border-radius:999px;padding:3px 7px;margin-right:4px;border:1.5px solid var(--line);color:var(--muted);background:var(--panel);white-space:nowrap}
+.hlc.on{border-color:#0ea5e9;background:#0ea5e9;color:#fff;cursor:pointer;box-shadow:0 0 8px #0ea5e999}
+.hlc.on:disabled{cursor:default}
+.hgrid{display:flex;gap:6px;justify-content:center}
+.hgrid button{width:52px;height:52px;border-radius:8px;border:2px solid var(--line);background:var(--panel);color:var(--ink);font:800 1.5rem var(--display);text-transform:uppercase;cursor:pointer}
+.hgrid button[aria-pressed="true"]{background:#0ea5e9;border-color:#0ea5e9;color:#fff}
+.hgrid button:disabled{opacity:.35;cursor:default}
+.igrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.igrid button{border:0;border-radius:10px;padding:13px 8px;font:800 .95rem var(--body);color:#fff;cursor:pointer;display:inline-flex;gap:8px;align-items:center;justify-content:center;min-height:52px}
+.igrid .ii{font:900 1.05rem var(--body);width:22px;text-align:center}
+.rlist.hl div{grid-template-columns:minmax(0,1fr) auto auto}
+.nx.c-hlp{border-color:#0ea5e9;background:rgba(14,165,233,.10)}
+@media (max-width:360px){.hbtn .hl{display:none}.hbtn{padding:3px 9px}}
 </style>
 
 <div class="app">
@@ -337,8 +376,10 @@ body.embed .iab{display:none!important}
     <div class="lvt"><b id="lvName"></b><small id="lvSub"></small></div>
     <button class="icon" id="bSnd" aria-label="Dźwięk"></button><button class="icon exit" id="bStats" aria-label="Wróć do haseł dnia" hidden>Wyjdź</button>
   </div>
-  <div class="trow"><div class="timer" id="timer" hidden></div><button class="jbtn" id="bJoker" hidden></button></div>
+  <div class="trow"><div class="timer" id="timer" hidden></div><button class="jbtn" id="bJoker" hidden></button><button class="hbtn" id="bHelp" hidden></button><button class="kbtn" id="bKolo" hidden></button></div>
   <div class="jstrip" id="jstrip" hidden></div>
+  <div class="lvtabs" id="lvtabs" hidden></div>
+  <div class="pvbar" id="pvbar" hidden></div>
   <div class="board-wrap"><div class="board" id="board"></div></div>
   <div class="kb" id="kb"></div>
 </div>
@@ -350,6 +391,7 @@ body.embed .iab{display:none!important}
   <button class="sitem" id="sArch"></button>
   <button class="sitem" id="sDuel"></button>
   <button class="sitem" id="sCh"></button>
+  <button class="sitem" id="sHlp"></button>
   <button class="sitem" id="sInv"></button>
   <a class="sitem" id="sX" href="https://x.com/Literiada" target="_blank" rel="noopener" style="text-decoration:none"></a>
   <button class="sitem" id="sTrain"></button>
@@ -358,8 +400,9 @@ body.embed .iab{display:none!important}
   <div class="ssep"></div>
   <button class="sitem" id="sHelp"></button>
   <button class="sitem" id="sMove"></button>
+  <button class="sitem" id="sInst" hidden></button>
   <button class="sitem" id="sAdm" hidden></button>
-  <div class="sfoot">Literiada · wersja 18.1 · 2026-11-14</div>
+  <div class="sfoot">Literiada · wersja 19.0 · 2026-11-19</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -382,6 +425,7 @@ let FZK=1;
 })();
 // linki z ?p=/?r= (np. przekazane z Messengera do Chrome) zamieniamy na #p=/#r=
 (function(){try{const q=new URLSearchParams(location.search);for(const k of ['p','r']){const v=q.get(k);if(v&&!location.hash){history.replaceState(null,'',location.pathname+'#'+k+'='+v);break}}}catch(e){}})();
+const DAYB=10,CLEANB=5;
 const LV=[{n:'Poziom 1',r:'5–8 pkt'},{n:'Poziom 2',r:'9–11 pkt'},{n:'Poziom 3',r:'12+ pkt'}];
 const LVA=[...LV,{n:'Niespodzianka',r:'12+ pkt'}];
 const isWknd=k=>{const d=new Date(keyToUTC(k)).getUTCDay();return d===0||d===6};
@@ -390,7 +434,7 @@ const isWknd=k=>{const d=new Date(keyToUTC(k)).getUTCDay();return d===0||d===6};
 const P3OLD=247,P3CUT=14;
 function wordFor(i,n){const pool=L[Math.min(i,2)],len=(i>=2&&n<P3CUT)?P3OLD:pool.length;const k=i===3?n+Math.floor(len/2):n;return pool[((k%len)+len)%len]}
 // uzupełnia zapis dnia do 4 poziomów (starsze zapisy miały 3)
-function norm(d){const def={g:()=>[],res:()=>null,pts:()=>0,t:()=>0,te:()=>null,tb:()=>0,jk:()=>0,jc:()=>0,jp:()=>null};
+function norm(d){const def={g:()=>[],res:()=>null,pts:()=>0,t:()=>0,te:()=>null,tb:()=>0,jk:()=>0,jc:()=>0,jp:()=>null,kr:()=>0,hq:()=>null,hpos:()=>null,hc:()=>0};
   for(const f in def){if(!Array.isArray(d[f]))d[f]=[];while(d[f].length<4)d[f].push(def[f]())}return d}
 const done3=d=>!!(d.res[2]||d.res.slice(0,3).includes('lost'));
 const p4open=()=>!!day&&isWknd(curKey())&&done3(day);
@@ -417,9 +461,13 @@ const SVG={
   back:'<path d="M14.5 6l-6 6 6 6"/>',
   chev:'<path d="M6 9.5l6 6 6-6"/>',
   send:'<path d="M3.5 11.5L20.5 4l-7.5 17-2.5-7z"/>',
+  copy:'<rect x="8.5" y="8.5" width="11.5" height="11.5" rx="2"/><path d="M15.5 8.5V5.5a1.5 1.5 0 0 0-1.5-1.5H5.5A1.5 1.5 0 0 0 4 5.5V14a1.5 1.5 0 0 0 1.5 1.5h3"/>',
+  chat:'<path d="M4 5.5h16v11H9l-5 4z"/>',
   trophy:'<path d="M7.5 4h9v5a4.5 4.5 0 0 1-9 0z"/><path d="M7.5 6H4.5a3 3 0 0 0 3 4M16.5 6h3a3 3 0 0 1-3 4M12 13.5v3.5M8.5 20.5h7M9.5 17h5v3.5h-5z"/>',
   rapier:'<path d="M7.2 16.8L20.5 3.5M16.8 16.8L3.5 3.5"/><path d="M4.2 13.8a3.4 3.4 0 0 0 6 6M19.8 13.8a3.4 3.4 0 0 1-6 6"/><path d="M6.4 17.6L3.5 20.5M17.6 17.6l2.9 2.9"/>',
   fencer:'<circle cx="8" cy="4.4" r="2.4" fill="currentColor" stroke="none"/><path d="M8.6 7.6l1.6 5"/><path d="M9.1 8.8l4 .7M8.8 8.6L5.4 9l-.9-3.2"/><path d="M13.1 9.5L23 6.3" stroke-width="1.3"/><path d="M12.6 8l1 2.9" stroke-width="1.8"/><path d="M10.2 12.6l4.2 2 .3 5.3h2.5M10.2 12.6L7 16.2l-4.2 3.8"/>',
+  ring:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M5.6 5.6l3.6 3.6M18.4 5.6l-3.6 3.6M5.6 18.4l3.6-3.6M18.4 18.4l-3.6-3.6"/>',
+  install:'<path d="M12 3.5v11M7.5 10l4.5 4.5 4.5-4.5"/><path d="M4 15.5v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
   sun:'<path d="M3 18h18M6.5 18a5.5 5.5 0 0 1 11 0"/><path d="M12 6.5v2.5M5.2 9.7l1.8 1.8M18.8 9.7L17 11.5M3 14h1.5M19.5 14H21"/>'};
 const ic=(n,s=18)=>`<svg class="ico" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SVG[n]}</svg>`;
 const MED={gold:['#f6cf45','#c99a06','#fff3b8'],silver:['#dfe3e8','#98a2ad','#ffffff'],bronze:['#e4a46a','#a5652e','#ffd9b5']};
@@ -470,8 +518,8 @@ function score(g,a){
 }
 const tileHTML=ch=>ch||'';
 
-function buildBoard(){const b=$('board');b.innerHTML='';
-  for(let r=0;r<6;r++){const row=document.createElement('div');row.className='row';
+function buildBoard(n=6){const b=$('board');b.innerHTML='';b.style.gridTemplateRows='repeat('+n+',1fr)';
+  for(let r=0;r<n;r++){const row=document.createElement('div');row.className='row';
     for(let c=0;c<5;c++){const t=document.createElement('div');t.className='t';row.appendChild(t)}b.appendChild(row)}}
 const ROWS=[['ą','ć','ę','ł','ń','ó','ś','ź','ż'],['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['ENTER','z','x','c','v','b','n','m','⌫']];
 const PL='ąćęłńóśźż';
@@ -482,20 +530,69 @@ function buildKb(){const kb=$('kb');kb.innerHTML='';
       b.dataset.k=k;b.setAttribute('aria-label',k==='⌫'?'Usuń':k==='ENTER'?'Sprawdź':k);
       b.addEventListener('click',()=>{press(k);b.blur()});row.appendChild(b)});
     kb.appendChild(row)});}
+// v19: podgląd poprzednich poziomów dnia (view = numer poziomu w podglądzie, null = bieżący poziom)
+let view=null;
+const maxG=()=>(mode!=='free'&&day&&day.kr&&day.kr[lvl])?7:6;
+const inPlay=()=>mode!=='free'&&!!day;
+function ensureRows(n){if($('board').children.length!==n){buildBoard(n);fitBoard()}}
 function paint(){
+  const pv=view!=null&&inPlay()&&view!==lvl,G=pv?(day.g[view]||[]):guesses;
+  ensureRows(pv?Math.max(6,G.length):Math.max(maxG(),G.length));
   const rows=$('board').children;
-  for(let r=0;r<6;r++){const g=guesses[r],tiles=rows[r].children;
+  for(let r=0;r<rows.length;r++){const g=G[r],tiles=rows[r].children;
     for(let c=0;c<5;c++){const t=tiles[c];
       if(g){t.innerHTML=tileHTML(g.w[c]);t.className='t '+g.s[c];clearStyle(t);paintTile(t,g.s[c])}
-      else if(r===guesses.length&&!done){t.innerHTML=tileHTML(cur[c]);t.className='t'+(cur[c]?' f':'');clearStyle(t)}
+      else if(!pv&&r===guesses.length&&!done&&guesses.length<maxG()){t.innerHTML=tileHTML(cur[c]);t.className='t'+(cur[c]?' f':'');clearStyle(t)}
       else{t.innerHTML='';t.className='t';clearStyle(t)}}}
-  const go=document.querySelector('.k.go');if(go)go.classList.toggle('ready',cur.length===5&&!done);
-  const best={},rank={hit:3,near:2,miss:1};
-  guesses.forEach(g=>[...g.w].forEach((ch,i)=>{if(!best[ch]||rank[g.s[i]]>rank[best[ch]])best[ch]=g.s[i]}));
-  if(mode!=='free'&&day&&day.jk&&day.jk[lvl]===2&&day.jp[lvl]!=null)best[answer[day.jp[lvl]]]='hit';
+  const go=document.querySelector('.k.go');if(go)go.classList.toggle('ready',!pv&&cur.length===5&&!done);
+  const best={},rank={hit:3,near:2,miss:1},L1=pv?view:lvl,A1=pv?wordFor(view,curN()):answer;
+  G.forEach(g=>[...g.w].forEach((ch,i)=>{if(!best[ch]||rank[g.s[i]]>rank[best[ch]])best[ch]=g.s[i]}));
+  if(inPlay()&&day.jk&&day.jk[L1]===2&&day.jp[L1]!=null)best[A1[day.jp[L1]]]='hit';
+  if(inPlay()&&day.hpos&&day.hpos[L1]!=null)best[A1[day.hpos[L1]]]='hit';
   document.querySelectorAll('.k').forEach(b=>{if(!b.dataset.k||b.dataset.k.length>1)return;b.classList.remove('hit','near','miss');clearStyle(b);const st=best[b.dataset.k];if(st){b.classList.add(st);paintKey(b,st)}});
-  paintLevels();updJoker();
+  $('kb').classList.toggle('off',pv);
+  paintLevels();updJoker();lvTabs();updKolo();updHelpBtn();
+  cancelAnimationFrame(paint.raf);paint.raf=requestAnimationFrame(fitBoard);
 }
+// ---- v19: zakładki poziomów nad planszą + przesuwanie palcem / strzałki
+function lvCount(){return (isWknd(curKey())&&(day.g[3].length||day.res[3]||p4open()))?4:3}
+function lvTabs(){const el=$('lvtabs'),bar=$('pvbar');if(!el)return;
+  if(!inPlay()||duel){el.hidden=true;bar.hidden=true;return}
+  const act=view!=null?view:lvl;let h='';
+  for(let i=0;i<lvCount();i++){const r=day.res[i],has=(day.g[i]||[]).length>0,cur=i===lvl&&!r,op=unlocked(i);
+    const cls=r==='won'?'won':r==='lost'?'lost':cur?'cur':!op?'lock':'';
+    const mark=r==='won'?(day.kr[i]?ic('ring',13):'✓'):r==='lost'?'✗':cur?'<span class="dot"></span>':!op?ic('lock',12):'';
+    h+=`<button data-lt="${i}" class="${cls}" aria-current="${i===act}" aria-label="${i===3?'Niespodzianka':'Poziom '+(i+1)}">${i===3?'P4':'P'+(i+1)} ${mark}</button>`}
+  el.innerHTML=h;el.hidden=false;
+  el.querySelectorAll('[data-lt]').forEach(b=>b.onclick=()=>goLevel(+b.dataset.lt));
+  const pv=view!=null&&view!==lvl;bar.hidden=!pv;
+  if(pv){const w=wordFor(view,curN()),r=day.res[view];
+    bar.innerHTML=`<span>Podgląd ${view===3?'P4':'P'+(view+1)}${r?' · <b style="letter-spacing:.08em">'+w.toUpperCase()+'</b>':' · w trakcie'}${r==='won'&&!RX()?' · '+day.pts[view]+' pkt':''}</span><button id="pvBack">Wróć do ${lvl===3?'P4':'P'+(lvl+1)}</button>`;
+    $('pvBack').onclick=()=>goLevel(lvl)}}
+function goLevel(i){if(!inPlay()||busy)return;
+  if(i===lvl){view=null;paint();return}
+  if((day.g[i]||[]).length||day.res[i]){view=i;cur='';paint();return}
+  if(!unlocked(i)){toast(i===3?'Niespodzianka czeka po poziomie 3 (sobota i niedziela)':'Ten poziom jest jeszcze zablokowany',1800);return}
+  if(!done){toast('Najpierw dokończ bieżący poziom',1800);return}
+  view=null;lvl=i;loadDayLevel();fitBoard()}
+function stepLevel(d){if(!inPlay()||duel||!$('ov').hidden)return;const n=lvCount(),a=view!=null?view:lvl;
+  for(let i=a+d;i>=0&&i<n;i+=d){if(i===lvl||(day.g[i]||[]).length||day.res[i]){goLevel(i);return}}}
+(function(){let x0=null,y0=null;const w=document.querySelector('.board-wrap');if(!w)return;
+  w.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
+  w.addEventListener('touchend',e=>{if(x0==null)return;const t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;x0=null;
+    if(Math.abs(dx)>50&&Math.abs(dy)<45)stepLevel(dx<0?1:-1)},{passive:true})})();
+// ---- v19: koło ratunkowe (7. próba za 0 pkt, poziom zaliczony)
+function canKolo(){return inPlay()&&!done&&!day.kr[lvl]&&guesses.length===6&&!day.res[lvl]}
+function updKolo(){const b=$('bKolo');if(!b)return;const on=canKolo()&&view==null;b.hidden=!on;
+  if(on)b.innerHTML=ic('ring',16)+' Koło ratunkowe'}
+function offerKolo(){if(!canKolo())return;
+  open(`<div class="step">${lvl===3?'Weekendowa niespodzianka':LV[lvl].n} · 6 prób wykorzystanych</div><h2>${ic('ring',26)} Koło ratunkowe</h2>
+  <div class="koloc">${ic('ring',44)}<div><b>Jeszcze jedna szansa: 7. próba</b><small>Jeśli odgadniesz hasło, za ten poziom dostaniesz 0 pkt i bez bonusu za czas, ale poziom zaliczy się jako ukończony${lvl<2?' i odblokuje poziom '+(lvl+2):''}. ${lvl<3?'Ukończony dzień daje +10 pkt bonusu.':''}</small></div></div>
+  <p class="sub">Jedno koło na poziom. Bez koła poziom kończy się teraz bez trafienia${lvl<2?', a kolejne poziomy zostaną zablokowane':''}.</p>
+  <div class="actions"><button class="main" id="aKolo" style="background:#e5484d">${ic('ring',16)} Rzuć koło: 7. próba</button><button id="aNoKolo">Nie, kończę poziom</button></div>`);
+  $('aKolo').onclick=()=>{day.kr[lvl]=1;saveDay();store.set('sd2_kola',(+store.get('sd2_kola',0)||0)+1);close();paint();fitBoard();
+    const t=$('toast');t.classList.add('big');toast('Koło ratunkowe: 7. próba!',1800);setTimeout(()=>t.classList.remove('big'),1800)};
+  $('aNoKolo').onclick=()=>{close();finish(false)}}
 function paintLevels(){
   const play=mode!=='free', L0=play?lvl:freeLvl;
   $('lvName').innerHTML=brandT();
@@ -536,11 +633,11 @@ const SFX=(()=>{let ctx=null,on=store.get('lt_sound',true);
     timeup(){[880,660,440].forEach((f,i)=>tone(f,i*0.22,0.2,'square',0.12));tone(330,0.7,0.5,'square',0.12)}
   }})();
 function sndIcon(){$('bSnd').innerHTML=ic(SFX.on?'sndOn':'sndOff',20)}
-function attemptLabel(){const n=guesses.length+1;return n===6?'<span class="last">OSTATNIA PRÓBA</span>':'Próba '+n+' z 6'}
-function attemptToast(){const n=guesses.length+1;const t=$('toast');t.classList.add('big');toast(n===6?'OSTATNIA PRÓBA':'Próba '+n,1500);setTimeout(()=>t.classList.remove('big'),1500)}
+function attemptLabel(){const n=guesses.length+1;if(n>maxG())return '6 prób wykorzystanych';if(n===7)return '<span class="last" style="background:#e5484d">KOŁO · 7. PRÓBA</span>';return n===6?'<span class="last">OSTATNIA PRÓBA</span>':'Próba '+n+' z 6'}
+function attemptToast(){const n=guesses.length+1;const t=$('toast');t.classList.add('big');toast(n===7?'KOŁO RATUNKOWE':n===6?'OSTATNIA PRÓBA':'Próba '+n,1500);setTimeout(()=>t.classList.remove('big'),1500)}
 function fitBoard(){const w=document.querySelector('.board-wrap'),b=$('board');if(!w)return;
-  const W=w.clientWidth,H=w.clientHeight,gap=6;let cw=Math.min((W-4*gap)/5,(H-5*gap)/6,100);cw=Math.max(cw,26);
-  b.style.width=(cw*5+gap*4)+'px';b.style.height=(cw*6+gap*5)+'px';b.style.setProperty('--tfs',(cw*0.62*FZK)+'px')}
+  const n=b.children.length||6,W=w.clientWidth,H=w.clientHeight,gap=6;let cw=Math.min((W-4*gap)/5,(H-(n-1)*gap)/n,100);cw=Math.max(cw,24);
+  b.style.width=(cw*5+gap*4)+'px';b.style.height=(cw*n+gap*(n-1))+'px';b.style.setProperty('--tfs',(cw*0.62*FZK)+'px')}
 function unlocked(i){return i===3?p4open():(i===0||day.res[i-1]==='won')}
 function toast(msg,ms=1600){const t=$('toast');t.textContent=msg;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,ms)}
 function shake(){const row=$('board').children[guesses.length];row.classList.remove('shake');void row.offsetWidth;row.classList.add('shake')}
@@ -548,6 +645,8 @@ function shake(){const row=$('board').children[guesses.length];row.classList.rem
 function press(k){
   SFX.unlock();
   if(done||busy)return;
+  if(view!=null&&view!==lvl){goLevel(lvl);return}
+  if(guesses.length>=maxG()){if(canKolo())offerKolo();return}
   if(k!=='ENTER')SFX.key();
   if(k==='ENTER')return submit();
   if(k==='⌫'){cur=cur.slice(0,-1);return paint()}
@@ -565,26 +664,30 @@ function submit(){
   paint();
   const tiles=$('board').children[guesses.length-1].children;
   [...tiles].forEach((t,i)=>{t.style.animationDelay=(i*90)+'ms';t.classList.add('rev');SFX.tile(s[i],i*0.09)});
-  if(!won&&guesses.length<6&&s.every(x=>x==='miss'))SFX.none(0.6);
-  setTimeout(()=>{busy=false;if(won)finish(true);else if(guesses.length===6)finish(false);else attemptToast()},5*90+450);
+  if(!won&&guesses.length<maxG()&&s.every(x=>x==='miss'))SFX.none(0.6);
+  setTimeout(()=>{busy=false;if(won)finish(true);else if(guesses.length>=maxG()){if(canKolo())offerKolo();else finish(false)}else attemptToast()},5*90+450);
 }
 function finish(won){
   done=true;
   let p=0;
   if(mode!=='free'){
     const e=day.t[lvl]?Date.now()-day.t[lvl]:null;day.te[lvl]=e;
-    const tb=won&&e!=null&&!RX()?bonusFor(lvl,e):0;day.tb[lvl]=tb;
-    p=won?Math.max(0,pointsFor(answer,guesses.length)+tb-(day.jk[lvl]===2?day.jc[lvl]:0)):0;
-    day.res[lvl]=won?'won':'lost';day.pts[lvl]=p;saveDay();
+    const kolo=!!day.kr[lvl];
+    const tb=won&&e!=null&&!RX()&&!kolo?bonusFor(lvl,e):0;day.tb[lvl]=tb;
+    p=won&&!kolo?Math.max(0,pointsFor(answer,guesses.length)+tb-(day.jk[lvl]===2?day.jc[lvl]:0)-(day.hpos[lvl]!=null?day.hc[lvl]:0)):0;
+    day.res[lvl]=won?'won':'lost';day.pts[lvl]=p;
+    // v19: bonus za ukończony dzień (P1–P3): +10, a bez koła ratunkowego +5 za czysty dzień
+    if(won&&lvl===2)day.pts[4]=DAYB+(day.kr.slice(0,3).some(Boolean)?0:CLEANB);
+    saveDay();
     const h=store.get('sd2_hist',{});h[curKey()]=day.pts.slice();store.set('sd2_hist',h);
     if(mode==='day'){const ot=store.get('sd2_ontime',{});ot[curKey()]=1;const ks=Object.keys(ot).sort();while(ks.length>400)delete ot[ks.shift()];store.set('sd2_ontime',ot)}
     rankSync();refPush();
   }
   if(duel){duelSave({g:guesses,res:won?'won':'lost',pts:won?pointsFor(answer,guesses.length):0});const nk=store.get('sd2_nick','');
     if(duel.ch){if(nk)duelPush(nk,won);chDone(duel.ch,won)}else if(nk)duelPush(nk,won)}
-  paint();updTimer();
+  view=null;paint();updTimer();
   if(won)SFX.win(0);else SFX.lose(0);
-  toast(won?['Genialnie!','Wspaniale!','Świetnie!','Brawo!','Nieźle!','Uff, udało się!'][guesses.length-1]:'Hasło: '+answer.toUpperCase(),2000);
+  toast(won?['Genialnie!','Wspaniale!','Świetnie!','Brawo!','Nieźle!','Uff, udało się!','Uratowane!'][guesses.length-1]:'Hasło: '+answer.toUpperCase(),2000);
   setTimeout(()=>{showResult(won,p);if(won)confetti(mode==='free'?70:(lvl>=2?240:120))},900);
 }
 // ---- v18 (P1): seria dni z rzędu (liczą się dni rozegrane w swoim dniu, nie nadrabiane w archiwum)
@@ -592,17 +695,19 @@ function streakN(){const lg=store.get('sd2_log',{}),a=store.get('sd2_arch',{}),o
   const on=k=>!!ot[k]||((lg[k]||[]).some(Boolean)&&!(a[k]&&a[k].late));
   let t=keyToUTC(todayKey());if(!on(utcToKey(t)))t-=DAY;let n=0;while(t>=START&&on(utcToKey(t))){n++;t-=DAY}return n}
 const dniPL=n=>n===1?'1 dzień':n+' dni';
+const razy=n=>n===1?'1 raz':n+' razy';
 function grid(g){return g.map(x=>x.s.map(s=>s==='hit'?'🟩':s==='near'?'🟧':'⬜').join('')).join('\n')}
 const RX=()=>!!store.get('sd2_relax',false);
 const SHARE_URL='https://literiada.github.io · @Literiada';
 const medE=n=>n<=2?'🥇':n<=4?'🥈':'🥉';
 function shareLines(withGrid,compact){const G=i=>Array.isArray(withGrid)?!!withGrid[i]:!!withGrid;
   if(mode==='free'){const won=(guesses.length&&guesses[guesses.length-1].w===answer);return 'Literiada (trening) '+(won?guesses.length:'X')+'/6\n'+grid(guesses)+'\n👉 '+SHARE_URL}
-  if(RX()){let t='Literiada #'+(curN()+1)+' 🌿 na luzie\n';day.res.forEach((r,i)=>{if(!r)return;const g=day.g[i]||[];t+='\n'+(i===3?'🎁 P4':'P'+(i+1))+' '+(r==='won'?(g.length||'✓')+'/6':'X/6');if(G(i)&&g.length)t+='\n'+grid(g)});return t+'\n\n👉 '+SHARE_URL}
+  if(RX()){let t='Literiada #'+(curN()+1)+' 🌿 na luzie\n';day.res.forEach((r,i)=>{if(!r)return;const g=day.g[i]||[];t+='\n'+(i===3?'🎁 P4':'P'+(i+1))+' '+(r==='won'?(day.kr[i]?'🛟 7/6':(g.length||'✓')+'/6'):'X/6')+(day.hpos[i]!=null?' 🤝':'');if(G(i)&&g.length)t+='\n'+grid(g)});return t+'\n\n👉 '+SHARE_URL}
   const tot=day.pts.reduce((a,b)=>a+b,0),sk=mode==='day'?streakN():0;let t='Literiada #'+(curN()+1)+' · '+tot+' pkt'+(done3(day)&&day.res.slice(0,3).every(r=>r==='won')?' 🏆':'')+(sk>=2?'\n🔥 '+dniPL(sk)+' z rzędu':'')+'\n';
   day.res.forEach((r,i)=>{if(!r)return;const g=day.g[i]||[];
-    t+='\n'+(i===3?'🎁 P4':'P'+(i+1))+' '+(r==='won'?medE(g.length||6)+' '+(g.length||'✓')+'/6':'❌ X/6')+' · '+day.pts[i]+' pkt'+(!compact&&day.te&&day.te[i]!=null&&r==='won'?' · ⏱'+fmtT(day.te[i]):'');
+    t+='\n'+(i===3?'🎁 P4':'P'+(i+1))+' '+(r==='won'?(day.kr[i]?'🛟 7/6':medE(g.length||6)+' '+(g.length||'✓')+'/6'):'❌ X/6')+(day.hpos[i]!=null?' 🤝':'')+' · '+day.pts[i]+' pkt'+(!compact&&day.te&&day.te[i]!=null&&r==='won'?' · ⏱'+fmtT(day.te[i]):'');
     if(G(i)&&g.length)t+='\n'+grid(g)});
+  if(day.pts[4])t+='\n🏁 Bonus dnia +'+day.pts[4]+' pkt';
   return t+'\n\n👉 '+SHARE_URL}
 function shareText(){return xText()}
 // długość wg zasad X: emoji liczą się podwójnie
@@ -629,18 +734,21 @@ function archPending(){const a=store.get('sd2_arch',{}),lg=store.get('sd2_log',{
   for(let t=today-DAY;t>=START;t-=DAY){const k=utcToKey(t),e=a[k],res=(e&&e.res)||lg[k]||[null,null,null];if(!(res[2]||res.slice(0,3).includes('lost')))n++}return n}
 function updBadge(){const n=archPending(),b=$('arBadge');if(!b)return;b.hidden=!n;b.textContent=n;
   $('sArch').title=n?'Archiwum · zaległe dni: '+n:'Archiwum poprzednich dni';const c=chCount(),cb=$('chBadge');if(cb){cb.hidden=!c;cb.textContent=c}
-  const d=$('mDot');if(d)d.hidden=!(n||c)||document.body.classList.contains('side-on')}
+  const hc=HL.loaded?hlPending().length:0,hb=$('hlBadge');if(hb){hb.hidden=!hc;hb.textContent=hc}
+  const d=$('mDot');if(d)d.hidden=!(n||c||hc)||document.body.classList.contains('side-on')}
 function close(){$('ov').hidden=true;updBadge();setTimeout(menuHint,400)}
 function open(html){document.querySelectorAll('.hint').forEach(h=>h.remove());$('card').innerHTML=html;$('ov').hidden=false;const c=$('aClose');if(c)c.onclick=close}
 
 function showResult(won,p){
   const v=val(answer), word=`<span class="answer">${answer}</span>`;
   let body,btns='';
-  const head=won?'Odgadnięte w '+guesses.length+(guesses.length===1?' próbie':' próbach'):'Tym razem się nie udało';
+  const koloW=won&&mode!=='free'&&!!day.kr[lvl];
+  const head=koloW?'Uratowane kołem ratunkowym':won?'Odgadnięte w '+guesses.length+(guesses.length===1?' próbie':' próbach'):'Tym razem się nie udało';
   const mk=won?medalKind(guesses.length):null;
   const tbNow=(mode!=='free'&&day.tb)?day.tb[lvl]:0;
   const bolt=won&&mode!=='free'&&tbNow>=TMAX[lvl]/2?`<span class="bolt">${ic('bolt',14)} Błyskawica! Ponad połowa bonusu za czas</span>`:'';
-  const cel=won&&RX()&&mode!=='free'?`<div class="cel"><span style="font-size:64px;line-height:1">🌿</span><div class="msg">${pick(CHEER[mk])}<small>Odgadnięte w ${guesses.length}. próbie</small></div></div>`
+  const cel=koloW?`<div class="cel"><span style="color:#e5484d">${ic('ring',64)}</span><div class="msg">Koło ratunkowe zadziałało!<small>Odgadnięte w 7. próbie${lvl<2?' · poziom '+(lvl+2)+' odblokowany':''}</small></div></div>`
+    :won&&RX()&&mode!=='free'?`<div class="cel"><span style="font-size:64px;line-height:1">🌿</span><div class="msg">${pick(CHEER[mk])}<small>Odgadnięte w ${guesses.length}. próbie</small></div></div>`
     :won?`<div class="cel">${medal(mk)}<div class="msg">${pick(CHEER[mk])}<small>${medalName[mk][0].toUpperCase()+medalName[mk].slice(1)} za ${guesses.length}. próbę</small>${bolt}</div></div>`
     :`<div class="cel"><span style="color:var(--near)">${ic('sun',64)}</span><div class="msg">${pick(CHEER.lost)}<small>${mode==='arch'?'W archiwum czekają kolejne dni.':'Każdy dzień to nowe hasła.'}</small></div></div>`;
   const full=won&&mode!=='free'&&lvl===2?`<div class="full">Komplet! Wszystkie 3 hasła ${mode==='arch'?'tego dnia':'dnia'} odgadnięte.</div>`:'';
@@ -649,12 +757,14 @@ function showResult(won,p){
     body=`<p>${word}</p><p class="sub">Dziś odgadnięte: <b>${okN} z ${day.res.filter(Boolean).length}</b>${won?'':' · Kolejne hasło jutro.'}</p>`;
   }
   if(mode!=='free'&&!RX()){
-    const tb=day.tb?day.tb[lvl]:0,te=day.te?day.te[lvl]:null,base=pointsFor(answer,guesses.length),jc=day.jk[lvl]===2?day.jc[lvl]:0;
-    body=won?`<p>${word}</p><p>Wartość słowa ${v} pkt × premia ${7-guesses.length} (za ${guesses.length}. próbę) = ${base} pkt</p>`
+    const tb=day.tb?day.tb[lvl]:0,te=day.te?day.te[lvl]:null,base=pointsFor(answer,guesses.length),jc=day.jk[lvl]===2?day.jc[lvl]:0,hcost=day.hpos[lvl]!=null?day.hc[lvl]:0;
+    body=koloW?`<p>${word}</p><p>Koło ratunkowe: za ten poziom <b>0 pkt</b> i bez bonusu za czas, ale poziom jest zaliczony.</p>`:won?`<p>${word}</p><p>Wartość słowa ${v} pkt × premia ${7-guesses.length} (za ${guesses.length}. próbę) = ${base} pkt</p>`
       +(tb?`<p>Bonus za czas (${fmtT(te)}): +${tb} pkt</p>`:(te!=null?`<p class="sub">Czas ${fmtT(te)}: bez bonusu za czas.</p>`:''))
       +(jc?`<p>Joker (odsłonięta litera): −${jc} pkt</p>`:'')
+      +(hcost?`<p>Pomocna dłoń 🤝 (podpowiedziana litera): −${hcost} pkt</p>`:'')
       +`<p>Razem za poziom: <b>${p} pkt</b></p>`
             :`<p>Hasło: ${word} (${v} pkt)</p><p>Tym razem 0 pkt.${lvl<2?(mode==='arch'?' Kolejne poziomy tego dnia zostają zablokowane.':' Kolejny poziom odblokujesz jutro.'):''}</p>`;
+    if(won&&lvl===2&&day.pts[4])body+=`<p>Bonus za ukończony dzień: <b>+${DAYB} pkt</b>${day.pts[4]>DAYB?`, za czysty dzień bez koła: <b>+${CLEANB} pkt</b>`:''}</p>`;
     body+=`<p class="sub">${mode==='arch'?'Ten dzień razem':'Dziś razem'}: <b>${day.pts.reduce((a,b)=>a+b,0)} pkt</b></p>`;
   }
   if(mode!=='free'){
@@ -704,13 +814,14 @@ function showStats(){
   const lg=store.get('sd2_log',{});for(const k in lg)lg[k].forEach((r,i)=>{if(r){played[i]++;if(r==='won')won[i]++}});
   const month=new Date(t).toLocaleDateString('pl-PL',{month:'long',timeZone:'UTC'});
   const dayRows=LVA.slice(0,isWknd(curKey())?4:3).map((l,i)=>{const r=day.res[i],g=day.g[i]||[];const w=wordFor(i,curN());
-    const word=r?w:(unlocked(i)?'…':ic('lock',15));const note=r==='won'?(g.length?'odgadnięte w '+g.length+'. próbie':'odgadnięte'):r==='lost'?'nie odgadnięte':unlocked(i)?(g.length?'w trakcie · dotknij, żeby grać':'dotknij, żeby grać'):i===3?'po zakończeniu poziomu 3':'zablokowane';
+    const word=r?w:(unlocked(i)?'…':ic('lock',15));const note=r==='won'&&day.kr[i]?'uratowane kołem ratunkowym, 7. próba':r==='won'?(g.length?'odgadnięte w '+g.length+'. próbie':'odgadnięte'):r==='lost'?'nie odgadnięte':unlocked(i)?(g.length?'w trakcie · dotknij, żeby grać':'dotknij, żeby grać'):i===3?'po zakończeniu poziomu 3':'zablokowane';
     const mini=g.length&&r?`<span class="mini" hidden>${g.map(x=>`<span class="mr">${[...x.w].map((ch,j)=>`<i style="background:${COL[x.s[j]]}">${ch}</i>`).join('')}</span>`).join('')}</span>`:'';
     const act=g.length&&r?` data-tog="${i}" role="button" tabindex="0" aria-expanded="false"`:(!r&&unlocked(i))?` data-play="${i}" role="button" tabindex="0"`:'';
-    return `<div${act} class="${r==='lost'?'lostr':''}"><span class="lvn">${i===3?'P4':'P'+(i+1)}</span><span class="w">${word}<small>${note}${!RX()&&day.te&&day.te[i]!=null&&r?' · '+ic('clock',12)+' '+fmtT(day.te[i])+(day.tb[i]?' (+'+day.tb[i]+')':''):''}</small></span><span class="pt">${RX()?'':(r==='won'&&g.length?medal(medalKind(g.length),18):'')+day.pts[i]+' pkt'}${mini?' <span class="chev">'+ic('chev',16)+'</span>':''}</span>${mini}</div>`}).join('');
+    return `<div${act} class="${r==='lost'?'lostr':''}"><span class="lvn">${i===3?'P4':'P'+(i+1)}</span><span class="w">${word}<small>${note}${!RX()&&day.te&&day.te[i]!=null&&r?' · '+ic('clock',12)+' '+fmtT(day.te[i])+(day.tb[i]?' (+'+day.tb[i]+')':''):''}</small></span><span class="pt">${RX()?'':(r==='won'&&g.length?(day.kr[i]?'<span style="color:#e5484d">'+ic('ring',18)+'</span>':medal(medalKind(g.length),18)):'')+day.pts[i]+' pkt'}${mini?' <span class="chev">'+ic('chev',16)+'</span>':''}</span>${mini}</div>`}).join('');
   const boards=day.g.some(x=>x&&x.length)?LVA.map((l,i)=>{const g=day.g[i]||[],r=day.res[i];if(!g.length)return '';const w=wordFor(i,curN());
-    return `<div class="bl"><div class="bh"><span>${l.n} · <span class="w">${r?w:'w trakcie'}</span></span><span>${RX()?(r==='won'?g.length+'/6':''):(r==='won'?medal(medalKind(g.length),18):'')+day.pts[i]+' pkt'}</span></div><span class="mini">${g.map(x=>`<span class="mr">${[...x.w].map((ch,j)=>`<i style="background:${COL[x.s[j]]}">${ch}</i>`).join('')}</span>`).join('')}</span></div>`}).join('')
+    return `<div class="bl"><div class="bh"><span>${l.n} · <span class="w">${r?w:'w trakcie'}</span></span><span>${RX()?(r==='won'?(day.kr[i]?'7/6 koło':g.length+'/6'):''):(r==='won'?(day.kr[i]?'<span style="color:#e5484d">'+ic('ring',18)+'</span>':medal(medalKind(g.length),18)):'')+day.pts[i]+' pkt'}</span></div><span class="mini">${g.map(x=>`<span class="mr">${[...x.w].map((ch,j)=>`<i style="background:${COL[x.s[j]]}">${ch}</i>`).join('')}</span>`).join('')}</span></div>`}).join('')
     :'<p class="sub">Plansze z tego dnia nie zostały zapisane: ten dzień rozegrano w starszej wersji gry, która zapamiętywała tylko wynik. Punkty są policzone.</p>';
+  const bonusRow=!RX()&&day.pts[4]?`<div><span class="lvn" style="color:#3b82f6">+</span><span class="w" style="letter-spacing:0;text-transform:none">Bonus dnia<small>ukończony dzień${day.pts[4]>DAYB?' i czysty dzień bez koła':''}</small></span><span class="pt">+${day.pts[4]} pkt</span></div>`:'';
   const pend=archPending();
   const allDone=done3(day)&&!p4going(day);
   const anyB=day.g.some(x=>x&&x.length)||day.res.some(Boolean);
@@ -720,7 +831,7 @@ function showStats(){
   const nextB=mode==='day'&&allDone?nextBox(pend):'';
   const extraB=nextB?'':`${p4b}<button class="invbtn" id="aInv">${ic('send',18)} Zaproś znajomych do gry</button><button class="rkbtn" id="aRank">${ic('trophy',18)} Ranking graczy</button><button class="duelbtn" id="aDuel">${ic('fencer',18)} Wyzwij znajomego na pojedynek</button>`;
   open(`${logo()}<div class="step">${mode==='arch'?'Archiwum · ':''}Strona 4 z 4 · Podsumowanie</div><h2>${mode==='arch'?'Dzień '+shortDate(archKey):'Podsumowanie dnia'}</h2>${rkInv}
-  ${day.g.some(x=>x&&x.length)?'<p class="sub">Dotknij paska poziomu, żeby rozwinąć jego planszę.</p>':''}<div class="daysum">${dayRows}</div>
+  ${day.g.some(x=>x&&x.length)?'<p class="sub">Dotknij paska poziomu, żeby rozwinąć jego planszę.</p>':''}<div class="daysum">${dayRows}${bonusRow}</div>
   ${RX()?'<div class="relaxnote">🌿 Grasz na luzie: bez zegara, punktów i rankingu. Wyłączysz to w menu ☰.</div>':''}<div class="total ptsblock"><span>${mode==='arch'?'Ten dzień razem':'Dziś razem'}</span><span>${day.pts.reduce((a,b)=>a+b,0)} pkt</span></div>
   ${mode==='day'&&streakN()?`<div class="streak"><span style="font-size:1.6rem;line-height:1">🔥</span><span><b>${dniPL(streakN())} z rzędu</b><small>${streakN()>=2?'Nie przerywaj serii, jutro nowe hasła.':'Wróć jutro, żeby zacząć serię.'}</small></span></div>`:''}
   ${day.res.some(Boolean)?shareBtns('S'):''}
@@ -730,8 +841,8 @@ function showStats(){
   <h2 class="ptsblock">Twoje punkty</h2>
   <div class="stats ptsblock"><div><b>${sumRange(h,t,t)}</b><span>dziś</span></div><div><b>${sumRange(h,wFrom,wFrom+6*DAY)}</b><span>ten tydzień</span></div><div><b>${sumRange(h,mFrom,t)}</b><span>${month}</span></div><div><b>${all}</b><span>łącznie</span></div></div>
   <div class="week ptsblock">${days.map((d,i)=>{const s=sumP(d.p);return `<div>${s||''}<i style="height:${s/mx*80}%">${d.p.map((p,j)=>p?`<s class="c${j+1}" style="height:${p/s*100}%"></s>`:'').join('')}</i>${names[i]}</div>`}).join('')}</div>
-  <div class="legend ptsblock"><span style="--c:var(--hit)">Poziom 1</span><span style="--c:var(--near)">Poziom 2</span><span style="--c:var(--ink)">Poziom 3</span>${played[3]?'<span style="--c:#8b5cf6">Niespodzianka</span>':''}</div>
-  <div class="lvres">${LVA.map((l,i)=>i===3&&!played[3]?'':`<div><span>${l.n} (${l.r})</span><b>${won[i]} z ${played[i]} odgadniętych</b></div>`).join('')}</div>
+  <div class="legend ptsblock"><span style="--c:var(--hit)">Poziom 1</span><span style="--c:var(--near)">Poziom 2</span><span style="--c:var(--ink)">Poziom 3</span>${played[3]?'<span style="--c:#8b5cf6">Niespodzianka</span>':''}${Object.values(h).some(a=>Array.isArray(a)&&a[4])?'<span style="--c:#3b82f6">Bonus dnia</span>':''}</div>
+  <div class="lvres">${LVA.map((l,i)=>i===3&&!played[3]?'':`<div><span>${l.n} (${l.r})</span><b>${won[i]} z ${played[i]} odgadniętych</b></div>`).join('')}${(+store.get('sd2_kola',0)||0)?`<div><span>Koło ratunkowe</span><b>użyte ${razy(+store.get('sd2_kola',0))}</b></div>`:''}${(+store.get('sd2_help_n',0)||0)?`<div><span>Pomocna dłoń 🤝</span><b>pomogłeś ${razy(+store.get('sd2_help_n',0))}</b></div>`:''}</div>
   <p class="sub">Tydzień liczony od poniedziałku. Wyniki zapisują się w tej przeglądarce. Przeniesiesz je na inne urządzenie w menu: Przenieś wyniki.</p>
   <h2>Trening</h2>${trainPicker()}
   <button class="linkbtn" id="aReset">Zacznij od nowa (wyzeruj wyniki)</button>`);
@@ -763,7 +874,7 @@ function showHelp(){
   const ex=(w,s)=>`<div class="ex">${[...w].map((ch,i)=>`<div class="t ${s[i]||''}">${tileHTML(ch)}</div>`).join('')}</div>`;
   const groups={};for(const c in PV){(groups[PV[c]]=groups[PV[c]]||[]).push(c)}
   open(`${logo()}<h2>Jak grać</h2>
-  <p>Odgadnij pięcioliterowe słowo w sześciu próbach. Każda próba musi być prawdziwym polskim słowem. A i Ą to różne litery.</p>
+  <p>Odgadnij pięcioliterowe słowo w sześciu próbach (w razie potrzeby z kołem ratunkowym w siódmej). Każda próba musi być prawdziwym polskim słowem. A i Ą to różne litery.</p>
   ${ex('kubek',['hit'])}<p><b>K</b> jest w słowie i stoi na dobrym miejscu (zielony).</p>
   ${ex('rondo',['','near'])}<p><b>O</b> jest w słowie, ale w innym miejscu (pomarańczowy).</p>
   ${ex('zegar',['','','miss'])}<p><b>G</b> nie występuje w słowie. Na klawiaturze taka litera staje się blada, przekreślona i w przerywanej ramce.</p>
@@ -779,7 +890,12 @@ function showHelp(){
   <p><b>Ranking graczy.</b> W menu ☰ wybierz Ranking graczy i podaj pseudonim (bez maila i hasła). Twoje punkty trafią do wspólnego rankingu: dziś, w tym tygodniu, w miesiącu i łącznie. Jest tam też tabela pojedynków. Ranking jest dobrowolny i w każdej chwili możesz się z niego usunąć.</p>
   <p><b>Gra na luzie 🌿.</b> Wolisz grać bez presji? W menu ☰ włącz „Grę na luzie”: znika zegar, punkty, medale i ranking, zostają same słowa. Wyłączysz to w każdej chwili.</p>
   <p><b>Literiada na X.</b> Obserwuj @Literiada (x.com/Literiada): nowości, wyzwania i najlepsze wyniki graczy. Wrzucając wynik na X, oznacz @Literiada.</p>
-  <p><b>Zaproś znajomych.</b> W menu ☰ albo w podsumowaniu dnia kliknij „Zaproś do gry” i wyślij link w Messengerze, SMS-ie lub WhatsAppie.</p>
+  <p><b>Zaproś znajomych.</b> W menu ☰ albo w podsumowaniu dnia kliknij „Zaproś do gry” i wybierz komunikator: Messenger, WhatsApp, SMS, Telegram, e-mail, X albo Facebook.</p>
+  <p><b>Koło ratunkowe 🛟.</b> Gdy wykorzystasz 6 prób, gra zaproponuje 7. próbę. Odgadnięcie hasła w 7. próbie daje 0 pkt za ten poziom i bez bonusu za czas, ale poziom zalicza się jako ukończony i odblokowuje kolejny. Jedno koło na poziom, nie działa w pojedynkach i wyzwaniach.</p>
+  <p><b>Bonus dnia.</b> Za ukończenie poziomów 1–3 dostajesz +10 pkt, a jeśli nie użyłeś koła ratunkowego, dodatkowo +5 pkt za czysty dzień.</p>
+  <p><b>Pomocna dłoń 🤝.</b> Utknąłeś? Poproś o jedną literę gracza z rankingu, który dziś odgadł Twój poziom. Przy takich graczach ikona 🤝 w rankingu świeci się. Pomocnik widzi tylko kolory Twoich prób i wskazuje jedną literę hasła na jej miejscu. Podpowiedziana litera kosztuje tyle punktów, ile jest warta w Scrabble, a zegar biegnie dalej. Licznik 🤝 przy nicku pokazuje, ile razy ktoś pomógł innym.</p>
+  <p><b>Zakładki poziomów.</b> Nad planszą są przyciski P1, P2, P3 (w weekend P4). Dotknij ich albo przesuń palcem po planszy w bok, żeby zobaczyć plansze wcześniejszych poziomów dnia. Na komputerze działają strzałki ← →. Podgląd nie zatrzymuje zegara.</p>
+  <p><b>Ikona na pulpicie.</b> W menu ☰ wybierz „Ikona na pulpicie”, żeby otwierać Literiadę jak aplikację, bez paska przeglądarki.</p>
   <p><b>Joker.</b> Na poziomie 2, 3 i w niespodziance możesz odsłonić jedną literę hasła. Jokera dostajesz za polecenie gry znajomemu (jeden na poziom). Odsłonięta litera kosztuje tyle punktów, ile jest warta w Scrabble.</p>
   <p>Wynik = wartość słowa × premia za szybkość: 6 za odgadnięcie w 1. próbie, 5 w 2., i tak dalej do 1 w 6. próbie. Przykład: ŻÓŁTY (17 pkt) odgadnięty w 3. próbie daje 17 × 4 = 68 pkt.</p>
   <p><b>Bonus za czas.</b> Zegar 5:00 rusza po wpisaniu pierwszej litery danego poziomu i nie zatrzymuje się po wyjściu z gry. Bonus maleje płynnie z każdą sekundą: na starcie wynosi 20 pkt na poziomie 1, 40 pkt na poziomie 2 i 60 pkt na poziomie 3, a po 5 minutach spada do zera. Pasek pod zegarem pokazuje, ile jeszcze zostało. Po 5 minutach usłyszysz sygnał i grasz dalej, już bez bonusu za czas.</p>
@@ -788,7 +904,7 @@ function showHelp(){
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 18.1 · 2026-11-14</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 19.0 · 2026-11-19</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
@@ -802,7 +918,7 @@ function loadDay(){
   if(done3(day)&&p4going(day))lvl=3;
 }
 function loadDayLevel(){
-  answer=wordFor(lvl,curN());norm(day);
+  view=null;answer=wordFor(lvl,curN());norm(day);
   guesses=day.g[lvl]||[];done=!!day.res[lvl];cur='';
   if(day.t[lvl]&&Date.now()-day.t[lvl]>tl(lvl)*1000)timeupFired=curKey()+':'+lvl;
   paint();updTimer();
@@ -864,9 +980,11 @@ const GAME_URL='https://literiada.github.io/';
 const BASE=()=>{try{if(/^https?:$/.test(location.protocol))return location.origin+location.pathname;if(location.protocol==='file:')return location.href.split('#')[0]}catch(e){}return GAME_URL};
 function updJoker(){const b=$('bJoker'),st=$('jstrip');if(!b)return;
   const can=mode!=='free'&&day&&day.jk&&lvl>=1;const k=can?day.jk[lvl]:0;
-  b.hidden=!can||done||k===2;b.className='jbtn'+(k===1?' have':'');
+  const pv=view!=null&&view!==lvl;
+  b.hidden=!can||done||k===2||pv;b.className='jbtn'+(k===1?' have':'');
   b.innerHTML=ic('joker',15)+(k===1?' Użyj jokera':' Joker');
-  if(can&&k===2&&day.jp[lvl]!=null){st.hidden=false;st.innerHTML='Joker:'+[...answer].map((c,i)=>`<i class="${i===day.jp[lvl]?'on':''}">${i===day.jp[lvl]?c:''}</i>`).join('')}
+  const jp=can&&k===2&&!pv?day.jp[lvl]:null,hp=inPlay()&&!pv&&day.hpos?day.hpos[lvl]:null;
+  if(jp!=null||hp!=null){st.hidden=false;st.innerHTML=(jp!=null&&hp!=null?'Joker i pomoc:':jp!=null?'Joker:':'🤝 Pomoc:')+[...answer].map((c,i)=>`<i class="${i===jp?'on':i===hp?'hp':''}">${i===jp||i===hp?c:''}</i>`).join('')}
   else st.hidden=true}
 function jokerPos(){const known=new Set();guesses.forEach(g=>g.s.forEach((x,i)=>{if(x==='hit')known.add(i)}));for(let i=0;i<5;i++)if(!known.has(i))return i;return 0}
 // ---- v15: zaproszenia (link z identyfikatorem zapraszającego, liczone po ukończeniu 1. poziomu przez zaproszonego)
@@ -878,18 +996,29 @@ async function invCount(){try{const {F,db,uid}=await fb();await F.setDoc(F.doc(d
 async function shareGame(){const url=await inviteURL(),t=INV_TXT+' 👉 '+url;invCount();
   if(isTouch()){try{if(navigator.share)return navigator.share({title:'Literiada',text:t}).catch(()=>{})}catch(e){}}
   try{await navigator.clipboard.writeText(t)}catch(e){}return 'copied'}
-async function inviteFriends(){const url=await inviteURL(),t=INV_TXT+' 👉 '+url;invCount();
-  const tg='https://t.me/share/url?url='+encodeURIComponent(url)+'&text='+encodeURIComponent(INV_TXT);
-  let ok=false;if(!isTouch()){try{await navigator.clipboard.writeText(t);ok=true}catch(e){}}
+async function inviteFriends(){const url=await inviteURL(),t=INV_TXT+' 👉 '+url,E=encodeURIComponent,touch=isTouch();
+  let ok=false;if(!touch){try{await navigator.clipboard.writeText(t);ok=true;invCount()}catch(e){}}
+  const cpq=()=>{try{navigator.clipboard.writeText(t).catch(()=>{})}catch(e){}};
+  const CH=[['ms','Messenger','#0866ff',ic('chat',20)],['wa','WhatsApp','#128c7e','<span class="ii">✆</span>'],touch?['sms','SMS','#4b5563',ic('chat',20)]:null,['tg','Telegram','#1c8acb',ic('send',20)],
+    ['em','E-mail','#c5221f','<span class="ii">@</span>'],['x','X','#000000','<span class="ii">𝕏</span>'],['fb','Facebook','#1877f2','<span class="ii">f</span>'],['cp','Kopiuj','#c2410c',ic('copy',20)]].filter(Boolean);
+  const go={
+    ms:()=>{cpq();toast('Tekst zaproszenia skopiowany: wklej go w Messengerze',3000);if(touch){location.href='fb-messenger://share/?link='+E(url);setTimeout(()=>{if(!document.hidden)extOpen('https://m.me/')},1800)}else extOpen('https://www.messenger.com/')},
+    wa:()=>extOpen('https://wa.me/?text='+E(t)),
+    sms:()=>{location.href='sms:?&body='+E(t)},
+    tg:()=>extOpen('https://t.me/share/url?url='+E(url)+'&text='+E(INV_TXT)),
+    em:()=>{location.href='mailto:?subject='+E('Zagraj ze mną w Literiadę')+'&body='+E(t)},
+    x:()=>extOpen('https://x.com/intent/post?text='+E(INV_TXT+' 👉 '+url+' @Literiada')),
+    fb:()=>{cpq();toast('Tekst zaproszenia skopiowany: możesz go wkleić we wpisie',3000);extOpen('https://www.facebook.com/sharer/sharer.php?u='+E(url))},
+    cp:()=>{copy2(t);const a=$('invT');if(a)a.select()}};
   open(`<div class="step">Zaproś do gry</div><h2>${ic('send',22)} ${ok?'Zaproszenie skopiowane ✓':'Wyślij zaproszenie'}</h2>
-  <p>${ok?'Wklej je znajomemu w Messengerze, WhatsAppie, mailu lub SMS-ie (Ctrl+V) albo wyślij przez Telegram.':'Wybierz, jak chcesz wysłać zaproszenie.'}</p>
-  <textarea readonly rows="4" id="invT" style="width:100%;box-sizing:border-box;font:.85rem var(--body);padding:8px;border:2px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink)"></textarea>
-  <div class="actions"><button id="invTg" style="background:#229ED9;color:#fff;border-color:#229ED9">${ic('send',16)} Telegram</button>${navigator.share?'<button id="invMore">Więcej opcji</button>':''}<button id="invCp">Kopiuj</button></div>
-  <div class="actions"><button class="main" id="aClose">Gotowe</button></div>`);
+  <p>${ok?'Tekst jest już w schowku. Wybierz, gdzie go wysłać, albo wklej (Ctrl+V) w dowolnym komunikatorze.':'Wybierz, gdzie wysłać zaproszenie.'}</p>
+  <div class="igrid">${CH.map(([k,l,c,i])=>`<button data-inv="${k}" style="background:${c}">${i}${l}</button>`).join('')}</div>
+  <textarea readonly rows="3" id="invT" style="width:100%;box-sizing:border-box;font:.85rem var(--body);padding:8px;border:2px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink)"></textarea>
+  <div class="actions">${navigator.share?'<button id="invMore">Więcej opcji</button>':''}<button class="main" id="aClose">Gotowe</button></div>
+  <p class="sub">Messenger i Facebook przyjmują tylko link, dlatego tekst zaproszenia kopiuję do schowka, żeby można go było wkleić. Signal, Instagram i inne aplikacje znajdziesz pod „Więcej opcji”.</p>`);
   $('invT').value=t;
-  $('invTg').onclick=()=>{try{extOpen(tg)}catch(e){location.href=tg}};
-  $('invCp').onclick=()=>{copy2(t);$('invT').select()};
-  if($('invMore'))$('invMore').onclick=()=>{try{navigator.share({title:'Literiada',text:t}).catch(()=>{})}catch(e){}}}
+  document.querySelectorAll('[data-inv]').forEach(b=>b.onclick=()=>{invCount();try{go[b.dataset.inv]()}catch(e){copy2(t)}});
+  if($('invMore'))$('invMore').onclick=()=>{invCount();try{navigator.share({title:'Literiada',text:t}).catch(()=>{})}catch(e){}}}
 function copy2(t){try{navigator.clipboard.writeText(t).then(()=>toast('Zaproszenie skopiowane! Wklej je znajomym w Messengerze lub SMS-ie',2600),()=>fallback(t))}catch(e){fallback(t)}}
 // zaproszony: zapamiętaj, kto zaprosił (tylko nowy gracz), zapisz po ukończeniu pierwszego poziomu
 (function(){try{const q=new URLSearchParams(location.search),z=q.get('z');if(!z)return;
@@ -1049,7 +1178,7 @@ async function rankSync(){const nick=store.get('sd2_nick','');if(!nick||RX())ret
   try{const {F,db,uid}=await fb();const h=store.get('sd2_hist',{}),cut=keyToUTC(todayKey())-62*DAY,days={};let all=0;
     for(const k in h){const s=Math.round(rsum(h[k]));all+=s;if(s>0&&keyToUTC(k)>=cut)days[k]=s}
     const one=(k,v)=>v>0?{[k]:v}:{};
-    await F.setDoc(F.doc(db,'players',uid),{nick,all:Math.round(all),days,dd:one(todayKey(),myVal('d')),ww:one(rkWk(),myVal('w')),mm:one(rkMk(),myVal('m')),upd:Date.now()});RK.cache={};rankOk=true}catch(e){console.warn('ranking',e);rankOk=false}
+    await F.setDoc(F.doc(db,'players',uid),{nick,all:Math.round(all),days,dd:one(todayKey(),myVal('d')),ww:one(rkWk(),myVal('w')),mm:one(rkMk(),myVal('m')),sv:one(todayKey(),svMask()),hl:Math.min(100000,Math.max(0,+store.get('sd2_help_n',0)||0)),upd:Date.now()});RK.cache={};rankOk=true}catch(e){console.warn('ranking',e);rankOk=false}
   rankBusy=false;if(rankAgain){rankAgain=false;rankSync()}}
 async function duelPush(sn,won){try{if(!duel)return;const {F,db,uid}=await fb();
   const id=String(duel.code||'x').replace(/[^A-Za-z0-9_-]/g,'').slice(0,40)+'_'+uid;
@@ -1076,19 +1205,20 @@ function rankHTML(){const tab=RK.tab,nick=store.get('sd2_nick','');
     body=(FBUID?`<p><b>Wyniki Twoich zagadek</b></p><div class="dlog">${mine.length?mine.map(line).join(''):'<p class="sub">Nikt jeszcze nie odesłał wyniku Twojej zagadki. Wyślij nową w menu: Pojedynek.</p>'}</div>`:'')
       +`<p><b>Ostatnie pojedynki</b></p><div class="dlog">${(RK.duels||[]).length?RK.duels.map(line).join(''):'<p class="sub">Brak pojedynków. Bądź pierwszy!</p>'}</div>`;
   } else {
-    const list=RK.rows.map(r=>({id:r.id,nick:r.nick||'?',v:rankVal(r,tab)})).filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
+    const list=RK.rows.map(r=>({id:r.id,nick:r.nick||'?',v:rankVal(r,tab),sv:r.sv,hl:r.hl})).filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
     const meAll=list.findIndex(r=>r.id===FBUID);if(meAll>=50)RK.mePos=meAll+1;list.length=Math.min(list.length,50);
     const me=list.findIndex(r=>r.id===FBUID),myPos=me>=0?me+1:RK.mePos;
-    const row=(r,i)=>`<div class="${r.id===FBUID?'me':''}"><span class="pos">${i<3?medal(['gold','silver','bronze'][i],22):i+1}</span><span class="nk">${esc(r.nick)}${admB(r.id)}</span><span class="pt">${r.v} pkt</span><span class="acts">${chBtn(r)}${admDelBtn(r)}</span></div>`;
+    const row=(r,i)=>`<div class="${r.id===FBUID?'me':''}"><span class="pos">${i<3?medal(['gold','silver','bronze'][i],22):i+1}</span><span class="nk">${esc(r.nick)}${admB(r.id)}</span><span class="pt">${r.v} pkt</span><span class="acts">${hlBtn(r)}${chBtn(r)}${admDelBtn(r)}</span></div>`;
     const meRow=me<0&&RK.mePos&&nick?'<span class="gap">…</span>'+row({id:FBUID,nick,v:myVal(tab)},RK.mePos-1):'';
     body=list.length?`<div class="rlist">${list.map(row).join('')}${meRow}</div>`:'<p class="sub">Nikt jeszcze nie zdobył punktów w tym okresie. Twoja szansa!</p>';
     body+=`<p class="sub">${RK.cnt!=null?'Graczy w rankingu: '+RK.cnt:''}${list.length>=50?' · pokazujemy pierwszą 50':''}${myPos?' · Twoje miejsce: <b>'+myPos+'</b>':''}</p>`;
   }
   const join=nick?`<p class="sub">Grasz jako <b>${esc(nick)}</b>. <button class="linkbtn" id="rNick" style="padding:0">Zmień nick</button> · <button class="linkbtn" id="rOut" style="padding:0">Usuń mnie z rankingu</button></p>`
     :`<div class="rjoin"><b>Dołącz do rankingu</b><span style="font-size:.85rem">Wpisz pseudonim, który zobaczą inni gracze. Bez maila i hasła, zapisujemy tylko pseudonim i punkty.</span><input id="rIn" maxlength="20" placeholder="np. Radek z Pręgowa" autocomplete="off"><button id="rJoin">Dołącz</button><span class="dbad" id="rErr" hidden></span></div>`;
-  return `<div class="step">Ranking</div><h2>${ic('trophy',24)} Ranking graczy</h2>${join}<div class="rtabs">${tabs}</div>${body}${nick&&tab!=='p'?'<p class="sub">Przycisk „Wyzwij” wysyła graczowi Twoje hasło do odgadnięcia. Jedno wyzwanie dziennie do tej samej osoby.</p>':''}<div class="actions"><button id="aClose">Zamknij</button></div><p class="sub">Link do rankingu: literiada.github.io/#ranking</p>`}
+  return `<div class="step">Ranking</div><h2>${ic('trophy',24)} Ranking graczy</h2>${join}<div class="rtabs">${tabs}</div>${body}${nick&&tab!=='p'?'<p class="sub">Przycisk „Wyzwij” wysyła graczowi Twoje hasło do odgadnięcia. Jedno wyzwanie dziennie do tej samej osoby.</p><p class="sub">🤝 to licznik pomocy udzielonych innym graczom. Świecąca ikona oznacza, że ten gracz odgadł dziś Twój bieżący poziom: dotknij jej, żeby poprosić go o jedną literę.</p>':''}<div class="actions"><button id="aClose">Zamknij</button></div><p class="sub">Link do rankingu: literiada.github.io/#ranking</p>`}
 function rankBind(){document.querySelectorAll('[data-rt]').forEach(b=>b.onclick=()=>{RK.tab=b.dataset.rt;rankLoad()});
   document.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{const r=(RK.rows||[]).find(x=>x.id===b.dataset.ch);if(r)chNew(r)});
+  document.querySelectorAll('[data-hreq]').forEach(b=>b.onclick=()=>{const r=(RK.rows||[]).find(x=>x.id===b.dataset.hreq);if(r)helpAsk(r)});
   document.querySelectorAll('[data-ad]').forEach(b=>b.onclick=()=>{const r=(RK.rows||[]).find(x=>x.id===b.dataset.ad);if(r)admAsk(r)});
   document.querySelectorAll('[data-dd]').forEach(b=>b.onclick=()=>admDelDuel(b.dataset.dd));
   if($('rRetry'))$('rRetry').onclick=()=>{RK.err=null;rankLoad(true)};
@@ -1099,7 +1229,7 @@ function rankBind(){document.querySelectorAll('[data-rt]').forEach(b=>b.onclick=
   if($('rOut'))$('rOut').onclick=async()=>{let nd=0;try{const {F,db,uid}=await fb();await F.deleteDoc(F.doc(db,'players',uid));
       const qs=await Promise.all([F.getDocs(F.query(F.collection(db,'duels'),F.where('su','==',uid))),F.getDocs(F.query(F.collection(db,'duels'),F.where('au','==',uid)))]);
       const seen=new Set();for(const q of qs)for(const d of q.docs){if(seen.has(d.id))continue;seen.add(d.id);try{await F.deleteDoc(F.doc(db,'duels',d.id));nd++}catch(e){}}
-      await chWipe()}catch(e){}
+      await chWipe();await hlWipe()}catch(e){}
     store.set('sd2_nick','');RK.cache={};toast('Usunięto Cię z rankingu'+(nd?' i z tabeli pojedynków ('+nd+')':''),2600);rankLoad(true)}}
 function rankDraw(){if($('ov').hidden||!$('card').querySelector('.rtabs'))return;$('card').innerHTML=rankHTML();const c=$('aClose');if(c)c.onclick=close;rankBind()}
 async function rankLoad(force){const tab=RK.tab,c=RK.cache[tab];await admLoad();
@@ -1135,9 +1265,9 @@ async function showAdminStats(){open(`<div class="step">Statystyki</div><h2>${ic
     const box=(v,l)=>`<div><b style="font:800 1.6rem var(--display)">${v}</b><span style="display:block;font-size:.78rem;color:var(--muted)">${l}</span></div>`;
     const rows=ids.slice(0,30).map(id=>`<div><span>${esc(nick[id]||'gracz spoza rankingu')}</span><span style="white-space:nowrap">${sent[id]||0} wysł. · <b>${ok[id]||0} udanych</b></span></div>`).join('')||'<p class="sub">Jeszcze nikt nie zapraszał.</p>';
     $('card').innerHTML=`<div class="step">Statystyki</div><h2>${ic('chart',22)} Statystyki Literiady</h2>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:center">${box(ps.docs.length,'graczy w rankingu')}${box(today,'grało dziś (z rankingu)')}${box(is.docs.length,'osób, które zapraszały')}${box(sentAll,'kliknięć „Zaproś”')}${box(iv.docs.length,'udanych zaproszeń')}${box(ds.docs.length,'rozegranych pojedynków')}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:center">${box(ps.docs.length,'graczy w rankingu')}${box(today,'grało dziś (z rankingu)')}${box(is.docs.length,'osób, które zapraszały')}${box(sentAll,'kliknięć wysyłki zaproszeń')}${box(iv.docs.length,'udanych zaproszeń')}${box(ds.docs.length,'rozegranych pojedynków')}</div>
     <p><b>Zapraszający</b> <span class="sub">(udane = zaproszony ukończył 1. poziom)</span></p><div class="dlog">${rows}</div>
-    <p class="sub">„Kliknięcia Zaproś” liczą otwarcia zaproszenia (także przy jokerze), nie wiemy, czy wiadomość faktycznie wysłano.</p>
+    <p class="sub">„Kliknięcia Zaproś” liczą kliknięcia przycisków wysyłki (Messenger, WhatsApp, SMS itd.) i polecenia przy jokerze. Nie wiemy, czy wiadomość faktycznie wysłano.</p>
     ${await admPanel()}
     <div class="actions"><button id="aRef2">Odśwież</button><button class="main" id="aClose">Zamknij</button></div>`;
     $('aClose').onclick=close;$('aRef2').onclick=showAdminStats;admPanelBind()}
@@ -1157,10 +1287,11 @@ function nextBox(pend){const nk=store.get('sd2_nick',''),items=[];
   items.push(`<button class="nx c-duel" data-nx="duel">${ic('fencer',20)}<span>Rzuć wyzwanie znajomemu<small>Wymyśl hasło i wyślij je linkiem</small></span></button>`);
   if(!RX())items.push(nk?`<button class="nx c-rank" data-nx="rank">${ic('trophy',20)}<span>Zobacz ranking dnia<small>Sprawdź swoje miejsce i wyzwij innych graczy</small></span></button>`
     :`<button class="nx c-rank" data-nx="rank">${ic('trophy',20)}<span>Dołącz do rankingu<small>Porównaj się z innymi i odbieraj wyzwania</small></span></button>`);
+  if(HL.loaded&&hlPending().length)items.push(`<button class="nx c-hlp" data-nx="hlp"><span style="font-size:20px;width:20px;text-align:center">🤝</span><span>Ktoś prosi Cię o pomoc: ${hlPending().length}<small>Podpowiedz jedną literę, licznik 🤝 przy Twoim nicku wzrośnie</small></span></button>`);
   if(chCount())items.push(`<button class="nx c-ch" data-nx="ch">${ic('rapier',20)}<span>Wyzwania czekają: ${chCount()}<small>Ktoś rzucił Ci wyzwanie albo odpowiedział na Twoje</small></span></button>`);
   items.push(`<button class="nx c-inv" data-nx="inv">${ic('send',20)}<span>Zaproś znajomego<small>Za polecenie dostajesz jokera na poziomie 2 lub 3</small></span></button>`);
   return `<div class="nextbox"><h3>Co dalej?</h3>${items.slice(0,5).join('')}<div class="cdown" id="cdown">Nowe hasła za ${untilMidnight()}</div></div>`}
-function bindNext(){const act={p4:startP4,arch:()=>{const k=oldestPending();if(k)enterArch(k);else showArchive()},duel:showDuel,rank:()=>showRanking('d'),inv:()=>inviteFriends(),ch:()=>showChallenges()};
+function bindNext(){const act={p4:startP4,arch:()=>{const k=oldestPending();if(k)enterArch(k);else showArchive()},duel:showDuel,rank:()=>showRanking('d'),inv:()=>inviteFriends(),ch:()=>showChallenges(),hlp:()=>showHelps()};
   document.querySelectorAll('[data-nx]').forEach(b=>b.onclick=act[b.dataset.nx]);
   clearInterval(cdownT);cdownT=setInterval(()=>{const c=$('cdown');if(!c){clearInterval(cdownT);return}c.textContent='Nowe hasła za '+untilMidnight()},20000)}
 // ---- v17.6: Wyzwania z rankingu (Firestore: challenges, chset)
@@ -1274,6 +1405,115 @@ async function admPanel(){let uid='';try{uid=(await fb()).uid}catch(e){}await ad
   ${ADM.me?`<p><b>Zablokowani w rankingu</b></p><div class="dlog">${bans}</div>`:''}`}
 function admPanelBind(){const c=$('admCp');if(c)c.onclick=()=>{const t=$('card').querySelector('code').textContent;try{navigator.clipboard.writeText(t).then(()=>toast('Skopiowano identyfikator',1800),()=>fallback(t))}catch(e){fallback(t)}};
   document.querySelectorAll('[data-unban]').forEach(b=>b.onclick=async()=>{try{const {F,db}=await fb();await F.deleteDoc(F.doc(db,'bans',b.dataset.unban));toast('Odblokowano',1800)}catch(e){toast('Nie udało się odblokować',2400)}showAdminStats()})}
+// ---- v19: Pomocna dłoń (Firestore: helps; w players pola sv = odgadnięte dziś poziomy, hl = udzielone pomoce)
+const HL={inb:[],loaded:false,poll:null};
+function svMask(){const t=store.get('sd2_day',null);if(!t||t.d!==dayNo()||!Array.isArray(t.res))return 0;return t.res.slice(0,4).reduce((m,r,i)=>m|(r==='won'?1<<i:0),0)}
+const helpOk=()=>mode==='day'&&!duel&&!!day&&!RX();
+const lvTxtOf=i=>i===3?'weekendową niespodziankę':'poziom '+(i+1);
+function updHelpBtn(){const b=$('bHelp');if(!b)return;const pv=view!=null&&view!==lvl;
+  const got=!!day&&inPlay()&&day.hpos&&day.hpos[lvl]!=null,q=inPlay()&&day.hq?day.hq[lvl]:null;
+  b.hidden=!helpOk()||done||pv||got||guesses.length>=maxG();if(b.hidden)return;
+  const w=q&&q.st==='new';b.className='hbtn'+(w?' wait':'');b.innerHTML=w?'🤝<span class="hl"> Czekam: '+esc(q.hn)+'</span>':'🤝<span class="hl"> Pomocna dłoń</span>'}
+function hlBtn(r){const n=+r.hl||0,tk=todayKey();
+  const q=day&&day.hq?day.hq[lvl]:null;
+  const can=helpOk()&&!done&&!!store.get('sd2_nick','')&&r.id!==FBUID&&((+((r.sv||{})[tk])||0)&(1<<lvl))&&day.hpos[lvl]==null&&!(q&&q.st==='new');
+  if(!n&&!can)return '';
+  return can?`<button class="hlc on" data-hreq="${esc(r.id)}" title="Poproś o pomoc: ${esc(r.nick)}" aria-label="Poproś o pomoc: ${esc(r.nick)}">🤝 ${n}</button>`:`<span class="hlc" title="Pomocna dłoń: ${n}">🤝 ${n}</span>`}
+async function helpClick(){if(!helpOk()||done)return;const q=day.hq[lvl];
+  if(!store.get('sd2_nick','')){open(`<div class="step">Pomocna dłoń</div><h2>🤝 Pomocna dłoń</h2><p>O jedną literę możesz poprosić graczy z rankingu, którzy dziś odgadli ${lvTxtOf(lvl)}. Najpierw dołącz do rankingu: wystarczy pseudonim, bez maila i hasła.</p><div class="actions"><button class="main" id="hJoin">${ic('trophy',16)} Dołącz do rankingu</button><button id="aClose">Anuluj</button></div>`);$('hJoin').onclick=()=>showRanking('d');return}
+  if(q&&q.st==='new'){const hm=new Date(q.ts).toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'});
+    open(`<div class="step">Pomocna dłoń</div><h2>🤝 Czekasz na pomoc</h2><p>Prośba wysłana do <b>${esc(q.hn)}</b> o ${hm}. Gdy odpowie, podpowiedziana litera pojawi się nad planszą. Zegar w tym czasie biegnie.</p>
+    <div class="actions"><button class="main" id="hChk" style="background:#0ea5e9">Sprawdź teraz</button><button id="hOther">Poproś kogoś innego</button></div><div class="actions"><button id="aClose">Graj dalej</button></div>`);
+    $('hChk').onclick=async()=>{$('hChk').textContent='Sprawdzam…';await helpPoll(true);close()};
+    $('hOther').onclick=async()=>{await helpCancel(lvl);helpPick()};return}
+  helpPick()}
+async function helpCancel(i){const q=day.hq[i];if(!q)return;try{const {F,db}=await fb();await F.deleteDoc(F.doc(db,'helps',q.id))}catch(e){}day.hq[i]=null;saveDay();paint()}
+async function helpPick(){open(`<div class="step">Pomocna dłoń</div><h2>🤝 Poproś o pomoc</h2><p class="sub">Szukam graczy, którzy dziś odgadli ${lvTxtOf(lvl)}…</p><div class="actions"><button id="aClose">Zamknij</button></div>`);
+  let list=[];try{const {F,db,uid}=await fb();const tk=todayKey();await admLoad();
+    const q=await F.getDocs(F.query(F.collection(db,'players'),F.where(new F.FieldPath('sv',tk),'>',0)));
+    list=q.docs.map(d=>Object.assign({id:d.id},d.data())).filter(r=>r.id!==uid&&((+((r.sv||{})[tk])||0)&(1<<lvl)))}
+  catch(e){console.warn('pomoc',e);const sb=$('card').querySelector('.sub');if(sb)sb.textContent='Nie udało się wczytać graczy. Sprawdź internet i spróbuj ponownie.';return}
+  list.sort((a,b)=>(+b.hl||0)-(+a.hl||0));
+  const rows=list.slice(0,30).map(r=>`<div><span class="nk">${esc(r.nick)}${admB(r.id)}</span><span class="hlc on" aria-hidden="true">🤝 ${+r.hl||0}</span><button class="chb" data-hp="${esc(r.id)}" style="border-color:#0ea5e9;color:#0369a1">Poproś</button></div>`).join('');
+  $('card').innerHTML=`<div class="step">Pomocna dłoń</div><h2>🤝 Poproś o pomoc</h2><p>Ci gracze odgadli dziś ${lvTxtOf(lvl)}. Wybrana osoba zobaczy kolory Twoich prób (bez liter) i wskaże jedną literę hasła na jej miejscu.</p>
+  <p class="sub">Za podpowiedzianą literę odejmę z wyniku poziomu tyle punktów, ile jest warta w Scrabble. Zegar biegnie dalej. Jedna pomoc na poziom.</p>
+  ${rows?`<div class="rlist hl">${rows}</div>`:'<p class="sub">Nikt z rankingu nie odgadł jeszcze dziś tego poziomu. Spróbuj później albo użyj jokera.</p>'}<div class="actions"><button id="aClose">Zamknij</button></div>`;
+  $('aClose').onclick=close;document.querySelectorAll('[data-hp]').forEach(b=>b.onclick=()=>{const r=list.find(x=>x.id===b.dataset.hp);if(r)helpSend(r,b)})}
+function helpAsk(r){open(`<div class="step">Pomocna dłoń</div><h2>🤝 Poprosić ${esc(r.nick)} o pomoc?</h2><p><b>${esc(r.nick)}</b> odgadł(a) dziś ${lvTxtOf(lvl)}. Zobaczy kolory Twoich prób (bez liter) i wskaże jedną literę hasła na jej miejscu.</p><p class="sub">Podpowiedziana litera kosztuje tyle punktów, ile jest warta w Scrabble. Zegar biegnie dalej.</p>
+  <div class="actions"><button class="main" id="hSend" style="background:#0ea5e9">🤝 Poproś o literę</button><button id="hBack">Wróć do rankingu</button></div>`);
+  $('hBack').onclick=()=>showRanking();$('hSend').onclick=()=>helpSend(r,$('hSend'))}
+async function helpSend(r,b){if(!helpOk()||done)return;if(b){b.disabled=true;b.textContent='Wysyłam…'}
+  try{const {F,db,uid}=await fb();const dk=todayKey(),id=uid+'_'+dk+'_'+lvl;
+    const pat=guesses.slice(0,7).map(g=>g.s.map(x=>x==='hit'?'h':x==='near'?'n':'m').join(''));
+    const d={ru:uid,rn:store.get('sd2_nick','').slice(0,20),hu:r.id,hn:String(r.nick||'').slice(0,20),dk,lv:lvl,pat,st:'new',ts:Date.now()};
+    try{await F.deleteDoc(F.doc(db,'helps',id))}catch(e){}
+    await F.setDoc(F.doc(db,'helps',id),d);
+    day.hq[lvl]={id,hn:d.hn,st:'new',ts:d.ts};saveDay();close();paint();toast('🤝 Prośba wysłana do: '+d.hn,2400);helpWatch()}
+  catch(e){console.warn('pomoc',e);if(b){b.disabled=false;b.textContent='Poproś'}
+    toast(String(e&&e.code||'').includes('permission')?'Nie udało się wysłać. Sprawdź, czy jesteś w rankingu i czy data w telefonie ustawia się automatycznie.':'Nie udało się wysłać. Sprawdź internet.',3600)}}
+function helpWatch(){clearInterval(HL.poll);if(!day||mode!=='day')return;if(!day.hq.some((q,i)=>q&&q.st==='new'&&day.hpos[i]==null))return;HL.poll=setInterval(()=>{if(!document.hidden)helpPoll()},20000);setTimeout(helpPoll,3000)}
+async function helpPoll(manual){const D0=mode==='day'?day:null;if(!D0)return;const pend=[];for(let i=0;i<4;i++){const q=D0.hq[i];if(q&&q.st==='new'&&D0.hpos[i]==null)pend.push(i)}
+  if(!pend.length){clearInterval(HL.poll);return}let got=false;
+  try{const {F,db}=await fb();for(const i of pend){const q=D0.hq[i];const d=await F.getDoc(F.doc(db,'helps',q.id));if(!d.exists())continue;const x=d.data();
+    if(x.st==='done'&&Number.isInteger(x.pos)&&x.pos>=0&&x.pos<5){const A=wordFor(i,curN());q.st='done';got=true;
+      if(!D0.res[i]){D0.hpos[i]=x.pos;D0.hc[i]=PV[A[x.pos]]||0}saveDay();
+      if(i===lvl&&!done){paint();const t=$('toast');t.classList.add('big');toast('🤝 '+q.hn+': litera nr '+(x.pos+1)+' to '+A[x.pos].toUpperCase(),3200);setTimeout(()=>t.classList.remove('big'),3200)}
+      else toast('🤝 '+q.hn+' odpowiedział(a) na Twoją prośbę',2600)}
+    else if(x.st==='rej'){q.st='rej';saveDay();if(i===lvl)paint();toast(q.hn+' nie może teraz pomóc. Możesz poprosić kogoś innego.',3200)}}}
+  catch(e){console.warn('pomoc',e)}
+  if(manual===true&&!got)toast('Jeszcze bez odpowiedzi. Sprawdzę ponownie za chwilę.',2400)}
+async function hlLoad(){try{const {F,db,uid}=await fb();const q=await F.getDocs(F.query(F.collection(db,'helps'),F.where('hu','==',uid)));
+  const old=Date.now()-3*DAY;HL.inb=[];for(const d of q.docs){const x=Object.assign({id:d.id},d.data());if((+x.ts||0)<old)F.deleteDoc(F.doc(db,'helps',d.id)).catch(()=>{});else HL.inb.push(x)}
+  HL.loaded=true;updBadge();return true}catch(e){console.warn('pomoc',e);return false}}
+const hlPending=()=>HL.inb.filter(x=>x.st==='new'&&x.dk===todayKey()).sort((a,b)=>b.ts-a.ts);
+async function hlNotify(){if(!store.get('sd2_nick','')||RX())return;if(!await hlLoad())return;const s=store.get('sd2_hl_seen',{}),nw=hlPending().filter(x=>!s[x.id]);
+  if(nw.length&&$('ov').hidden){toast('🤝 '+(nw.length===1?nw[0].rn+' prosi Cię o pomoc':'Masz '+nw.length+' prośby o pomoc')+' · menu ☰',3600);nw.forEach(x=>s[x.id]=1);
+    const ks=Object.keys(s);while(ks.length>200)delete s[ks.shift()];store.set('sd2_hl_seen',s)}}
+async function hlWipe(){try{const {F,db,uid}=await fb();
+  const qs=await Promise.all([F.getDocs(F.query(F.collection(db,'helps'),F.where('hu','==',uid))),F.getDocs(F.query(F.collection(db,'helps'),F.where('ru','==',uid)))]);
+  for(const q of qs)for(const d of q.docs){try{await F.deleteDoc(F.doc(db,'helps',d.id))}catch(e){}}HL.inb=[];updBadge()}catch(e){console.warn('pomoc',e)}}
+async function showHelps(){open(`<div class="step">Pomocna dłoń</div><h2>🤝 Prośby o pomoc</h2><p class="sub">Wczytuję…</p><div class="actions"><button id="aClose">Zamknij</button></div>`);
+  if(!store.get('sd2_nick','')){$('card').querySelector('.sub').textContent='Prośby o pomoc dostają gracze z rankingu. Dołącz do rankingu w menu ☰ → Ranking graczy.';return}
+  if(!await hlLoad()){$('card').querySelector('.sub').textContent='Prośby są chwilowo niedostępne. Sprawdź internet i spróbuj ponownie.';return}
+  const pend=hlPending(),n=+store.get('sd2_help_n',0)||0,s=store.get('sd2_hl_seen',{});pend.forEach(x=>s[x.id]=1);store.set('sd2_hl_seen',s);
+  const h=pend.map(x=>`<div class="chi"><div class="row2"><span><b>${esc(x.rn)}</b>${admB(x.ru)} prosi o jedną literę</span><span class="sub">${x.lv===3?'Niespodzianka':'Poziom '+(x.lv+1)}</span></div><div class="actions"><button class="main" data-hh="${esc(x.id)}" style="background:#0ea5e9">🤝 Pomóż</button><button data-hr="${esc(x.id)}">Nie teraz</button></div></div>`).join('')||'<p class="sub">Nikt teraz nie prosi Cię o pomoc.</p>';
+  const doneL=HL.inb.filter(x=>x.st!=='new').sort((a,b)=>b.ts-a.ts).slice(0,10).map(x=>`<div><span><b>${esc(x.rn)}</b> · ${x.lv===3?'P4':'P'+(x.lv+1)}</span><span class="st ${x.st==='done'?'done':'rej'}">${x.st==='done'?'pomogłeś':'odmówiłeś'}</span></div>`).join('');
+  $('card').innerHTML=`<div class="step">Pomocna dłoń</div><h2>🤝 Prośby o pomoc</h2><p>Gracze z rankingu proszą o jedną literę hasła z poziomu, który dziś odgadłeś. Zobaczysz kolory ich prób i sam wybierzesz, którą literę podpowiedzieć.</p>
+  ${h}${doneL?`<p><b>Ostatnio</b></p><div class="dlog">${doneL}</div>`:''}<div class="streak" style="background:#e0f2fe;border-color:#7dd3fc;color:#0c4a6e"><span style="font-size:1.6rem;line-height:1">🤝</span><span><b>Twoja pomocna dłoń: ${n}</b><small>Licznik widać przy Twoim nicku w rankingu.</small></span></div>
+  <div class="actions"><button class="main" id="aClose">Zamknij</button></div>`;
+  $('aClose').onclick=close;updBadge();
+  document.querySelectorAll('[data-hh]').forEach(b=>b.onclick=()=>{const x=HL.inb.find(z=>z.id===b.dataset.hh);if(x)helpGive(x)});
+  document.querySelectorAll('[data-hr]').forEach(b=>b.onclick=async()=>{try{const {F,db}=await fb();await F.updateDoc(F.doc(db,'helps',b.dataset.hr),{st:'rej',upd:Date.now()});toast('Odpowiedziano: nie teraz',1800)}catch(e){toast('Nie udało się, spróbuj ponownie',2400)}showHelps()})}
+function helpGive(x){const t=store.get('sd2_day',null),my=t&&t.d===dayNo()?norm(t):null;
+  if(!my||my.res[x.lv]!=='won'){open(`<div class="step">Pomocna dłoń</div><h2>🤝 Najpierw zagraj</h2><p>Żeby pomóc, musisz sam odgadnąć dzisiejsze hasło: ${lvTxtOf(x.lv)}. Zagraj, a potem wróć do prośby w menu ☰ → Prośby o pomoc.</p><div class="actions"><button class="main" id="aClose">OK</button></div>`);return}
+  const A=wordFor(x.lv,dayNo()),pat=(Array.isArray(x.pat)?x.pat:[]).filter(p=>typeof p==='string'&&/^[hnm]{5}$/.test(p)).slice(0,7);
+  const known=new Set();pat.forEach(p=>[...p].forEach((c,i)=>{if(c==='h')known.add(i)}));
+  const rows=pat.map(p=>`<span class="mr">${[...p].map(c=>`<i style="background:${COL[c==='h'?'hit':c==='n'?'near':'miss']}"></i>`).join('')}</span>`).join('');
+  open(`<div class="step">Pomocna dłoń</div><h2>🤝 Pomóż: ${esc(x.rn)}</h2><p>Próby gracza ${esc(x.rn)} (same kolory, bez liter):</p>${rows?`<span class="mini">${rows}</span>`:'<p class="sub">Jeszcze nie było żadnej próby.</p>'}
+  <p><b>Dotknij jednej litery hasła</b>, którą chcesz podpowiedzieć. Litery już odgadnięte na zielono są wyszarzone.</p>
+  <div class="hgrid">${[...A].map((c,i)=>`<button data-hpos="${i}" aria-pressed="false"${known.has(i)?' disabled':''}>${c}</button>`).join('')}</div>
+  <div class="actions"><button class="main" id="hGo" disabled style="background:#0ea5e9">Wyślij podpowiedź</button><button id="hBack">Wróć</button></div><p class="sub">${esc(x.rn)} zobaczy tylko tę jedną literę na jej miejscu. Licznik 🤝 przy Twoim nicku w rankingu wzrośnie.</p>`);
+  let sel=null;document.querySelectorAll('[data-hpos]').forEach(b=>b.onclick=()=>{sel=+b.dataset.hpos;document.querySelectorAll('[data-hpos]').forEach(z=>z.setAttribute('aria-pressed',String(z===b)));$('hGo').disabled=false});
+  $('hBack').onclick=()=>showHelps();
+  $('hGo').onclick=async()=>{if(sel==null)return;$('hGo').disabled=true;$('hGo').textContent='Wysyłam…';
+    try{const {F,db}=await fb();await F.updateDoc(F.doc(db,'helps',x.id),{st:'done',pos:sel,upd:Date.now()});x.st='done';
+      store.set('sd2_help_n',(+store.get('sd2_help_n',0)||0)+1);rankSync();toast('🤝 Dziękujemy! Podpowiedź wysłana do: '+x.rn,2800);showHelps()}
+    catch(e){console.warn('pomoc',e);$('hGo').disabled=false;$('hGo').textContent='Wyślij podpowiedź';toast('Nie udało się wysłać. Prośba mogła zostać anulowana.',3000)}}}
+// ---- v19: ikona na pulpicie (instalacja jak aplikacja)
+let instEv=null;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();instEv=e;instLabel()});
+addEventListener('appinstalled',()=>{instEv=null;instLabel();toast('Literiada jest na pulpicie',2400)});
+const standalone=()=>{try{return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}catch(e){return false}};
+function instLabel(){const b=$('sInst');if(!b)return;b.hidden=standalone()||inFrame;b.innerHTML=ic('install',20)+'Ikona na pulpicie'}
+async function doInstall(){if(instEv){const ev=instEv;instEv=null;try{ev.prompt();const r=await ev.userChoice;if(r&&r.outcome==='accepted')toast('Literiada jest na pulpicie',2400)}catch(e){}instLabel();return}
+  const ua=navigator.userAgent||'',ios=/iPhone|iPad|iPod/i.test(ua),sam=/SamsungBrowser/i.test(ua),and=/Android/i.test(ua),ff=/Firefox/i.test(ua);
+  const how=inApp()?'Najpierw otwórz grę w zwykłej przeglądarce (Chrome, Safari lub Samsung Internet): aplikacje Messenger i Facebook nie dodają ikon.'
+    :ios?'W Safari dotknij <b>Udostępnij</b> (kwadrat ze strzałką w górę), wybierz <b>Do ekranu początkowego</b> i potwierdź <b>Dodaj</b>.'
+    :sam?'W Samsung Internet dotknij <b>☰</b> (menu na dole ekranu), potem <b>Dodaj stronę do</b> → <b>Ekran startowy</b>.'
+    :and?'W Chrome dotknij <b>⋮</b> w prawym górnym rogu, potem <b>Zainstaluj aplikację</b> albo <b>Dodaj do ekranu głównego</b>.'
+    :ff?'Firefox na komputerze nie instaluje stron jako aplikacji. Otwórz grę w Chrome lub Edge i kliknij ikonkę instalacji w pasku adresu.'
+    :'W Chrome lub Edge kliknij ikonkę instalacji (monitor ze strzałką) po prawej stronie paska adresu. Możesz też otworzyć menu <b>⋮</b> i wybrać opcję instalacji strony jako aplikacji.';
+  open(`<div class="step">Ikona na pulpicie</div><h2>${ic('install',22)} Literiada jak aplikacja</h2>${logo()}<p>Dodaj grę na ekran telefonu albo pulpit komputera. Otworzysz ją jednym dotknięciem z ikony, w osobnym oknie, bez paska przeglądarki. Wyniki zostają te same.</p><p>${how}</p><div class="actions"><button class="main" id="aClose">OK</button></div>`)}
 function newFree(){const pool=L[freeLvl];let a;do{a=pool[Math.floor(Math.random()*pool.length)]}while(a===answer);answer=a;guesses=[];cur='';done=false;paint();fitBoard()}
 function setMode(m){mode=m;close();endDuel();
   if(m==='day'){loadDay();loadDayLevel()}else{freeLvl=lvl;newFree()}}
@@ -1282,6 +1522,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&document.body.classList.contains('side-on')&&!isWide()){sideSet(false);return}
   if(!$('ov').hidden){if(e.key==='Escape')close();return}
   if(e.ctrlKey||e.metaKey)return;
+  if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();stepLevel(e.key==='ArrowLeft'?-1:1);return}
   if(e.key==='Enter'){e.preventDefault();press('ENTER')}
   else if(e.key==='Backspace')press('⌫');
   else if(e.key.length===1)press(e.key.toLowerCase());
@@ -1295,6 +1536,8 @@ $('sArch').innerHTML=ic('cal',20)+'Archiwum<span class="badge" id="arBadge" hidd
 $('sDuel').innerHTML=ic('fencer',20)+'Pojedynek';$('sDuel').onclick=sideGo(showDuel);
 $('sCh').innerHTML=ic('rapier',20)+'Wyzwania<span class="badge" id="chBadge" hidden></span>';$('sCh').onclick=sideGo(()=>showChallenges());
 chOptLabel();$('sChOpt').onclick=sideGo(chOptToggle);
+$('sHlp').innerHTML='<span style="width:20px;text-align:center">🤝</span>Prośby o pomoc<span class="badge" id="hlBadge" hidden></span>';$('sHlp').onclick=sideGo(()=>showHelps());
+$('sInst').onclick=sideGo(doInstall);
 $('sTrain').innerHTML=ic('train',20)+'Trening';$('sTrain').onclick=sideGo(showTrain);
 $('sHelp').innerHTML=ic('help',20)+'Jak grać';$('sHelp').onclick=sideGo(showHelp);
 $('sMove').innerHTML=ic('move',20)+'Przenieś wyniki';$('sMove').onclick=sideGo(showMove);
@@ -1309,7 +1552,7 @@ $('sRelax').onclick=sideGo(()=>setRelax(!RX()));
 $('sInv').innerHTML=ic('send',20)+'Zaproś do gry';$('sX').innerHTML='<span style="font:900 1.15rem var(--body);width:20px;text-align:center">𝕏</span>Obserwuj nas na X';$('sInv').onclick=sideGo(()=>inviteFriends());
 if(mqWide.addEventListener)mqWide.addEventListener('change',()=>sideSet(isWide()&&store.get('sd2_side',true)));
 if(isWide()&&store.get('sd2_side',true))sideSet(true);
-$('bJoker').onclick=jokerClick;$('bSnd').onclick=()=>{SFX.unlock();SFX.toggle();sndIcon()};sndIcon();$('bStats').onclick=()=>{setMode('day');toast('Wracasz do haseł dnia')};
+$('bJoker').onclick=jokerClick;$('bHelp').onclick=helpClick;$('bKolo').onclick=offerKolo;$('bSnd').onclick=()=>{SFX.unlock();SFX.toggle();sndIcon()};sndIcon();$('bStats').onclick=()=>{setMode('day');toast('Wracasz do haseł dnia')};
 // ---- v14: duże ekrany (Full HD+, 2K, 4K) – proporcjonalne powiększenie całej gry
 let ZS=1;
 function fitScale(){const w=innerWidth,h=innerHeight;let s=1;
@@ -1329,6 +1572,9 @@ else if(done3(day)&&lvl!==3)showStats();
 else setTimeout(menuHint,800);
 if(store.get('sd2_nick',''))setTimeout(rankSync,3000);
 setTimeout(chNotify,3500);
+setTimeout(hlNotify,4500);setInterval(()=>{if(!document.hidden)hlNotify()},90000);setTimeout(helpWatch,5000);instLabel();
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){helpPoll()}});
+if('serviceWorker' in navigator&&location.protocol==='https:'&&!inFrame)addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw',e))});
 setTimeout(()=>{if(store.get('sd2_adm',null))admLoad()},2500);
 addEventListener('hashchange',()=>{if(location.hash==='#statystyki'){clearHash();showAdminStats()}else if(location.hash==='#ranking'){clearHash();showRanking()}else if(/^#p=/.test(location.hash)){close();startDuelFromHash()}else if(/^#r=/.test(location.hash)){close();startResultFromHash()}});
 </script>
