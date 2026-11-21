@@ -367,6 +367,39 @@ body.embed .iab{display:none!important}
 .rlist.hl div{grid-template-columns:minmax(0,1fr) auto auto}
 .nx.c-hlp{border-color:#0ea5e9;background:rgba(14,165,233,.10)}
 @media (max-width:360px){.hbtn .hl{display:none}.hbtn{padding:3px 9px}}
+
+/* v19.1 */
+.rkt{border:2px solid #12a150;border-radius:12px;padding:10px;background:var(--panel);display:flex;flex-direction:column;gap:8px}
+.rkt>b{display:flex;align-items:center;gap:6px;font-size:1rem}
+.rkg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.rkg button{border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:7px 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;font:600 .74rem var(--body)}
+.rkg button b{font:800 1.45rem var(--display);line-height:1.1}
+.rkg button small{font-size:.72rem;color:var(--muted)}
+.rkg button.top b{color:#b45309}
+
+.adm-b.vice{background:#12a150;color:#fff}
+.rpx{border:1.5px solid #8b5cf6;background:var(--panel);color:#6d28d9;border-radius:999px;padding:3px 7px;cursor:pointer;margin-left:4px;display:inline-flex;align-items:center}
+.admx{display:inline-flex;align-items:center}
+.fl{display:flex;flex-direction:column;gap:5px;font-weight:700;font-size:.92rem}
+.fi{font:500 1rem var(--body);padding:9px 10px;border:2px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);width:100%;box-sizing:border-box}
+textarea.fi{resize:vertical}
+.rep .rtxt{white-space:pre-wrap;font-size:.95rem;color:var(--ink)}
+.rep.late{border:2px solid #e5484d;background:#fff5f5}
+.rans{background:#e8f6ee;border-left:4px solid #12a150;padding:6px 9px;border-radius:6px;font-size:.9rem;color:#0b3d22;white-space:pre-wrap}
+.st.prog{background:#dbeafe;color:#1e3a8a}
+.st.radek{background:#ffe4c7;color:#5a2a00}
+.rcnt{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rcnt button{border:2px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:8px 4px;cursor:pointer;font:600 .8rem var(--body);display:flex;flex-direction:column;align-items:center;gap:2px}
+.rcnt button b{font:800 1.5rem var(--display)}
+.rcnt button[aria-pressed="true"]{border-color:#111;box-shadow:0 0 0 2px #111 inset}
+.rcnt button.warn{border-color:#e5484d;color:#b42318}
+.wl{display:flex;flex-direction:column;gap:10px;margin:6px 0}
+.wl div{display:flex;gap:10px;align-items:flex-start;font-size:1rem}
+.wl b{flex:none;width:28px;height:28px;border-radius:50%;background:#12a150;color:#fff;display:grid;place-items:center;font:800 .95rem var(--body)}
+.wl i{font-style:normal;font-weight:800;padding:0 5px;border-radius:4px;color:#fff}
+.news{padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:.95rem}
+.mvq{display:flex;flex-direction:column;gap:6px;background:#fff7e6;border:2px solid #ff8a00;border-radius:8px;padding:10px;color:#3d2400}
+.team div span{display:flex;flex-direction:column}
 </style>
 
 <div class="app">
@@ -399,10 +432,12 @@ body.embed .iab{display:none!important}
   <button class="sitem" id="sChOpt"></button>
   <div class="ssep"></div>
   <button class="sitem" id="sHelp"></button>
+  <button class="sitem" id="sSup"></button>
   <button class="sitem" id="sMove"></button>
   <button class="sitem" id="sInst" hidden></button>
   <button class="sitem" id="sAdm" hidden></button>
-  <div class="sfoot">Literiada · wersja 19.0 · 2026-11-19</div>
+  <button class="sitem" id="sRep" hidden></button>
+  <div class="sfoot">Literiada · wersja 19.1 · 2026-11-20</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -468,8 +503,14 @@ const SVG={
   fencer:'<circle cx="8" cy="4.4" r="2.4" fill="currentColor" stroke="none"/><path d="M8.6 7.6l1.6 5"/><path d="M9.1 8.8l4 .7M8.8 8.6L5.4 9l-.9-3.2"/><path d="M13.1 9.5L23 6.3" stroke-width="1.3"/><path d="M12.6 8l1 2.9" stroke-width="1.8"/><path d="M10.2 12.6l4.2 2 .3 5.3h2.5M10.2 12.6L7 16.2l-4.2 3.8"/>',
   ring:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M5.6 5.6l3.6 3.6M18.4 5.6l-3.6 3.6M5.6 18.4l3.6-3.6M18.4 18.4l-3.6-3.6"/>',
   install:'<path d="M12 3.5v11M7.5 10l4.5 4.5 4.5-4.5"/><path d="M4 15.5v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
+  hand:'<path d="M8 13V6a1.5 1.5 0 0 1 3 0v5M11 10.5V4.5a1.5 1.5 0 0 1 3 0v6M14 10.5V6a1.5 1.5 0 0 1 3 0v6M17 10a1.5 1.5 0 0 1 3 0v3.5a7 7 0 0 1-7 7h-1.2a6 6 0 0 1-4.5-2.1l-3-3.6a1.6 1.6 0 0 1 2.4-2.1L8 14.2"/>',
+  flag:'<path d="M5.5 21V3.5M5.5 4h12l-2.5 4.5 2.5 4.5h-12"/>',
+  inbox:'<path d="M3.5 13.5l2.5-8h12l2.5 8v6h-17z"/><path d="M3.5 13.5h5l1.2 2.5h4.6l1.2-2.5h5"/>',
+  trash:'<path d="M4.5 6.5h15M9.5 6.5V4h5v2.5M6.5 6.5l1 14h9l1-14M10 10.5v6M14 10.5v6"/>',
+  db:'<ellipse cx="12" cy="5.5" rx="7.5" ry="2.5"/><path d="M4.5 5.5v13c0 1.4 3.4 2.5 7.5 2.5s7.5-1.1 7.5-2.5v-13M4.5 12c0 1.4 3.4 2.5 7.5 2.5s7.5-1.1 7.5-2.5"/>',
   sun:'<path d="M3 18h18M6.5 18a5.5 5.5 0 0 1 11 0"/><path d="M12 6.5v2.5M5.2 9.7l1.8 1.8M18.8 9.7L17 11.5M3 14h1.5M19.5 14H21"/>'};
 const ic=(n,s=18)=>`<svg class="ico" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SVG[n]}</svg>`;
+const HI=ic('hand',16);
 const MED={gold:['#f6cf45','#c99a06','#fff3b8'],silver:['#dfe3e8','#98a2ad','#ffffff'],bronze:['#e4a46a','#a5652e','#ffd9b5']};
 const medalKind=t=>t<=2?'gold':t<=4?'silver':'bronze';
 const medalName={gold:'złoty medal',silver:'srebrny medal',bronze:'brązowy medal'};
@@ -735,7 +776,8 @@ function archPending(){const a=store.get('sd2_arch',{}),lg=store.get('sd2_log',{
 function updBadge(){const n=archPending(),b=$('arBadge');if(!b)return;b.hidden=!n;b.textContent=n;
   $('sArch').title=n?'Archiwum · zaległe dni: '+n:'Archiwum poprzednich dni';const c=chCount(),cb=$('chBadge');if(cb){cb.hidden=!c;cb.textContent=c}
   const hc=HL.loaded?hlPending().length:0,hb=$('hlBadge');if(hb){hb.hidden=!hc;hb.textContent=hc}
-  const d=$('mDot');if(d)d.hidden=!(n||c||hc)||document.body.classList.contains('side-on')}
+  const rc=typeof RP!=='undefined'&&RP?repCount():0,rb=$('repBadge');if(rb){rb.hidden=!rc;rb.textContent=rc}
+  const d=$('mDot');if(d)d.hidden=!(n||c||hc||rc)||document.body.classList.contains('side-on')}
 function close(){$('ov').hidden=true;updBadge();setTimeout(menuHint,400)}
 function open(html){document.querySelectorAll('.hint').forEach(h=>h.remove());$('card').innerHTML=html;$('ov').hidden=false;const c=$('aClose');if(c)c.onclick=close}
 
@@ -761,7 +803,7 @@ function showResult(won,p){
     body=koloW?`<p>${word}</p><p>Koło ratunkowe: za ten poziom <b>0 pkt</b> i bez bonusu za czas, ale poziom jest zaliczony.</p>`:won?`<p>${word}</p><p>Wartość słowa ${v} pkt × premia ${7-guesses.length} (za ${guesses.length}. próbę) = ${base} pkt</p>`
       +(tb?`<p>Bonus za czas (${fmtT(te)}): +${tb} pkt</p>`:(te!=null?`<p class="sub">Czas ${fmtT(te)}: bez bonusu za czas.</p>`:''))
       +(jc?`<p>Joker (odsłonięta litera): −${jc} pkt</p>`:'')
-      +(hcost?`<p>Pomocna dłoń 🤝 (podpowiedziana litera): −${hcost} pkt</p>`:'')
+      +(hcost?`<p>Pomocna dłoń ${HI} (podpowiedziana litera): −${hcost} pkt</p>`:'')
       +`<p>Razem za poziom: <b>${p} pkt</b></p>`
             :`<p>Hasło: ${word} (${v} pkt)</p><p>Tym razem 0 pkt.${lvl<2?(mode==='arch'?' Kolejne poziomy tego dnia zostają zablokowane.':' Kolejny poziom odblokujesz jutro.'):''}</p>`;
     if(won&&lvl===2&&day.pts[4])body+=`<p>Bonus za ukończony dzień: <b>+${DAYB} pkt</b>${day.pts[4]>DAYB?`, za czysty dzień bez koła: <b>+${CLEANB} pkt</b>`:''}</p>`;
@@ -826,7 +868,7 @@ function showStats(){
   const allDone=done3(day)&&!p4going(day);
   const anyB=day.g.some(x=>x&&x.length)||day.res.some(Boolean);
   const p4b=p4open()&&!day.res[3]?`<button class="p4btn" id="aP4">${ic('gift',18)} ${day.g[3].length?'Wróć do weekendowej niespodzianki':'Weekendowa niespodzianka: zagraj!'}</button>`:'';
-  const askRk=!RX()&&mode==='day'&&done3(day)&&!store.get('sd2_nick','')&&!store.get('sd2_rk_never',false)&&store.get('sd2_rk_ask','')!==todayKey();
+  const askRk=!RX()&&mode==='day'&&(done3(day)||(!store.get('sd2_rk_first',false)&&day.res.includes('won')))&&!store.get('sd2_nick','')&&!store.get('sd2_rk_never',false)&&store.get('sd2_rk_ask','')!==todayKey();
   const rkInv=askRk?`<div class="rjoin" id="rkInv"><b>${ic('trophy',18)} Sprawdź swoje miejsce w rankingu!</b><span style="font-size:.85rem">Dziś masz ${day.pts.reduce((a,b)=>a+b,0)} pkt. Podaj pseudonim, a Twoje punkty trafią do wspólnego rankingu graczy. Bez maila i hasła.</span><input id="rIn" maxlength="20" placeholder="np. Radek z Pręgowa" autocomplete="off"><button id="rJoin">Dołącz do rankingu</button><span class="dbad" id="rErr" hidden></span><span style="display:flex;justify-content:space-between;gap:8px"><button class="linkbtn" id="rkLater" style="padding:0;color:#0b3d22">Nie teraz</button><button class="linkbtn" id="rkNever" style="padding:0;color:#0b3d22">Nie pytaj więcej</button></span></div>`:'';
   const nextB=mode==='day'&&allDone?nextBox(pend):'';
   const extraB=nextB?'':`${p4b}<button class="invbtn" id="aInv">${ic('send',18)} Zaproś znajomych do gry</button><button class="rkbtn" id="aRank">${ic('trophy',18)} Ranking graczy</button><button class="duelbtn" id="aDuel">${ic('fencer',18)} Wyzwij znajomego na pojedynek</button>`;
@@ -834,6 +876,7 @@ function showStats(){
   ${day.g.some(x=>x&&x.length)?'<p class="sub">Dotknij paska poziomu, żeby rozwinąć jego planszę.</p>':''}<div class="daysum">${dayRows}${bonusRow}</div>
   ${RX()?'<div class="relaxnote">🌿 Grasz na luzie: bez zegara, punktów i rankingu. Wyłączysz to w menu ☰.</div>':''}<div class="total ptsblock"><span>${mode==='arch'?'Ten dzień razem':'Dziś razem'}</span><span>${day.pts.reduce((a,b)=>a+b,0)} pkt</span></div>
   ${mode==='day'&&streakN()?`<div class="streak"><span style="font-size:1.6rem;line-height:1">🔥</span><span><b>${dniPL(streakN())} z rzędu</b><small>${streakN()>=2?'Nie przerywaj serii, jutro nowe hasła.':'Wróć jutro, żeby zacząć serię.'}</small></span></div>`:''}
+  ${mode==='day'&&!RX()&&store.get('sd2_nick','')&&!store.get('sd2_moved',0)&&day.res.some(Boolean)?'<div id="rkTile" class="rkt"><b>'+ic('trophy',18)+' Twoje miejsca w rankingu</b><span class="sub">Sprawdzam…</span></div>':''}
   ${day.res.some(Boolean)?shareBtns('S'):''}
   ${nextB}${extraB}<div class="actions"><button class="menub" id="aMenu">${ic('menu',16)} Menu</button>${anyB?'<button id="aBoards">Zobacz plansze</button>':''}${!allDone?'<button id="aBack">Wróć do gry</button>':''}<button id="aArch">${ic('cal',16)} Archiwum${pend?' ('+pend+')':''}</button></div>
   <div class="boards" id="boards" hidden>${boards}</div>
@@ -842,20 +885,21 @@ function showStats(){
   <div class="stats ptsblock"><div><b>${sumRange(h,t,t)}</b><span>dziś</span></div><div><b>${sumRange(h,wFrom,wFrom+6*DAY)}</b><span>ten tydzień</span></div><div><b>${sumRange(h,mFrom,t)}</b><span>${month}</span></div><div><b>${all}</b><span>łącznie</span></div></div>
   <div class="week ptsblock">${days.map((d,i)=>{const s=sumP(d.p);return `<div>${s||''}<i style="height:${s/mx*80}%">${d.p.map((p,j)=>p?`<s class="c${j+1}" style="height:${p/s*100}%"></s>`:'').join('')}</i>${names[i]}</div>`}).join('')}</div>
   <div class="legend ptsblock"><span style="--c:var(--hit)">Poziom 1</span><span style="--c:var(--near)">Poziom 2</span><span style="--c:var(--ink)">Poziom 3</span>${played[3]?'<span style="--c:#8b5cf6">Niespodzianka</span>':''}${Object.values(h).some(a=>Array.isArray(a)&&a[4])?'<span style="--c:#3b82f6">Bonus dnia</span>':''}</div>
-  <div class="lvres">${LVA.map((l,i)=>i===3&&!played[3]?'':`<div><span>${l.n} (${l.r})</span><b>${won[i]} z ${played[i]} odgadniętych</b></div>`).join('')}${(+store.get('sd2_kola',0)||0)?`<div><span>Koło ratunkowe</span><b>użyte ${razy(+store.get('sd2_kola',0))}</b></div>`:''}${(+store.get('sd2_help_n',0)||0)?`<div><span>Pomocna dłoń 🤝</span><b>pomogłeś ${razy(+store.get('sd2_help_n',0))}</b></div>`:''}</div>
+  <div class="lvres">${LVA.map((l,i)=>i===3&&!played[3]?'':`<div><span>${l.n} (${l.r})</span><b>${won[i]} z ${played[i]} odgadniętych</b></div>`).join('')}${(+store.get('sd2_kola',0)||0)?`<div><span>Koło ratunkowe</span><b>użyte ${razy(+store.get('sd2_kola',0))}</b></div>`:''}${(+store.get('sd2_help_n',0)||0)?`<div><span>Pomocna dłoń ${HI}</span><b>pomogłeś ${razy(+store.get('sd2_help_n',0))}</b></div>`:''}</div>
   <p class="sub">Tydzień liczony od poniedziałku. Wyniki zapisują się w tej przeglądarce. Przeniesiesz je na inne urządzenie w menu: Przenieś wyniki.</p>
   <h2>Trening</h2>${trainPicker()}
   <button class="linkbtn" id="aReset">Zacznij od nowa (wyzeruj wyniki)</button>`);
   $('aReset').onclick=askReset;bindTrain();
-  bindShare('S');
+  bindShare('S');rkTileFill();
   if($('aBoards'))$('aBoards').onclick=()=>{const b=$('boards');b.hidden=!b.hidden;$('aBoards').textContent=b.hidden?'Zobacz plansze':'Ukryj plansze';if(!b.hidden)b.scrollIntoView({behavior:'smooth',block:'nearest'})};
   if($('aBack'))$('aBack').onclick=()=>{close();if(mode==='free')setMode('day')};
   $('aArch').onclick=showArchive;$('aMenu').onclick=()=>sideSet(true);
   if($('aDuel'))$('aDuel').onclick=showDuel;if($('aRank'))$('aRank').onclick=()=>showRanking();if($('aInv'))$('aInv').onclick=()=>inviteFriends();
   if(nextB)bindNext();
-  if($('rkInv')){
+  if($('rkInv')){store.set('sd2_rk_first',true);
     $('rJoin').onclick=async()=>{const v=$('rIn').value.replace(/\s+/g,' ').trim().slice(0,20);
       if(v.length<2){$('rErr').hidden=false;$('rErr').textContent='Pseudonim musi mieć co najmniej 2 znaki.';return}
+      $('rJoin').textContent='Sprawdzam…';if(await nickTaken(v)){$('rErr').hidden=false;$('rErr').innerHTML=NICK_MSG;$('rJoin').textContent='Dołącz do rankingu';return}
       store.set('sd2_nick',v);if(!store.get('sd2_duel_name',''))store.set('sd2_duel_name',v);$('rJoin').textContent='Dołączam…';await rankSync();showRanking('d')};
     $('rkLater').onclick=()=>{store.set('sd2_rk_ask',todayKey());$('rkInv').remove()};
     $('rkNever').onclick=()=>{store.set('sd2_rk_never',true);$('rkInv').remove();toast('Ranking znajdziesz zawsze w menu ☰',2200)}}
@@ -893,7 +937,8 @@ function showHelp(){
   <p><b>Zaproś znajomych.</b> W menu ☰ albo w podsumowaniu dnia kliknij „Zaproś do gry” i wybierz komunikator: Messenger, WhatsApp, SMS, Telegram, e-mail, X albo Facebook.</p>
   <p><b>Koło ratunkowe 🛟.</b> Gdy wykorzystasz 6 prób, gra zaproponuje 7. próbę. Odgadnięcie hasła w 7. próbie daje 0 pkt za ten poziom i bez bonusu za czas, ale poziom zalicza się jako ukończony i odblokowuje kolejny. Jedno koło na poziom, nie działa w pojedynkach i wyzwaniach.</p>
   <p><b>Bonus dnia.</b> Za ukończenie poziomów 1–3 dostajesz +10 pkt, a jeśli nie użyłeś koła ratunkowego, dodatkowo +5 pkt za czysty dzień.</p>
-  <p><b>Pomocna dłoń 🤝.</b> Utknąłeś? Poproś o jedną literę gracza z rankingu, który dziś odgadł Twój poziom. Przy takich graczach ikona 🤝 w rankingu świeci się. Pomocnik widzi tylko kolory Twoich prób i wskazuje jedną literę hasła na jej miejscu. Podpowiedziana litera kosztuje tyle punktów, ile jest warta w Scrabble, a zegar biegnie dalej. Licznik 🤝 przy nicku pokazuje, ile razy ktoś pomógł innym.</p>
+  <p><b>Pomoc.</b> Coś nie działa albo masz pytanie? Menu ☰ → Pomoc – napisz do admina. Odpowiedź dostaniesz w grze.</p>
+  <p><b>Pomocna dłoń ${HI}.</b> Utknąłeś? Poproś o jedną literę gracza z rankingu, który dziś odgadł Twój poziom. Przy takich graczach ikona ${HI} w rankingu świeci się. Pomocnik widzi tylko kolory Twoich prób i wskazuje jedną literę hasła na jej miejscu. Podpowiedziana litera kosztuje tyle punktów, ile jest warta w Scrabble, a zegar biegnie dalej. Licznik ${HI} przy nicku pokazuje, ile razy ktoś pomógł innym.</p>
   <p><b>Zakładki poziomów.</b> Nad planszą są przyciski P1, P2, P3 (w weekend P4). Dotknij ich albo przesuń palcem po planszy w bok, żeby zobaczyć plansze wcześniejszych poziomów dnia. Na komputerze działają strzałki ← →. Podgląd nie zatrzymuje zegara.</p>
   <p><b>Ikona na pulpicie.</b> W menu ☰ wybierz „Ikona na pulpicie”, żeby otwierać Literiadę jak aplikację, bez paska przeglądarki.</p>
   <p><b>Joker.</b> Na poziomie 2, 3 i w niespodziance możesz odsłonić jedną literę hasła. Jokera dostajesz za polecenie gry znajomemu (jeden na poziom). Odsłonięta litera kosztuje tyle punktów, ile jest warta w Scrabble.</p>
@@ -904,7 +949,7 @@ function showHelp(){
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 19.0 · 2026-11-19</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 19.1 · 2026-11-20</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
@@ -984,7 +1029,7 @@ function updJoker(){const b=$('bJoker'),st=$('jstrip');if(!b)return;
   b.hidden=!can||done||k===2||pv;b.className='jbtn'+(k===1?' have':'');
   b.innerHTML=ic('joker',15)+(k===1?' Użyj jokera':' Joker');
   const jp=can&&k===2&&!pv?day.jp[lvl]:null,hp=inPlay()&&!pv&&day.hpos?day.hpos[lvl]:null;
-  if(jp!=null||hp!=null){st.hidden=false;st.innerHTML=(jp!=null&&hp!=null?'Joker i pomoc:':jp!=null?'Joker:':'🤝 Pomoc:')+[...answer].map((c,i)=>`<i class="${i===jp?'on':i===hp?'hp':''}">${i===jp||i===hp?c:''}</i>`).join('')}
+  if(jp!=null||hp!=null){st.hidden=false;st.innerHTML=(jp!=null&&hp!=null?'Joker i pomoc:':jp!=null?'Joker:':HI+' Pomoc:')+[...answer].map((c,i)=>`<i class="${i===jp?'on':i===hp?'hp':''}">${i===jp||i===hp?c:''}</i>`).join('')}
   else st.hidden=true}
 function jokerPos(){const known=new Set();guesses.forEach(g=>g.s.forEach((x,i)=>{if(x==='hit')known.add(i)}));for(let i=0;i<5;i++)if(!known.has(i))return i;return 0}
 // ---- v15: zaproszenia (link z identyfikatorem zapraszającego, liczone po ukończeniu 1. poziomu przez zaproszonego)
@@ -1110,21 +1155,24 @@ function mvKeys(){const o={};try{for(let i=0;i<localStorage.length;i++){const k=
 function b64e(t){const b=new TextEncoder().encode(t);let s='';b.forEach(x=>s+=String.fromCharCode(x));return btoa(s)}
 function b64d(t){const s=atob(t);return new TextDecoder().decode(new Uint8Array([...s].map(c=>c.charCodeAt(0))))}
 function mvInfo(d){let h={};try{h=JSON.parse(d.sd2_hist||'{}')||{}}catch(e){}const ks=Object.keys(h);return {days:ks.length,pts:ks.reduce((s,k)=>s+(Array.isArray(h[k])?h[k].reduce((a,b)=>a+(+b||0),0):0),0)}}
-const mvCode=()=>MV_PRE+b64e(JSON.stringify({v:1,ts:Date.now(),d:mvKeys()}));
+const mvCode=()=>MV_PRE+b64e(JSON.stringify({v:1,ts:Date.now(),u:FBUID||null,d:mvKeys()}));
 function mvParse(t){t=String(t||'').trim();const i=t.indexOf(MV_PRE);if(i<0)return null;try{const o=JSON.parse(b64d(t.slice(i+MV_PRE.length).replace(/[^A-Za-z0-9+/=]/g,'')));return o&&o.d&&typeof o.d==='object'?o:null}catch(e){return null}}
 const dni=n=>n===1?'1 dzień':n+' dni';
-function showMove(){const me=mvInfo(mvKeys());
+function showMove(){const me=mvInfo(mvKeys());fb().catch(()=>{});
   open(`<div class="step">Przenieś wyniki</div><h2>${ic('move',22)} Eksport i import wyników</h2>
   <p>Wyniki zapisują się tylko w tej przeglądarce. Żeby przenieść je na inne urządzenie albo pod nowy adres gry, zrób eksport tutaj, a import tam.</p>
   <div class="mvbox mv"><b>1. Eksport (tu, gdzie masz wyniki)</b><span class="sub">Tutaj: ${dni(me.days)}, razem ${me.pts} pkt.</span>
-  <div class="actions"><button class="main" id="mCopy">Kopiuj kod wyników</button><button id="mFile">Pobierz plik</button></div><div id="mOut"></div></div>
+  <div class="actions"><button class="main" id="mFile">Pobierz plik</button><button id="mCopy">Kopiuj kod</button>${navigator.share?'<button id="mShare">Wyślij kod</button>':''}</div><span class="sub">Na iPhonie najpewniejszy jest plik albo „Wyślij kod” (np. do Notatek lub do siebie w wiadomości).</span><div id="mOut"></div><div id="mAsk"></div></div>
   <div class="mvbox mv"><b>2. Import (na nowym miejscu)</b><textarea id="mIn" rows="3" placeholder="Wklej tu kod wyników (zaczyna się od LITERIADA1:)"></textarea>
-  <div class="actions"><button class="main" id="mImp">Importuj z kodu</button><button id="mLoad">Wczytaj plik</button></div><input type="file" id="mF" accept=".txt,text/plain" hidden>
+  <div class="actions"><button class="main" id="mLoad">Wczytaj plik</button><button id="mImp">Importuj z kodu</button>${navigator.clipboard&&navigator.clipboard.readText?'<button id="mPaste">Wklej ze schowka</button>':''}</div><input type="file" id="mF" accept=".txt,text/plain" hidden>
   <span class="sub" id="mInfo">Import zastąpi wyniki zapisane na tej stronie.</span></div>
   <div class="actions"><button id="aClose">Zamknij</button></div>`);
-  $('mCopy').onclick=()=>{const c=mvCode();const show=()=>{$('mOut').innerHTML='<textarea rows="3" readonly id="mCode"></textarea><span class="sub">Zaznacz i skopiuj kod powyżej.</span>';$('mCode').value=c;$('mCode').select()};
-    try{navigator.clipboard.writeText(c).then(()=>{$('mCopy').textContent='Skopiowano ✓';toast('Kod wyników w schowku')},show)}catch(e){show()}};
-  $('mFile').onclick=()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([mvCode()],{type:'text/plain'}));a.download='Literiada_wyniki_'+todayKey()+'.txt';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}catch(e){toast('Nie udało się zapisać pliku, użyj kopiowania kodu',2600)}};
+  $('mCopy').onclick=()=>{const c=mvCode();const ok=()=>{$('mCopy').textContent='Skopiowano ✓';toast('Kod wyników w schowku');mvMoveAsk()};
+    const show=()=>{$('mOut').innerHTML='<textarea rows="4" id="mCode"></textarea><span class="sub">Kod jest zaznaczony. Przytrzymaj na nim palec i wybierz Kopiuj. Sprawdź, czy kopiujesz całość.</span>';const t=$('mCode');t.value=c;try{t.focus();t.setSelectionRange(0,c.length)}catch(e){}mvMoveAsk()};
+    try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(c).then(ok,()=>{if(legacyCopy(c))ok();else show()});else if(legacyCopy(c))ok();else show()}catch(e){show()}};
+  if($('mShare'))$('mShare').onclick=async()=>{try{await navigator.share({title:'Literiada – kod wyników',text:mvCode()});mvMoveAsk()}catch(e){}};
+  if($('mPaste'))$('mPaste').onclick=async()=>{try{const t=await navigator.clipboard.readText();$('mIn').value=t||'';mvAsk()}catch(e){toast('Nie mam dostępu do schowka. Wklej kod ręcznie w pole powyżej.',3000)}};
+  $('mFile').onclick=()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([mvCode()],{type:'text/plain'}));a.download='Literiada_wyniki_'+todayKey()+'.txt';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);mvMoveAsk()}catch(e){toast('Nie udało się zapisać pliku, użyj kopiowania kodu',2600)}};
   $('mLoad').onclick=()=>$('mF').click();
   $('mF').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{$('mIn').value=String(r.result||'');mvAsk()};r.readAsText(f)};
   $('mImp').onclick=mvAsk}
@@ -1135,8 +1183,15 @@ function mvAsk(){const o=mvParse($('mIn').value);const inf=$('mInfo');
   ${me.days?`<p>Wyniki zapisane teraz na tej stronie (${dni(me.days)}, ${me.pts} pkt) zostaną zastąpione.</p>`:'<p>Na tej stronie nie ma jeszcze wyników.</p>'}
   <div class="actions"><button class="main" id="mYes">Tak, importuj</button><button id="mNo">Anuluj</button></div>`);
   $('mNo').onclick=showMove;
-  $('mYes').onclick=()=>{try{Object.keys(mvKeys()).forEach(k=>localStorage.removeItem(k));for(const k in o.d)if(/^(sd2_|lt_)/.test(k)&&typeof o.d[k]==='string')localStorage.setItem(k,o.d[k]);localStorage.setItem('sd2_seen','true');localStorage.setItem('sd2_hint_menu','true')}catch(e){toast('Nie udało się zapisać wyników',2600);return}
+  $('mYes').onclick=()=>{try{Object.keys(mvKeys()).forEach(k=>localStorage.removeItem(k));for(const k in o.d)if(/^(sd2_|lt_)/.test(k)&&typeof o.d[k]==='string')localStorage.setItem(k,o.d[k]);localStorage.setItem('sd2_seen','true');localStorage.setItem('sd2_hint_menu','true');localStorage.setItem('sd2_ver',JSON.stringify(VER));localStorage.removeItem('sd2_moved');if(o.u&&o.u!==FBUID)localStorage.setItem('sd2_prev',JSON.stringify(String(o.u).slice(0,128)))}catch(e){toast('Nie udało się zapisać wyników',2600);return}
     close();setMode('day');rankSync();toast('Wyniki zaimportowane: '+dni(nw.days)+', '+nw.pts+' pkt',2600)}}
+function legacyCopy(t){try{const a=document.createElement('textarea');a.value=t;a.setAttribute('readonly','');a.style.position='fixed';a.style.top='-1000px';document.body.appendChild(a);a.select();a.setSelectionRange(0,t.length);const ok=document.execCommand('copy');a.remove();return ok}catch(e){return false}}
+function mvMoveAsk(){const el=$('mAsk');if(!el||!store.get('sd2_nick','')||store.get('sd2_moved',0))return;
+  el.innerHTML=`<div class="mvq"><b>Przenosisz grę na stałe?</b><span style="font-size:.88rem">Jeśli będziesz grać już tylko w nowym miejscu (inny telefon albo ikona na pulpicie), wyłączę ranking tutaj, żeby nie było Cię w nim dwa razy.</span><div class="actions"><button class="main" id="mMoved">Tak, przenoszę</button><button id="mBak">Nie, to tylko kopia</button></div></div>`;
+  $('mMoved').onclick=async()=>{store.set('sd2_moved',Date.now());await rankHide();RK.cache={};el.innerHTML='<p class="sub">✓ Tu ranking wyłączony. Teraz zaimportuj wyniki w nowym miejscu.</p>'};
+  $('mBak').onclick=()=>{el.innerHTML='<p class="sub">OK, kopia zapisana. Grasz dalej tutaj.</p>'}}
+function showMoved(){open(`<div class="step">Przeniesione wyniki</div><h2>${ic('move',22)} Twoja gra jest w innym miejscu</h2><p>Wyniki z tej przeglądarki zostały przeniesione na inne urządzenie albo do ikony na pulpicie. Tutaj punkty nie trafiają do rankingu, żeby nie było Cię w nim dwa razy.</p><p class="sub">Jeśli przeniesienie się nie udało i chcesz grać dalej tutaj, wróć do gry poniżej.</p><div class="actions"><button class="main" id="mvBack">Wróć do gry tutaj</button><button id="aClose">Zamknij</button></div>`);
+  $('mvBack').onclick=()=>{store.set('sd2_moved',0);rankSync();close();toast('Grasz dalej tutaj, wracasz do rankingu',2400)}}
 // ---- Panel boczny (menu)
 const mqWide=window.matchMedia?matchMedia('(min-width:1100px)'):{matches:false};
 const isWide=()=>mqWide.matches;
@@ -1174,16 +1229,18 @@ function fb(){if(window.__FBMOCK)return window.__FBMOCK().then(x=>{FBUID=x.uid;r
   fbP.catch(()=>{fbP=null});return fbP}
 const rsum=a=>Array.isArray(a)?a.reduce((x,y)=>x+(+y||0),0):0;
 let rankBusy=false,rankAgain=false,rankOk=true;
-async function rankSync(){const nick=store.get('sd2_nick','');if(!nick||RX())return;if(rankBusy){rankAgain=true;return}rankBusy=true;
+async function rankSync(){const nick=store.get('sd2_nick','');if(!nick||RX()||store.get('sd2_moved',0))return;if(rankBusy){rankAgain=true;return}rankBusy=true;
   try{const {F,db,uid}=await fb();const h=store.get('sd2_hist',{}),cut=keyToUTC(todayKey())-62*DAY,days={};let all=0;
     for(const k in h){const s=Math.round(rsum(h[k]));all+=s;if(s>0&&keyToUTC(k)>=cut)days[k]=s}
     const one=(k,v)=>v>0?{[k]:v}:{};
-    await F.setDoc(F.doc(db,'players',uid),{nick,all:Math.round(all),days,dd:one(todayKey(),myVal('d')),ww:one(rkWk(),myVal('w')),mm:one(rkMk(),myVal('m')),sv:one(todayKey(),svMask()),hl:Math.min(100000,Math.max(0,+store.get('sd2_help_n',0)||0)),upd:Date.now()});RK.cache={};rankOk=true}catch(e){console.warn('ranking',e);rankOk=false}
+    await F.setDoc(F.doc(db,'players',uid),{nick,all:Math.round(all),days,dd:one(todayKey(),myVal('d')),ww:one(rkWk(),myVal('w')),mm:one(rkMk(),myVal('m')),sv:one(todayKey(),svMask()),hl:Math.min(100000,Math.max(0,+store.get('sd2_help_n',0)||0)),...(store.get('sd2_prev','')?{prev:String(store.get('sd2_prev','')).slice(0,128)}:{}),upd:Date.now()});RK.cache={};rankOk=true}catch(e){console.warn('ranking',e);rankOk=false}
   rankBusy=false;if(rankAgain){rankAgain=false;rankSync()}}
 async function duelPush(sn,won){try{if(!duel)return;const {F,db,uid}=await fb();
   const id=String(duel.code||'x').replace(/[^A-Za-z0-9_-]/g,'').slice(0,40)+'_'+uid;
   await F.setDoc(F.doc(db,'duels',id),{au:duel.u||null,an:String(duel.f).slice(0,20),sn:String(sn).slice(0,20),su:uid,res:won?'won':'lost',tries:guesses.length,pts:won?pointsFor(answer,guesses.length):0,ts:Date.now()})}catch(e){console.warn('pojedynek',e)}}
-let RK={tab:'d',rows:null,duels:null,mine:null,err:null,cache:{},cnt:null,mePos:null,offTs:0};
+let RK={tab:'d',rows:null,duels:null,mine:null,err:null,cache:{},cnt:null,mePos:null,offTs:0,adj:null,adjTs:0};
+// v19.1: po przeniesieniu wyników nowe urządzenie zapisuje prev = stare urządzenie; starszy z pary znika z listy
+function dedupPrev(rows){const by={};rows.forEach(r=>by[r.id]=r);const hide=new Set();rows.forEach(r=>{const o=r.prev&&by[r.prev];if(o&&o.id!==r.id&&(+o.upd||0)<=(+r.upd||0))hide.add(o.id)});return rows.filter(r=>!hide.has(r.id))}
 function rankRange(tab){const tk=todayKey(),t=keyToUTC(tk);if(tab==='d')return [t,t];
   if(tab==='w'){const dow=(new Date(t).getUTCDay()+6)%7;return [t-dow*DAY,t]}
   if(tab==='m')return [Date.UTC(+tk.slice(0,4),+tk.slice(5,7)-1,1),t];return null}
@@ -1191,7 +1248,7 @@ const rkWk=()=>utcToKey(rankRange('w')[0]);
 const rkMk=()=>todayKey().slice(0,7);
 // v18: każdy gracz trzyma osobno punkty dnia (dd), tygodnia (ww) i miesiąca (mm); ranking pobiera tylko top 50
 function rkField(tab){return tab==='d'?['dd',todayKey()]:tab==='w'?['ww',rkWk()]:tab==='m'?['mm',rkMk()]:['all']}
-function rankVal(r,tab){if(tab==='a')return +r.all||0;const [m,k]=rkField(tab),nv=+((r[m]||{})[k])||0;
+function rankVal(r,tab){if(tab==='a')return (+r.all||0)+(RK.adj&&+RK.adj[r.id]||0);const [m,k]=rkField(tab),nv=+((r[m]||{})[k])||0;
   const [a,b]=rankRange(tab);let lv=0;const d=r.days||{};for(const x in d){const t=keyToUTC(x);if(t>=a&&t<=b)lv+=+d[x]||0}return Math.max(nv,lv)}
 function myVal(tab){const h=store.get('sd2_hist',{});if(tab==='a')return Math.round(sumRange(h,0,9e15));const [a,b]=rankRange(tab);return Math.round(sumRange(h,a,b))}
 function rankHTML(){const tab=RK.tab,nick=store.get('sd2_nick','');
@@ -1200,7 +1257,7 @@ function rankHTML(){const tab=RK.tab,nick=store.get('sd2_nick','');
   if(RK.err)body=`<p class="dbad">Ranking jest chwilowo niedostępny. Sprawdź połączenie z internetem i spróbuj ponownie.</p><div class="actions"><button id="rRetry">Spróbuj ponownie</button></div>`;
   else if(!RK.rows)body='<p class="sub">Wczytuję ranking…</p>';
   else if(tab==='p'){
-    const line=d=>`<div><span><b>${esc(d.sn)}</b>${admB(d.su)} ${d.res==='won'?'odgadł(a)':'nie odgadł(a)'} zagadki od <b>${esc(d.an)}</b>${admB(d.au)}</span><span style="white-space:nowrap">${d.res==='won'?d.tries+'. próba · '+d.pts+' pkt':'—'}${ADM.me&&d.id?`<button class="admx" data-dd="${esc(d.id)}" title="Usuń wpis">🗑</button>`:''}</span></div>`;
+    const line=d=>`<div><span><b>${esc(d.sn)}</b>${admB(d.su)} ${d.res==='won'?'odgadł(a)':'nie odgadł(a)'} zagadki od <b>${esc(d.an)}</b>${admB(d.au)}</span><span style="white-space:nowrap">${d.res==='won'?d.tries+'. próba · '+d.pts+' pkt':'—'}${ADM.me&&d.id?`<button class="admx" data-dd="${esc(d.id)}" title="Usuń wpis" aria-label="Usuń wpis">${ic('trash',14)}</button>`:''}</span></div>`;
     const mine=(RK.mine||[]).sort((a,b)=>b.ts-a.ts).slice(0,20);
     body=(FBUID?`<p><b>Wyniki Twoich zagadek</b></p><div class="dlog">${mine.length?mine.map(line).join(''):'<p class="sub">Nikt jeszcze nie odesłał wyniku Twojej zagadki. Wyślij nową w menu: Pojedynek.</p>'}</div>`:'')
       +`<p><b>Ostatnie pojedynki</b></p><div class="dlog">${(RK.duels||[]).length?RK.duels.map(line).join(''):'<p class="sub">Brak pojedynków. Bądź pierwszy!</p>'}</div>`;
@@ -1208,23 +1265,25 @@ function rankHTML(){const tab=RK.tab,nick=store.get('sd2_nick','');
     const list=RK.rows.map(r=>({id:r.id,nick:r.nick||'?',v:rankVal(r,tab),sv:r.sv,hl:r.hl})).filter(r=>r.v>0).sort((a,b)=>b.v-a.v);
     const meAll=list.findIndex(r=>r.id===FBUID);if(meAll>=50)RK.mePos=meAll+1;list.length=Math.min(list.length,50);
     const me=list.findIndex(r=>r.id===FBUID),myPos=me>=0?me+1:RK.mePos;
-    const row=(r,i)=>`<div class="${r.id===FBUID?'me':''}"><span class="pos">${i<3?medal(['gold','silver','bronze'][i],22):i+1}</span><span class="nk">${esc(r.nick)}${admB(r.id)}</span><span class="pt">${r.v} pkt</span><span class="acts">${hlBtn(r)}${chBtn(r)}${admDelBtn(r)}</span></div>`;
+    const row=(r,i)=>`<div class="${r.id===FBUID?'me':''}"><span class="pos">${i<3?medal(['gold','silver','bronze'][i],22):i+1}</span><span class="nk">${esc(r.nick)}${admB(r.id)}</span><span class="pt">${r.v} pkt</span><span class="acts">${hlBtn(r)}${chBtn(r)}${admDelBtn(r)}${rpBtn(r)}</span></div>`;
     const meRow=me<0&&RK.mePos&&nick?'<span class="gap">…</span>'+row({id:FBUID,nick,v:myVal(tab)},RK.mePos-1):'';
     body=list.length?`<div class="rlist">${list.map(row).join('')}${meRow}</div>`:'<p class="sub">Nikt jeszcze nie zdobył punktów w tym okresie. Twoja szansa!</p>';
     body+=`<p class="sub">${RK.cnt!=null?'Graczy w rankingu: '+RK.cnt:''}${list.length>=50?' · pokazujemy pierwszą 50':''}${myPos?' · Twoje miejsce: <b>'+myPos+'</b>':''}</p>`;
   }
   const join=nick?`<p class="sub">Grasz jako <b>${esc(nick)}</b>. <button class="linkbtn" id="rNick" style="padding:0">Zmień nick</button> · <button class="linkbtn" id="rOut" style="padding:0">Usuń mnie z rankingu</button></p>`
     :`<div class="rjoin"><b>Dołącz do rankingu</b><span style="font-size:.85rem">Wpisz pseudonim, który zobaczą inni gracze. Bez maila i hasła, zapisujemy tylko pseudonim i punkty.</span><input id="rIn" maxlength="20" placeholder="np. Radek z Pręgowa" autocomplete="off"><button id="rJoin">Dołącz</button><span class="dbad" id="rErr" hidden></span></div>`;
-  return `<div class="step">Ranking</div><h2>${ic('trophy',24)} Ranking graczy</h2>${join}<div class="rtabs">${tabs}</div>${body}${nick&&tab!=='p'?'<p class="sub">Przycisk „Wyzwij” wysyła graczowi Twoje hasło do odgadnięcia. Jedno wyzwanie dziennie do tej samej osoby.</p><p class="sub">🤝 to licznik pomocy udzielonych innym graczom. Świecąca ikona oznacza, że ten gracz odgadł dziś Twój bieżący poziom: dotknij jej, żeby poprosić go o jedną literę.</p>':''}<div class="actions"><button id="aClose">Zamknij</button></div><p class="sub">Link do rankingu: literiada.github.io/#ranking</p>`}
+  return `<div class="step">Ranking</div><h2>${ic('trophy',24)} Ranking graczy</h2>${join}<div class="rtabs">${tabs}</div>${body}${nick&&tab!=='p'?'<p class="sub">Przycisk „Wyzwij” wysyła graczowi Twoje hasło do odgadnięcia. Jedno wyzwanie dziennie do tej samej osoby.</p><p class="sub">'+HI+' to licznik pomocy udzielonych innym graczom. Świecąca ikona oznacza, że ten gracz odgadł dziś Twój bieżący poziom: dotknij jej, żeby poprosić go o jedną literę.</p>':''}<div class="actions"><button id="aClose">Zamknij</button></div><p class="sub">Link do rankingu: literiada.github.io/#ranking</p>`}
 function rankBind(){document.querySelectorAll('[data-rt]').forEach(b=>b.onclick=()=>{RK.tab=b.dataset.rt;rankLoad()});
   document.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{const r=(RK.rows||[]).find(x=>x.id===b.dataset.ch);if(r)chNew(r)});
   document.querySelectorAll('[data-hreq]').forEach(b=>b.onclick=()=>{const r=(RK.rows||[]).find(x=>x.id===b.dataset.hreq);if(r)helpAsk(r)});
   document.querySelectorAll('[data-ad]').forEach(b=>b.onclick=()=>{const r=(RK.rows||[]).find(x=>x.id===b.dataset.ad);if(r)admAsk(r)});
+  document.querySelectorAll('[data-rp]').forEach(b=>b.onclick=()=>{const r=(RK.rows||[]).find(x=>x.id===b.dataset.rp);if(r)rpAsk(r)});
   document.querySelectorAll('[data-dd]').forEach(b=>b.onclick=()=>admDelDuel(b.dataset.dd));
   if($('rRetry'))$('rRetry').onclick=()=>{RK.err=null;rankLoad(true)};
   if($('rJoin'))$('rJoin').onclick=async()=>{const v=$('rIn').value.replace(/\s+/g,' ').trim().slice(0,20);
     if(v.length<2){$('rErr').hidden=false;$('rErr').textContent='Pseudonim musi mieć co najmniej 2 znaki.';return}
-    store.set('sd2_nick',v);if(!store.get('sd2_duel_name',''))store.set('sd2_duel_name',v);$('rJoin').textContent='Dołączam…';await rankSync();if(!rankOk&&await admBanned()){store.set('sd2_nick','');rankDraw();toast('Ten profil został zablokowany w rankingu przez administratora gry',3600);return}RK.cache={};rankLoad(true)};
+    $('rJoin').textContent='Sprawdzam…';if(await nickTaken(v)){$('rErr').hidden=false;$('rErr').innerHTML=NICK_MSG;$('rJoin').textContent='Dołącz';return}
+    store.set('sd2_moved',0);store.set('sd2_nick',v);if(!store.get('sd2_duel_name',''))store.set('sd2_duel_name',v);$('rJoin').textContent='Dołączam…';await rankSync();if(!rankOk&&await admBanned()){store.set('sd2_nick','');rankDraw();toast('Ten profil został zablokowany w rankingu przez administratora gry',3600);return}RK.cache={};rankLoad(true)};
   if($('rNick'))$('rNick').onclick=()=>{store.set('sd2_nick','');rankDraw();setTimeout(()=>{const i=$('rIn');if(i)i.focus()},50)};
   if($('rOut'))$('rOut').onclick=async()=>{let nd=0;try{const {F,db,uid}=await fb();await F.deleteDoc(F.doc(db,'players',uid));
       const qs=await Promise.all([F.getDocs(F.query(F.collection(db,'duels'),F.where('su','==',uid))),F.getDocs(F.query(F.collection(db,'duels'),F.where('au','==',uid)))]);
@@ -1242,6 +1301,8 @@ async function rankLoad(force){const tab=RK.tab,c=RK.cache[tab];await admLoad();
       let big=RK.cnt!=null&&RK.cnt>250,f=rkField(tab),fp=f.length>1?new F.FieldPath(f[0],f[1]):f[0];
       if(big){try{const ps=await F.getDocs(F.query(col,F.orderBy(fp,'desc'),F.limit(50)));rows=ps.docs.map(d=>Object.assign({id:d.id},d.data()))}catch(e){console.warn('ranking',e);big=false}}
       if(!big){const ps=await F.getDocs(col);rows=ps.docs.map(d=>Object.assign({id:d.id},d.data()))}
+      rows=dedupPrev(rows);
+      if(tab==='a'&&(!RK.adj||Date.now()-RK.adjTs>300000)){try{const q=await F.getDocs(F.collection(db,'adj'));const a={};q.docs.forEach(d=>a[d.id]=+d.data().all||0);RK.adj=a;RK.adjTs=Date.now()}catch(e){RK.adj=RK.adj||{}}}
       const mv=myVal(tab);
       if(big&&store.get('sd2_nick','')&&!RX()&&mv>0&&!rows.some(r=>r.id===uid)){try{const q=await F.getCountFromServer(F.query(col,F.where(fp,'>',mv)));mePos=q.data().count+1}catch(e){console.warn('ranking',e)}}}
     if(RK.cnt==null||force){try{RK.cnt=(await F.getCountFromServer(col)).data().count}catch(e){}}
@@ -1287,7 +1348,7 @@ function nextBox(pend){const nk=store.get('sd2_nick',''),items=[];
   items.push(`<button class="nx c-duel" data-nx="duel">${ic('fencer',20)}<span>Rzuć wyzwanie znajomemu<small>Wymyśl hasło i wyślij je linkiem</small></span></button>`);
   if(!RX())items.push(nk?`<button class="nx c-rank" data-nx="rank">${ic('trophy',20)}<span>Zobacz ranking dnia<small>Sprawdź swoje miejsce i wyzwij innych graczy</small></span></button>`
     :`<button class="nx c-rank" data-nx="rank">${ic('trophy',20)}<span>Dołącz do rankingu<small>Porównaj się z innymi i odbieraj wyzwania</small></span></button>`);
-  if(HL.loaded&&hlPending().length)items.push(`<button class="nx c-hlp" data-nx="hlp"><span style="font-size:20px;width:20px;text-align:center">🤝</span><span>Ktoś prosi Cię o pomoc: ${hlPending().length}<small>Podpowiedz jedną literę, licznik 🤝 przy Twoim nicku wzrośnie</small></span></button>`);
+  if(HL.loaded&&hlPending().length)items.push(`<button class="nx c-hlp" data-nx="hlp">${ic('hand',20)}<span>Ktoś prosi Cię o pomoc: ${hlPending().length}<small>Podpowiedz jedną literę, licznik ${HI} przy Twoim nicku wzrośnie</small></span></button>`);
   if(chCount())items.push(`<button class="nx c-ch" data-nx="ch">${ic('rapier',20)}<span>Wyzwania czekają: ${chCount()}<small>Ktoś rzucił Ci wyzwanie albo odpowiedział na Twoje</small></span></button>`);
   items.push(`<button class="nx c-inv" data-nx="inv">${ic('send',20)}<span>Zaproś znajomego<small>Za polecenie dostajesz jokera na poziomie 2 lub 3</small></span></button>`);
   return `<div class="nextbox"><h3>Co dalej?</h3>${items.slice(0,5).join('')}<div class="cdown" id="cdown">Nowe hasła za ${untilMidnight()}</div></div>`}
@@ -1376,35 +1437,88 @@ async function chOptToggle(){const on=!chOk();store.set('sd2_ch_ok',on);chOptLab
   toast(on?'Przyjmujesz wyzwania od graczy z rankingu':'Nie przyjmujesz wyzwań. Inni zobaczą wyszarzony przycisk',2600)}
 
 // ---- v18.1: twórca gry (admin). Lista adminów: kolekcja Firestore "admins", dokument = identyfikator urządzenia
-let ADM={set:new Set(),loaded:false,me:false};
-async function admLoad(){if(ADM.loaded)return;try{const {F,db,uid}=await fb();
-  const c=store.get('sd2_adm',null);let ids;
-  if(c&&Date.now()-c.ts<6*3600e3)ids=c.ids;else{const q=await F.getDocs(F.collection(db,'admins'));ids=q.docs.map(d=>d.id);if(ids.length)store.set('sd2_adm',{ts:Date.now(),ids})}
-  ADM.set=new Set(ids);ADM.me=ADM.set.has(uid);ADM.loaded=true;admMenu()}catch(e){console.warn('admin',e)}}
-const admB=id=>id&&ADM.set.has(id)?'<span class="adm-b" title="Twórca gry">TWÓRCA</span>':'';
-const admDelBtn=r=>ADM.me&&r.id!==FBUID?`<button class="admx" data-ad="${esc(r.id)}" title="Usuń z rankingu">🗑</button>`:'';
-function admMenu(){const b=$('sAdm');if(!b)return;b.hidden=!ADM.me;b.innerHTML=ic('chart',20)+'Panel twórcy gry';b.onclick=sideGo(showAdminStats)}
-function admAsk(r){open(`<div class="step">Panel twórcy gry</div><h2>Usunąć gracza z rankingu?</h2>
-  <p>Gracz: <b>${esc(r.nick)}</b></p><p class="sub">Usunę jego wpis w rankingu i jego wyniki w tabeli pojedynków. „Usuń i zablokuj” dodatkowo nie pozwoli mu wrócić do rankingu z tego urządzenia.</p>
-  <div class="actions"><button class="main" id="adDel">Usuń</button><button id="adBan" style="border-color:#e5484d;color:#b42318">Usuń i zablokuj</button><button id="adNo">Anuluj</button></div>`);
-  $('adNo').onclick=()=>showRanking();$('adDel').onclick=()=>admDel(r,false);$('adBan').onclick=()=>admDel(r,true)}
+let ADM={set:new Set(),m:{},loaded:false,me:false,vice:false,staff:false};
+async function admLoad(force){if(ADM.loaded&&!force)return;try{const {F,db,uid}=await fb();
+  const c=store.get('sd2_adm2',null);let m;
+  if(!force&&c&&c.m&&Date.now()-c.ts<3600e3)m=c.m;else{const q=await F.getDocs(F.collection(db,'admins'));m={};q.docs.forEach(d=>{const r=(d.data()||{}).role;m[d.id]=r==='admin2'||r==='vice'?r:'admin'});store.set('sd2_adm2',{ts:Date.now(),m})}
+  ADM.m=m;ADM.set=new Set(Object.keys(m).filter(k=>m[k]==='admin'));ADM.me=m[uid]==='admin'||m[uid]==='admin2';ADM.vice=m[uid]==='vice';ADM.staff=ADM.me||ADM.vice;ADM.loaded=true;admMenu()}catch(e){console.warn('admin',e)}}
+const admB=id=>!id||!ADM.m?'':ADM.m[id]==='admin'?'<span class="adm-b" title="Twórca gry">TWÓRCA</span>':ADM.m[id]==='vice'?'<span class="adm-b vice" title="Opiekun gry">OPIEKUN</span>':'';
+const admDelBtn=r=>ADM.me&&r.id!==FBUID?`<button class="admx" data-ad="${esc(r.id)}" title="Gracz: usuń, połącz, uprawnienia" aria-label="Opcje gracza">${ic('trash',14)}</button>`:'';
+const rpBtn=r=>ADM.vice&&!ADM.me&&r.id!==FBUID?`<button class="rpx" data-rp="${esc(r.id)}" title="Zgłoś gracza" aria-label="Zgłoś gracza">${ic('flag',14)}</button>`:'';
+function admMenu(){const b=$('sAdm');if(!b)return;b.hidden=!ADM.staff;b.innerHTML=ic('chart',20)+(ADM.me?'Panel twórcy gry':'Panel opiekuna gry');b.onclick=sideGo(showAdminStats);
+  const r=$('sRep');if(r){r.hidden=!ADM.staff;r.innerHTML=ic('inbox',20)+'Zgłoszenia graczy<span class="badge" id="repBadge" hidden></span>';r.onclick=sideGo(()=>showReports())}
+  if(ADM.staff&&!RP.loaded)repLoad()}
+const ROLE_N={admin:'twórca gry',admin2:'admin (bez znaczka)',vice:'Opiekun gry (wiceadmin)'};
+const myNick=()=>String(store.get('sd2_nick','')||'admin').slice(0,20);
+function conf(h,t,yes,fn,back){open(`<h2>${h}</h2><p>${t}</p><div class="actions"><button class="main" id="cfY">${yes}</button><button id="cfN">Anuluj</button></div>`);$('cfY').onclick=()=>{$('cfY').disabled=true;fn()};$('cfN').onclick=back||close}
+function admAsk(r,back){const rl=(ADM.m||{})[r.id],bk=back||(()=>showRanking());
+  open(`<div class="step">Panel twórcy gry</div><h2>${esc(r.nick)}${admB(r.id)}</h2>
+  <p class="sub">${r.all!=null?'Punkty łącznie: '+(+r.all||0)+' · ':''}rola: <b>${rl?ROLE_N[rl]:'zwykły gracz'}</b></p>
+  <p><b>Usunięcie z rankingu</b></p><p class="sub">Przed usunięciem kopia wpisu i pojedynków trafia do Kosza w Panelu twórcy gry. Przez 30 dni możesz go stamtąd przywrócić. „Usuń i zablokuj” dodatkowo nie pozwoli mu wrócić do rankingu z tego urządzenia.</p>
+  <div class="actions"><button class="main" id="adDel">Usuń</button><button id="adBan" style="border-color:#e5484d;color:#b42318">Usuń i zablokuj</button></div>
+  <p><b>Ten sam gracz dwa razy?</b></p><p class="sub">Punkty łączne tego wpisu dopiszę do drugiego wpisu, a ten usunę (kopia w Koszu).</p><div class="actions"><button id="adMrg">Połącz z innym wpisem</button></div>
+  <p><b>Uprawnienia</b></p><div class="actions">${rl==='admin'?'<span class="sub">Twórca gry. Zmiana tylko w konsoli Firebase.</span>':rl?'<button id="adRole0">Odbierz uprawnienia</button>':'<button id="adRoleV">Nadaj rolę wiceadmina</button><button id="adRoleA">Nadaj uprawnienia admina</button>'}</div>
+  <div class="actions"><button id="adNo">Anuluj</button></div>`);
+  $('adNo').onclick=bk;$('adDel').onclick=()=>admDel(r,false);$('adBan').onclick=()=>admDel(r,true);$('adMrg').onclick=()=>admMergePick(r);
+  if($('adRole0'))$('adRole0').onclick=()=>conf('Odebrać uprawnienia?',`Gracz <b>${esc(r.nick)}</b> straci rolę: ${ROLE_N[rl]}.`,'Odbierz',()=>admRole(r,null),()=>admAsk(r,back));
+  if($('adRoleV'))$('adRoleV').onclick=()=>conf('Nadać rolę wiceadmina?',`<b>${esc(r.nick)}</b> zostanie Opiekunem gry: znaczek OPIEKUN w rankingu, statystyki, zgłoszenia graczy i odpowiadanie na nie, przycisk zgłaszania graczy. Bez usuwania i blokowania.<br><br>Rola działa na urządzeniu i w przeglądarce, z których ten gracz gra.`,'Nadaj rolę',()=>admRole(r,'vice'),()=>admAsk(r,back));
+  if($('adRoleA'))$('adRoleA').onclick=()=>conf('Nadać uprawnienia admina?',`<b>${esc(r.nick)}</b> będzie mógł usuwać, łączyć i blokować graczy, nadawać role i robić kopię bazy. Nie dostanie znaczka TWÓRCA. Nadawaj tylko sobie, na drugim urządzeniu.`,'Nadaj uprawnienia',()=>admRole(r,'admin2'),()=>admAsk(r,back))}
+async function admRole(r,role){try{const {F,db,uid}=await fb();
+    if(role)await F.setDoc(F.doc(db,'admins',r.id),{role,nick:String(r.nick||'').slice(0,20),by:uid,ts:Date.now()});else await F.deleteDoc(F.doc(db,'admins',r.id));
+    await admLoad(true);RK.cache={};toast(role?'Nadano: '+ROLE_N[role]+' · '+r.nick:'Odebrano uprawnienia: '+r.nick,3000)}
+  catch(e){console.warn('admin',e);toast('Nie udało się. Sprawdź, czy zasady Firestore v19.1 są opublikowane.',3600)}
+  showRanking()}
 async function admDel(r,ban){try{const {F,db,uid}=await fb();
+    const pd=await F.getDoc(F.doc(db,'players',r.id)),p=pd.exists()?pd.data():null;
+    const q=await F.getDocs(F.query(F.collection(db,'duels'),F.where('su','==',r.id)));
+    await F.setDoc(F.doc(db,'trash',r.id),{nick:String(r.nick||(p&&p.nick)||'?').slice(0,20),p,du:q.docs.slice(0,150).map(d=>({id:d.id,d:d.data()})),ban:!!ban,why:'del',by:uid,byn:myNick(),ts:Date.now()});
     if(ban)await F.setDoc(F.doc(db,'bans',r.id),{nick:String(r.nick||'').slice(0,20),by:uid,ts:Date.now()});
     await F.deleteDoc(F.doc(db,'players',r.id));let nd=0;
-    const q=await F.getDocs(F.query(F.collection(db,'duels'),F.where('su','==',r.id)));for(const d of q.docs){try{await F.deleteDoc(F.doc(db,'duels',d.id));nd++}catch(e){}}
-    RK.cache={};toast((ban?'Usunięto i zablokowano: ':'Usunięto: ')+r.nick+(nd?' (pojedynki: '+nd+')':''),2800)}
-  catch(e){console.warn('admin',e);toast('Nie udało się usunąć. Sprawdź, czy zasady Firestore v18.1 są opublikowane.',3600)}
+    for(const d of q.docs){try{await F.deleteDoc(F.doc(db,'duels',d.id));nd++}catch(e){}}
+    RK.cache={};toast((ban?'Usunięto i zablokowano: ':'Usunięto: ')+r.nick+(nd?' (pojedynki: '+nd+')':'')+' · kopia w Koszu',3000)}
+  catch(e){console.warn('admin',e);toast('Nie udało się usunąć (nic nie zmieniono). Sprawdź, czy zasady Firestore v19.1 są opublikowane.',4000)}
   showRanking()}
+function admMergePick(r){const rows=(RK.rows||[]).filter(x=>x.id!==r.id).sort((a,b)=>((b.nick===r.nick)-(a.nick===r.nick))||((+b.all||0)-(+a.all||0))).slice(0,60);
+  open(`<div class="step">Panel twórcy gry</div><h2>Połącz wpisy</h2><p>Wpis <b>${esc(r.nick)}</b> (${+r.all||0} pkt łącznie) zostanie usunięty, a jego punkty łączne dopiszę do wpisu, który wybierzesz.</p><p class="sub">Wybierz wpis, który zostaje. Ten sam nick jest na górze listy.</p>
+  <div class="dlog">${rows.map(x=>`<div><span>${esc(x.nick)} · ${+x.all||0} pkt</span><button class="linkbtn" data-mt="${esc(x.id)}" style="padding:0">Zostaw ten</button></div>`).join('')||'<p class="sub">Brak innych wpisów.</p>'}</div>
+  <div class="actions"><button id="adNo">Anuluj</button></div>`);
+  $('adNo').onclick=()=>admAsk(r);
+  document.querySelectorAll('[data-mt]').forEach(b=>b.onclick=()=>{const t=rows.find(x=>x.id===b.dataset.mt);if(t)conf('Połączyć wpisy?',`Usunę <b>${esc(r.nick)}</b> (${+r.all||0} pkt), a <b>${esc(t.nick)}</b> dostanie +${+r.all||0} pkt w rankingu łącznym. Możesz to cofnąć w Koszu.<br><br>Gracz powinien potem grać tylko z jednego miejsca.`,'Połącz',()=>admMerge(r,t),()=>admMergePick(r))})}
+async function admMerge(src,dst){try{const {F,db,uid}=await fb();const pd=await F.getDoc(F.doc(db,'players',src.id)),p=pd.exists()?pd.data():null,add=Math.round(+((p&&p.all)!=null?p.all:src.all)||0);
+    await F.setDoc(F.doc(db,'trash',src.id),{nick:String(src.nick||'?').slice(0,20),p,du:[],ban:false,why:'merge',into:dst.id,inton:String(dst.nick||'').slice(0,20),add,by:uid,byn:myNick(),ts:Date.now()});
+    const ad=await F.getDoc(F.doc(db,'adj',dst.id)),cur=ad.exists()?ad.data():{all:0,from:[]};
+    await F.setDoc(F.doc(db,'adj',dst.id),{all:(+cur.all||0)+add,from:[...(Array.isArray(cur.from)?cur.from:[]),String(src.nick||'?').slice(0,20)].slice(-20),upd:Date.now()});
+    await F.deleteDoc(F.doc(db,'players',src.id));RK.cache={};RK.adj=null;toast('Połączono: +'+add+' pkt dla '+dst.nick,3000)}
+  catch(e){console.warn('admin',e);toast('Nie udało się połączyć. Sprawdź, czy zasady Firestore v19.1 są opublikowane.',4000)}
+  showRanking('a')}
 async function admDelDuel(id){try{const {F,db}=await fb();await F.deleteDoc(F.doc(db,'duels',id));RK.cache={};toast('Wpis pojedynku usunięty',1800)}catch(e){toast('Nie udało się usunąć wpisu',2400)}rankLoad(true)}
 async function admBanned(){try{const {F,db,uid}=await fb();const d=await F.getDoc(F.doc(db,'bans',uid));return d.exists()}catch(e){return false}}
 async function admPanel(){let uid='';try{uid=(await fb()).uid}catch(e){}await admLoad();
   let bans='';if(ADM.me){try{const {F,db}=await fb();const q=await F.getDocs(F.collection(db,'bans'));
     bans=q.docs.map(d=>`<div><span>${esc(d.data().nick||d.id)}</span><button class="linkbtn" data-unban="${esc(d.id)}" style="padding:0">Odblokuj</button></div>`).join('')||'<p class="sub">Nikt nie jest zablokowany.</p>'}catch(e){bans='<p class="sub">Nie udało się wczytać blokad.</p>'}}
-  return `<p><b>Identyfikator tego urządzenia</b></p><div class="dlog"><div><code style="font-size:.78rem;word-break:break-all">${esc(uid||'brak połączenia')}</code>${uid?'<button class="linkbtn" id="admCp" style="padding:0">Kopiuj</button>':''}</div></div>
-  <p class="sub">${ADM.me?'✓ To urządzenie ma uprawnienia twórcy gry: znaczek TWÓRCA przy nicku i przycisk 🗑 przy graczach w rankingu.':'To urządzenie nie ma uprawnień twórcy gry. Żeby je nadać, dodaj ten identyfikator w Firebase: Firestore → kolekcja admins → nowy dokument o tym identyfikatorze.'}</p>
+  let extra='';if(ADM.me){try{extra=await admPanelMore()}catch(e){console.warn('panel',e)}}
+  else if(ADM.vice){await repLoad();const c=repCounts();extra=`<p><b>Zgłoszenia graczy</b></p><div class="rcnt"><button data-rf="open" class="${c.late?'warn':''}"><b>${c.open}</b>czeka${c.late?' · '+c.late+' po terminie':''}</button><button data-rf="radek"><b>${c.radek}</b>u Radka</button><button data-rf="closed"><b>${c.closed}</b>zamknięte</button></div>`}
+  return `${extra}<p><b>Identyfikator tego urządzenia</b></p><div class="dlog"><div><code style="font-size:.78rem;word-break:break-all">${esc(uid||'brak połączenia')}</code>${uid?'<button class="linkbtn" id="admCp" style="padding:0">Kopiuj</button>':''}</div></div>
+  <p class="sub">${ADM.me?'✓ To urządzenie ma uprawnienia admina: przycisk z koszem przy graczach w rankingu (usuń, połącz, nadaj rolę).':ADM.vice?'✓ Masz rolę Opiekuna gry: znaczek OPIEKUN, statystyki, zgłoszenia graczy i przycisk z flagą przy graczach w rankingu.':'To urządzenie nie ma uprawnień admina. Admin nadaje je w rankingu: przycisk przy graczu → Uprawnienia.'}</p>
   ${ADM.me?`<p><b>Zablokowani w rankingu</b></p><div class="dlog">${bans}</div>`:''}`}
+async function admPanelMore(){const {F,db}=await fb();await repLoad();const c=repCounts();
+  const [ad,tr]=await Promise.all([F.getDocs(F.collection(db,'admins')),trashList()]);await cfgLoad();
+  const team=ad.docs.map(d=>({id:d.id,...d.data()})).map(x=>{const rl=x.role==='admin2'||x.role==='vice'?x.role:'admin';return `<div><span><b>${esc(x.nick||(x.id===FBUID?myNick():'(bez nicku)'))}</b><small class="sub">${ROLE_N[rl]}${x.id===FBUID?' · to urządzenie':''}</small></span>${rl!=='admin'&&x.id!==FBUID?`<button class="linkbtn" data-tm="${esc(x.id)}" data-tn="${esc(x.nick||'')}" style="padding:0">Odbierz</button>`:''}</div>`}).join('');
+  const why=x=>x.why==='merge'?'połączony z '+esc(x.inton||'?')+' (+'+(+x.add||0)+' pkt)':x.ban?'usunięty i zablokowany':'usunięty';
+  const trash=tr.map(x=>`<div><span><b>${esc(x.nick)}</b> · ${x.p?(+x.p.all||0)+' pkt':'bez wpisu'}<small class="sub" style="display:block">${repD(x.ts)} · ${why(x)} · ${esc(x.byn||'')}</small></span><button class="linkbtn" data-trr="${esc(x.id)}" style="padding:0">Przywróć</button></div>`).join('')||'<p class="sub">Kosz jest pusty.</p>';
+  RP.trash=tr;
+  return `<p><b>Zgłoszenia graczy</b></p><div class="rcnt"><button data-rf="radek" class="${c.radek?'warn':''}"><b>${c.radek}</b>do Radka</button><button data-rf="open" class="${c.late?'warn':''}"><b>${c.open}</b>u wiceadmina${c.late?'<br>'+c.late+' czeka &gt;24 h':''}</button><button data-rf="closed"><b>${c.closed}</b>zamknięte</button></div>
+  <p><b>Zespół gry</b></p><div class="dlog team">${team||'<p class="sub">Brak.</p>'}</div><p class="sub">Role nadajesz w rankingu: przycisk przy graczu → Uprawnienia.</p>
+  <p><b>Telegram do pilnych spraw</b></p><div style="display:flex;gap:8px"><input class="fi" id="cfTg" maxlength="40" placeholder="nazwa użytkownika, np. Literiada_Radek" value="${esc(RP.cfg&&RP.cfg.tg||'')}"><button id="cfTgS">Zapisz</button></div><p class="sub">Wiceadmin zobaczy przycisk „Daj znać Radkowi”, który otworzy czat z Tobą na Telegramie.</p>
+  <p><b>Kosz</b> <span class="sub">(usunięci i połączeni gracze z ostatnich 30 dni)</span></p><div class="dlog">${trash}</div>
+  <p><b>Kopia bazy</b></p><div class="actions"><button id="bkDl">${ic('db',16)} Pobierz kopię bazy</button><button id="bkUp">Przywróć z kopii</button></div><p class="sub">Kopia to dwa pliki: pełna baza (.json) do archiwum i ranking (.csv) do otwarcia w Excelu.</p>`}
 function admPanelBind(){const c=$('admCp');if(c)c.onclick=()=>{const t=$('card').querySelector('code').textContent;try{navigator.clipboard.writeText(t).then(()=>toast('Skopiowano identyfikator',1800),()=>fallback(t))}catch(e){fallback(t)}};
-  document.querySelectorAll('[data-unban]').forEach(b=>b.onclick=async()=>{try{const {F,db}=await fb();await F.deleteDoc(F.doc(db,'bans',b.dataset.unban));toast('Odblokowano',1800)}catch(e){toast('Nie udało się odblokować',2400)}showAdminStats()})}
+  document.querySelectorAll('[data-unban]').forEach(b=>b.onclick=async()=>{try{const {F,db}=await fb();await F.deleteDoc(F.doc(db,'bans',b.dataset.unban));toast('Odblokowano',1800)}catch(e){toast('Nie udało się odblokować',2400)}showAdminStats()});
+  document.querySelectorAll('[data-rf]').forEach(b=>b.onclick=()=>showReports(b.dataset.rf));
+  document.querySelectorAll('[data-tm]').forEach(b=>b.onclick=()=>conf('Odebrać uprawnienia?',`Gracz <b>${esc(b.dataset.tn||'?')}</b> straci swoją rolę.`,'Odbierz',async()=>{try{const {F,db}=await fb();await F.deleteDoc(F.doc(db,'admins',b.dataset.tm));await admLoad(true);toast('Odebrano uprawnienia',2000)}catch(e){toast('Nie udało się',2400)}showAdminStats()},showAdminStats));
+  document.querySelectorAll('[data-trr]').forEach(b=>b.onclick=()=>{const x=(RP.trash||[]).find(z=>z.id===b.dataset.trr);if(x)conf('Przywrócić gracza?',`<b>${esc(x.nick)}</b> wróci do rankingu${x.du&&x.du.length?' razem z pojedynkami ('+x.du.length+')':''}${x.ban?', blokada zostanie zdjęta':''}${x.why==='merge'?', a dopisane punkty zostaną odjęte od '+esc(x.inton||'?'):''}.`,'Przywróć',()=>trashRestore(x),showAdminStats)});
+  if($('cfTgS'))$('cfTgS').onclick=async()=>{const v=$('cfTg').value.trim().replace(/^@/,'').replace(/^https?:\/\/t\.me\//,'').replace(/[^A-Za-z0-9_]/g,'').slice(0,40);try{const {F,db}=await fb();await F.setDoc(F.doc(db,'cfg','main'),{tg:v,upd:Date.now()});RP.cfg={tg:v};$('cfTg').value=v;toast(v?'Zapisano Telegram: @'+v:'Usunięto Telegram',2200)}catch(e){toast('Nie udało się zapisać. Sprawdź zasady Firestore v19.1.',3200)}};
+  if($('bkDl'))$('bkDl').onclick=backupDl;if($('bkUp'))$('bkUp').onclick=backupLoad}
 // ---- v19: Pomocna dłoń (Firestore: helps; w players pola sv = odgadnięte dziś poziomy, hl = udzielone pomoce)
 const HL={inb:[],loaded:false,poll:null};
 function svMask(){const t=store.get('sd2_day',null);if(!t||t.d!==dayNo()||!Array.isArray(t.res))return 0;return t.res.slice(0,4).reduce((m,r,i)=>m|(r==='won'?1<<i:0),0)}
@@ -1413,34 +1527,34 @@ const lvTxtOf=i=>i===3?'weekendową niespodziankę':'poziom '+(i+1);
 function updHelpBtn(){const b=$('bHelp');if(!b)return;const pv=view!=null&&view!==lvl;
   const got=!!day&&inPlay()&&day.hpos&&day.hpos[lvl]!=null,q=inPlay()&&day.hq?day.hq[lvl]:null;
   b.hidden=!helpOk()||done||pv||got||guesses.length>=maxG();if(b.hidden)return;
-  const w=q&&q.st==='new';b.className='hbtn'+(w?' wait':'');b.innerHTML=w?'🤝<span class="hl"> Czekam: '+esc(q.hn)+'</span>':'🤝<span class="hl"> Pomocna dłoń</span>'}
+  const w=q&&q.st==='new';b.className='hbtn'+(w?' wait':'');b.innerHTML=w?HI+'<span class="hl"> Czekam: '+esc(q.hn)+'</span>':HI+'<span class="hl"> Pomocna dłoń</span>'}
 function hlBtn(r){const n=+r.hl||0,tk=todayKey();
   const q=day&&day.hq?day.hq[lvl]:null;
   const can=helpOk()&&!done&&!!store.get('sd2_nick','')&&r.id!==FBUID&&((+((r.sv||{})[tk])||0)&(1<<lvl))&&day.hpos[lvl]==null&&!(q&&q.st==='new');
   if(!n&&!can)return '';
-  return can?`<button class="hlc on" data-hreq="${esc(r.id)}" title="Poproś o pomoc: ${esc(r.nick)}" aria-label="Poproś o pomoc: ${esc(r.nick)}">🤝 ${n}</button>`:`<span class="hlc" title="Pomocna dłoń: ${n}">🤝 ${n}</span>`}
+  return can?`<button class="hlc on" data-hreq="${esc(r.id)}" title="Poproś o pomoc: ${esc(r.nick)}" aria-label="Poproś o pomoc: ${esc(r.nick)}">${HI} ${n}</button>`:`<span class="hlc" title="Pomocna dłoń: ${n}">${HI} ${n}</span>`}
 async function helpClick(){if(!helpOk()||done)return;const q=day.hq[lvl];
-  if(!store.get('sd2_nick','')){open(`<div class="step">Pomocna dłoń</div><h2>🤝 Pomocna dłoń</h2><p>O jedną literę możesz poprosić graczy z rankingu, którzy dziś odgadli ${lvTxtOf(lvl)}. Najpierw dołącz do rankingu: wystarczy pseudonim, bez maila i hasła.</p><div class="actions"><button class="main" id="hJoin">${ic('trophy',16)} Dołącz do rankingu</button><button id="aClose">Anuluj</button></div>`);$('hJoin').onclick=()=>showRanking('d');return}
+  if(!store.get('sd2_nick','')){open(`<div class="step">Pomocna dłoń</div><h2>${HI} Pomocna dłoń</h2><p>O jedną literę możesz poprosić graczy z rankingu, którzy dziś odgadli ${lvTxtOf(lvl)}. Najpierw dołącz do rankingu: wystarczy pseudonim, bez maila i hasła.</p><div class="actions"><button class="main" id="hJoin">${ic('trophy',16)} Dołącz do rankingu</button><button id="aClose">Anuluj</button></div>`);$('hJoin').onclick=()=>showRanking('d');return}
   if(q&&q.st==='new'){const hm=new Date(q.ts).toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'});
-    open(`<div class="step">Pomocna dłoń</div><h2>🤝 Czekasz na pomoc</h2><p>Prośba wysłana do <b>${esc(q.hn)}</b> o ${hm}. Gdy odpowie, podpowiedziana litera pojawi się nad planszą. Zegar w tym czasie biegnie.</p>
+    open(`<div class="step">Pomocna dłoń</div><h2>${HI} Czekasz na pomoc</h2><p>Prośba wysłana do <b>${esc(q.hn)}</b> o ${hm}. Gdy odpowie, podpowiedziana litera pojawi się nad planszą. Zegar w tym czasie biegnie.</p>
     <div class="actions"><button class="main" id="hChk" style="background:#0ea5e9">Sprawdź teraz</button><button id="hOther">Poproś kogoś innego</button></div><div class="actions"><button id="aClose">Graj dalej</button></div>`);
     $('hChk').onclick=async()=>{$('hChk').textContent='Sprawdzam…';await helpPoll(true);close()};
     $('hOther').onclick=async()=>{await helpCancel(lvl);helpPick()};return}
   helpPick()}
 async function helpCancel(i){const q=day.hq[i];if(!q)return;try{const {F,db}=await fb();await F.deleteDoc(F.doc(db,'helps',q.id))}catch(e){}day.hq[i]=null;saveDay();paint()}
-async function helpPick(){open(`<div class="step">Pomocna dłoń</div><h2>🤝 Poproś o pomoc</h2><p class="sub">Szukam graczy, którzy dziś odgadli ${lvTxtOf(lvl)}…</p><div class="actions"><button id="aClose">Zamknij</button></div>`);
+async function helpPick(){open(`<div class="step">Pomocna dłoń</div><h2>${HI} Poproś o pomoc</h2><p class="sub">Szukam graczy, którzy dziś odgadli ${lvTxtOf(lvl)}…</p><div class="actions"><button id="aClose">Zamknij</button></div>`);
   let list=[];try{const {F,db,uid}=await fb();const tk=todayKey();await admLoad();
     const q=await F.getDocs(F.query(F.collection(db,'players'),F.where(new F.FieldPath('sv',tk),'>',0)));
     list=q.docs.map(d=>Object.assign({id:d.id},d.data())).filter(r=>r.id!==uid&&((+((r.sv||{})[tk])||0)&(1<<lvl)))}
   catch(e){console.warn('pomoc',e);const sb=$('card').querySelector('.sub');if(sb)sb.textContent='Nie udało się wczytać graczy. Sprawdź internet i spróbuj ponownie.';return}
   list.sort((a,b)=>(+b.hl||0)-(+a.hl||0));
-  const rows=list.slice(0,30).map(r=>`<div><span class="nk">${esc(r.nick)}${admB(r.id)}</span><span class="hlc on" aria-hidden="true">🤝 ${+r.hl||0}</span><button class="chb" data-hp="${esc(r.id)}" style="border-color:#0ea5e9;color:#0369a1">Poproś</button></div>`).join('');
-  $('card').innerHTML=`<div class="step">Pomocna dłoń</div><h2>🤝 Poproś o pomoc</h2><p>Ci gracze odgadli dziś ${lvTxtOf(lvl)}. Wybrana osoba zobaczy kolory Twoich prób (bez liter) i wskaże jedną literę hasła na jej miejscu.</p>
+  const rows=list.slice(0,30).map(r=>`<div><span class="nk">${esc(r.nick)}${admB(r.id)}</span><span class="hlc on" aria-hidden="true">${HI} ${+r.hl||0}</span><button class="chb" data-hp="${esc(r.id)}" style="border-color:#0ea5e9;color:#0369a1">Poproś</button></div>`).join('');
+  $('card').innerHTML=`<div class="step">Pomocna dłoń</div><h2>${HI} Poproś o pomoc</h2><p>Ci gracze odgadli dziś ${lvTxtOf(lvl)}. Wybrana osoba zobaczy kolory Twoich prób (bez liter) i wskaże jedną literę hasła na jej miejscu.</p>
   <p class="sub">Za podpowiedzianą literę odejmę z wyniku poziomu tyle punktów, ile jest warta w Scrabble. Zegar biegnie dalej. Jedna pomoc na poziom.</p>
   ${rows?`<div class="rlist hl">${rows}</div>`:'<p class="sub">Nikt z rankingu nie odgadł jeszcze dziś tego poziomu. Spróbuj później albo użyj jokera.</p>'}<div class="actions"><button id="aClose">Zamknij</button></div>`;
   $('aClose').onclick=close;document.querySelectorAll('[data-hp]').forEach(b=>b.onclick=()=>{const r=list.find(x=>x.id===b.dataset.hp);if(r)helpSend(r,b)})}
-function helpAsk(r){open(`<div class="step">Pomocna dłoń</div><h2>🤝 Poprosić ${esc(r.nick)} o pomoc?</h2><p><b>${esc(r.nick)}</b> odgadł(a) dziś ${lvTxtOf(lvl)}. Zobaczy kolory Twoich prób (bez liter) i wskaże jedną literę hasła na jej miejscu.</p><p class="sub">Podpowiedziana litera kosztuje tyle punktów, ile jest warta w Scrabble. Zegar biegnie dalej.</p>
-  <div class="actions"><button class="main" id="hSend" style="background:#0ea5e9">🤝 Poproś o literę</button><button id="hBack">Wróć do rankingu</button></div>`);
+function helpAsk(r){open(`<div class="step">Pomocna dłoń</div><h2>${HI} Poprosić ${esc(r.nick)} o pomoc?</h2><p><b>${esc(r.nick)}</b> odgadł(a) dziś ${lvTxtOf(lvl)}. Zobaczy kolory Twoich prób (bez liter) i wskaże jedną literę hasła na jej miejscu.</p><p class="sub">Podpowiedziana litera kosztuje tyle punktów, ile jest warta w Scrabble. Zegar biegnie dalej.</p>
+  <div class="actions"><button class="main" id="hSend" style="background:#0ea5e9">${HI} Poproś o literę</button><button id="hBack">Wróć do rankingu</button></div>`);
   $('hBack').onclick=()=>showRanking();$('hSend').onclick=()=>helpSend(r,$('hSend'))}
 async function helpSend(r,b){if(!helpOk()||done)return;if(b){b.disabled=true;b.textContent='Wysyłam…'}
   try{const {F,db,uid}=await fb();const dk=todayKey(),id=uid+'_'+dk+'_'+lvl;
@@ -1448,7 +1562,7 @@ async function helpSend(r,b){if(!helpOk()||done)return;if(b){b.disabled=true;b.t
     const d={ru:uid,rn:store.get('sd2_nick','').slice(0,20),hu:r.id,hn:String(r.nick||'').slice(0,20),dk,lv:lvl,pat,st:'new',ts:Date.now()};
     try{await F.deleteDoc(F.doc(db,'helps',id))}catch(e){}
     await F.setDoc(F.doc(db,'helps',id),d);
-    day.hq[lvl]={id,hn:d.hn,st:'new',ts:d.ts};saveDay();close();paint();toast('🤝 Prośba wysłana do: '+d.hn,2400);helpWatch()}
+    day.hq[lvl]={id,hn:d.hn,st:'new',ts:d.ts};saveDay();close();paint();toast('Prośba wysłana do: '+d.hn,2400);helpWatch()}
   catch(e){console.warn('pomoc',e);if(b){b.disabled=false;b.textContent='Poproś'}
     toast(String(e&&e.code||'').includes('permission')?'Nie udało się wysłać. Sprawdź, czy jesteś w rankingu i czy data w telefonie ustawia się automatycznie.':'Nie udało się wysłać. Sprawdź internet.',3600)}}
 function helpWatch(){clearInterval(HL.poll);if(!day||mode!=='day')return;if(!day.hq.some((q,i)=>q&&q.st==='new'&&day.hpos[i]==null))return;HL.poll=setInterval(()=>{if(!document.hidden)helpPoll()},20000);setTimeout(helpPoll,3000)}
@@ -1457,8 +1571,8 @@ async function helpPoll(manual){const D0=mode==='day'?day:null;if(!D0)return;con
   try{const {F,db}=await fb();for(const i of pend){const q=D0.hq[i];const d=await F.getDoc(F.doc(db,'helps',q.id));if(!d.exists())continue;const x=d.data();
     if(x.st==='done'&&Number.isInteger(x.pos)&&x.pos>=0&&x.pos<5){const A=wordFor(i,curN());q.st='done';got=true;
       if(!D0.res[i]){D0.hpos[i]=x.pos;D0.hc[i]=PV[A[x.pos]]||0}saveDay();
-      if(i===lvl&&!done){paint();const t=$('toast');t.classList.add('big');toast('🤝 '+q.hn+': litera nr '+(x.pos+1)+' to '+A[x.pos].toUpperCase(),3200);setTimeout(()=>t.classList.remove('big'),3200)}
-      else toast('🤝 '+q.hn+' odpowiedział(a) na Twoją prośbę',2600)}
+      if(i===lvl&&!done){paint();const t=$('toast');t.classList.add('big');toast(''+q.hn+': litera nr '+(x.pos+1)+' to '+A[x.pos].toUpperCase(),3200);setTimeout(()=>t.classList.remove('big'),3200)}
+      else toast(''+q.hn+' odpowiedział(a) na Twoją prośbę',2600)}
     else if(x.st==='rej'){q.st='rej';saveDay();if(i===lvl)paint();toast(q.hn+' nie może teraz pomóc. Możesz poprosić kogoś innego.',3200)}}}
   catch(e){console.warn('pomoc',e)}
   if(manual===true&&!got)toast('Jeszcze bez odpowiedzi. Sprawdzę ponownie za chwilę.',2400)}
@@ -1467,38 +1581,213 @@ async function hlLoad(){try{const {F,db,uid}=await fb();const q=await F.getDocs(
   HL.loaded=true;updBadge();return true}catch(e){console.warn('pomoc',e);return false}}
 const hlPending=()=>HL.inb.filter(x=>x.st==='new'&&x.dk===todayKey()).sort((a,b)=>b.ts-a.ts);
 async function hlNotify(){if(!store.get('sd2_nick','')||RX())return;if(!await hlLoad())return;const s=store.get('sd2_hl_seen',{}),nw=hlPending().filter(x=>!s[x.id]);
-  if(nw.length&&$('ov').hidden){toast('🤝 '+(nw.length===1?nw[0].rn+' prosi Cię o pomoc':'Masz '+nw.length+' prośby o pomoc')+' · menu ☰',3600);nw.forEach(x=>s[x.id]=1);
+  if(nw.length&&$('ov').hidden){toast(''+(nw.length===1?nw[0].rn+' prosi Cię o pomoc':'Masz '+nw.length+' prośby o pomoc')+' · menu ☰',3600);nw.forEach(x=>s[x.id]=1);
     const ks=Object.keys(s);while(ks.length>200)delete s[ks.shift()];store.set('sd2_hl_seen',s)}}
 async function hlWipe(){try{const {F,db,uid}=await fb();
   const qs=await Promise.all([F.getDocs(F.query(F.collection(db,'helps'),F.where('hu','==',uid))),F.getDocs(F.query(F.collection(db,'helps'),F.where('ru','==',uid)))]);
   for(const q of qs)for(const d of q.docs){try{await F.deleteDoc(F.doc(db,'helps',d.id))}catch(e){}}HL.inb=[];updBadge()}catch(e){console.warn('pomoc',e)}}
-async function showHelps(){open(`<div class="step">Pomocna dłoń</div><h2>🤝 Prośby o pomoc</h2><p class="sub">Wczytuję…</p><div class="actions"><button id="aClose">Zamknij</button></div>`);
+async function showHelps(){open(`<div class="step">Pomocna dłoń</div><h2>${HI} Prośby o pomoc</h2><p class="sub">Wczytuję…</p><div class="actions"><button id="aClose">Zamknij</button></div>`);
   if(!store.get('sd2_nick','')){$('card').querySelector('.sub').textContent='Prośby o pomoc dostają gracze z rankingu. Dołącz do rankingu w menu ☰ → Ranking graczy.';return}
   if(!await hlLoad()){$('card').querySelector('.sub').textContent='Prośby są chwilowo niedostępne. Sprawdź internet i spróbuj ponownie.';return}
   const pend=hlPending(),n=+store.get('sd2_help_n',0)||0,s=store.get('sd2_hl_seen',{});pend.forEach(x=>s[x.id]=1);store.set('sd2_hl_seen',s);
-  const h=pend.map(x=>`<div class="chi"><div class="row2"><span><b>${esc(x.rn)}</b>${admB(x.ru)} prosi o jedną literę</span><span class="sub">${x.lv===3?'Niespodzianka':'Poziom '+(x.lv+1)}</span></div><div class="actions"><button class="main" data-hh="${esc(x.id)}" style="background:#0ea5e9">🤝 Pomóż</button><button data-hr="${esc(x.id)}">Nie teraz</button></div></div>`).join('')||'<p class="sub">Nikt teraz nie prosi Cię o pomoc.</p>';
+  const h=pend.map(x=>`<div class="chi"><div class="row2"><span><b>${esc(x.rn)}</b>${admB(x.ru)} prosi o jedną literę</span><span class="sub">${x.lv===3?'Niespodzianka':'Poziom '+(x.lv+1)}</span></div><div class="actions"><button class="main" data-hh="${esc(x.id)}" style="background:#0ea5e9">${HI} Pomóż</button><button data-hr="${esc(x.id)}">Nie teraz</button></div></div>`).join('')||'<p class="sub">Nikt teraz nie prosi Cię o pomoc.</p>';
   const doneL=HL.inb.filter(x=>x.st!=='new').sort((a,b)=>b.ts-a.ts).slice(0,10).map(x=>`<div><span><b>${esc(x.rn)}</b> · ${x.lv===3?'P4':'P'+(x.lv+1)}</span><span class="st ${x.st==='done'?'done':'rej'}">${x.st==='done'?'pomogłeś':'odmówiłeś'}</span></div>`).join('');
-  $('card').innerHTML=`<div class="step">Pomocna dłoń</div><h2>🤝 Prośby o pomoc</h2><p>Gracze z rankingu proszą o jedną literę hasła z poziomu, który dziś odgadłeś. Zobaczysz kolory ich prób i sam wybierzesz, którą literę podpowiedzieć.</p>
-  ${h}${doneL?`<p><b>Ostatnio</b></p><div class="dlog">${doneL}</div>`:''}<div class="streak" style="background:#e0f2fe;border-color:#7dd3fc;color:#0c4a6e"><span style="font-size:1.6rem;line-height:1">🤝</span><span><b>Twoja pomocna dłoń: ${n}</b><small>Licznik widać przy Twoim nicku w rankingu.</small></span></div>
+  $('card').innerHTML=`<div class="step">Pomocna dłoń</div><h2>${HI} Prośby o pomoc</h2><p>Gracze z rankingu proszą o jedną literę hasła z poziomu, który dziś odgadłeś. Zobaczysz kolory ich prób i sam wybierzesz, którą literę podpowiedzieć.</p>
+  ${h}${doneL?`<p><b>Ostatnio</b></p><div class="dlog">${doneL}</div>`:''}<div class="streak" style="background:#e0f2fe;border-color:#7dd3fc;color:#0c4a6e">${ic('hand',28)}<span><b>Twoja pomocna dłoń: ${n}</b><small>Licznik widać przy Twoim nicku w rankingu.</small></span></div>
   <div class="actions"><button class="main" id="aClose">Zamknij</button></div>`;
   $('aClose').onclick=close;updBadge();
   document.querySelectorAll('[data-hh]').forEach(b=>b.onclick=()=>{const x=HL.inb.find(z=>z.id===b.dataset.hh);if(x)helpGive(x)});
   document.querySelectorAll('[data-hr]').forEach(b=>b.onclick=async()=>{try{const {F,db}=await fb();await F.updateDoc(F.doc(db,'helps',b.dataset.hr),{st:'rej',upd:Date.now()});toast('Odpowiedziano: nie teraz',1800)}catch(e){toast('Nie udało się, spróbuj ponownie',2400)}showHelps()})}
 function helpGive(x){const t=store.get('sd2_day',null),my=t&&t.d===dayNo()?norm(t):null;
-  if(!my||my.res[x.lv]!=='won'){open(`<div class="step">Pomocna dłoń</div><h2>🤝 Najpierw zagraj</h2><p>Żeby pomóc, musisz sam odgadnąć dzisiejsze hasło: ${lvTxtOf(x.lv)}. Zagraj, a potem wróć do prośby w menu ☰ → Prośby o pomoc.</p><div class="actions"><button class="main" id="aClose">OK</button></div>`);return}
+  if(!my||my.res[x.lv]!=='won'){open(`<div class="step">Pomocna dłoń</div><h2>${HI} Najpierw zagraj</h2><p>Żeby pomóc, musisz sam odgadnąć dzisiejsze hasło: ${lvTxtOf(x.lv)}. Zagraj, a potem wróć do prośby w menu ☰ → Prośby o pomoc.</p><div class="actions"><button class="main" id="aClose">OK</button></div>`);return}
   const A=wordFor(x.lv,dayNo()),pat=(Array.isArray(x.pat)?x.pat:[]).filter(p=>typeof p==='string'&&/^[hnm]{5}$/.test(p)).slice(0,7);
   const known=new Set();pat.forEach(p=>[...p].forEach((c,i)=>{if(c==='h')known.add(i)}));
   const rows=pat.map(p=>`<span class="mr">${[...p].map(c=>`<i style="background:${COL[c==='h'?'hit':c==='n'?'near':'miss']}"></i>`).join('')}</span>`).join('');
-  open(`<div class="step">Pomocna dłoń</div><h2>🤝 Pomóż: ${esc(x.rn)}</h2><p>Próby gracza ${esc(x.rn)} (same kolory, bez liter):</p>${rows?`<span class="mini">${rows}</span>`:'<p class="sub">Jeszcze nie było żadnej próby.</p>'}
+  open(`<div class="step">Pomocna dłoń</div><h2>${HI} Pomóż: ${esc(x.rn)}</h2><p>Próby gracza ${esc(x.rn)} (same kolory, bez liter):</p>${rows?`<span class="mini">${rows}</span>`:'<p class="sub">Jeszcze nie było żadnej próby.</p>'}
   <p><b>Dotknij jednej litery hasła</b>, którą chcesz podpowiedzieć. Litery już odgadnięte na zielono są wyszarzone.</p>
   <div class="hgrid">${[...A].map((c,i)=>`<button data-hpos="${i}" aria-pressed="false"${known.has(i)?' disabled':''}>${c}</button>`).join('')}</div>
-  <div class="actions"><button class="main" id="hGo" disabled style="background:#0ea5e9">Wyślij podpowiedź</button><button id="hBack">Wróć</button></div><p class="sub">${esc(x.rn)} zobaczy tylko tę jedną literę na jej miejscu. Licznik 🤝 przy Twoim nicku w rankingu wzrośnie.</p>`);
+  <div class="actions"><button class="main" id="hGo" disabled style="background:#0ea5e9">Wyślij podpowiedź</button><button id="hBack">Wróć</button></div><p class="sub">${esc(x.rn)} zobaczy tylko tę jedną literę na jej miejscu. Licznik ${HI} przy Twoim nicku w rankingu wzrośnie.</p>`);
   let sel=null;document.querySelectorAll('[data-hpos]').forEach(b=>b.onclick=()=>{sel=+b.dataset.hpos;document.querySelectorAll('[data-hpos]').forEach(z=>z.setAttribute('aria-pressed',String(z===b)));$('hGo').disabled=false});
   $('hBack').onclick=()=>showHelps();
   $('hGo').onclick=async()=>{if(sel==null)return;$('hGo').disabled=true;$('hGo').textContent='Wysyłam…';
     try{const {F,db}=await fb();await F.updateDoc(F.doc(db,'helps',x.id),{st:'done',pos:sel,upd:Date.now()});x.st='done';
-      store.set('sd2_help_n',(+store.get('sd2_help_n',0)||0)+1);rankSync();toast('🤝 Dziękujemy! Podpowiedź wysłana do: '+x.rn,2800);showHelps()}
+      store.set('sd2_help_n',(+store.get('sd2_help_n',0)||0)+1);rankSync();toast('Dziękujemy! Podpowiedź wysłana do: '+x.rn,2800);showHelps()}
     catch(e){console.warn('pomoc',e);$('hGo').disabled=false;$('hGo').textContent='Wyślij podpowiedź';toast('Nie udało się wysłać. Prośba mogła zostać anulowana.',3000)}}}
+
+// ---- v19.1: zgłoszenia graczy (kolekcja reports), kosz (trash), kopia bazy, powitanie, zajęty nick
+const VER='19.1';
+const NICK_MSG='Ten pseudonim już gra w rankingu. Jeśli to Ty na innym urządzeniu albo w ikonie na pulpicie, przenieś wyniki: menu ☰ → Przenieś wyniki. Jeśli nie, wybierz inny pseudonim.';
+async function nickTaken(v){const n=String(v).trim().toLowerCase();try{const {F,db,uid}=await fb();
+  let rows=(RK.cnt!=null&&RK.cnt<=250&&RK.cache.a&&Date.now()-RK.cache.a.ts<600000)?RK.cache.a.rows:null;
+  if(!rows){if(RK.cnt!=null&&RK.cnt>250){const q=await F.getDocs(F.query(F.collection(db,'players'),F.where('nick','==',String(v).trim())));rows=q.docs.map(d=>Object.assign({id:d.id},d.data()))}
+    else{const q=await F.getDocs(F.collection(db,'players'));rows=q.docs.map(d=>Object.assign({id:d.id},d.data()))}}
+  const prev=store.get('sd2_prev','');
+  return rows.some(r=>r.id!==uid&&r.id!==prev&&String(r.nick||'').trim().toLowerCase()===n)}catch(e){return false}}
+const RP_K={bug:'Błąd w grze',score:'Wyniki lub ranking',word:'Słownik: brakujące słowo lub złe hasło',q:'Pytanie',idea:'Pomysł',other:'Inne',player:'Zgłoszenie gracza'};
+const RP_ST={new:'nowe',prog:'w toku',radek:'do Radka',done:'załatwione',rej:'odrzucone'};
+const RP_READY=[
+  ['Przenoszenie wyników','Wyniki zapisują się w przeglądarce, w której grasz. Żeby przenieść je na inny telefon albo do ikony na pulpicie: menu ☰ → Przenieś wyniki → Pobierz plik (tam, gdzie masz wyniki), a potem Wczytaj plik w nowym miejscu. Potem graj już tylko w nowym miejscu.'],
+  ['Podwójny wpis w rankingu','Byłeś w rankingu dwa razy, bo grałeś w dwóch miejscach (np. w przeglądarce i z ikony na pulpicie). Zostawiliśmy wpis z wyższym wynikiem. Graj już tylko z jednego miejsca.'],
+  ['Koło ratunkowe','Koło ratunkowe to 7. próba po 6 nieudanych, jedna na poziom. Trafienie daje 0 pkt za poziom, ale poziom jest zaliczony i odblokowuje następny.'],
+  ['Pomocna dłoń','Pomocna dłoń: w rankingu świeci się ikona dłoni przy graczach, którzy dziś odgadli Twój poziom. Dotknij jej, a gracz podpowie Ci jedną literę. Kosztuje tyle punktów, ile litera jest warta w Scrabble.'],
+  ['Przekazuję do twórcy','Dzięki za zgłoszenie! Przekazałem sprawę twórcy gry, odpowiemy najszybciej, jak się da.'],
+  ['Dzięki za pomysł','Dzięki za pomysł! Zapisaliśmy go na listę do kolejnych wersji gry.'],
+  ['Poprawione','Dzięki za zgłoszenie, już poprawione!']];
+var RP={l:[],loaded:false,cfg:null,trash:null};
+const repD=ts=>new Date(+ts||0).toLocaleString('pl-PL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+const repOpen=x=>x.st==='new'||x.st==='prog';
+const repAgeH=x=>Math.floor((Date.now()-(+x.ts||0))/3600e3);
+const REP_LATE=24;
+function repCounts(){const L=RP.l||[];return {open:L.filter(repOpen).length,radek:L.filter(x=>x.st==='radek').length,late:L.filter(x=>repOpen(x)&&repAgeH(x)>=REP_LATE).length,closed:L.filter(x=>x.st==='done'||x.st==='rej').length}}
+function repCount(){if(!RP.loaded)return 0;const c=repCounts();return ADM.me?c.radek+c.late:ADM.vice?c.open:0}
+function devInfo(){const u=navigator.userAgent||'';
+  const os=/iPhone|iPad|iPod/.test(u)?'iPhone/iPad':/Android/.test(u)?'Android':/Windows/.test(u)?'Windows':/Mac/.test(u)?'Mac':'inny';
+  const br=/SamsungBrowser/.test(u)?'Samsung Internet':/FBAN|FBAV|FB_IAB|FBIOS|FB4A|Messenger/i.test(u)?'Facebook/Messenger':/Instagram/i.test(u)?'Instagram':/Twitter/i.test(u)?'X':/Edg\//.test(u)?'Edge':/CriOS|Chrome/.test(u)?'Chrome':/Firefox|FxiOS/.test(u)?'Firefox':/Safari/.test(u)?'Safari':'inna';
+  return {v:VER,os,br,ic:standalone(),w:innerWidth+'x'+innerHeight}}
+async function repSend(o){try{const {F,db,uid}=await fb();const ts=Date.now();
+  const d={k:o.k,t:String(o.t).slice(0,500),ru:uid,rn:String(store.get('sd2_nick','')||'bez nicku').slice(0,20),m:devInfo(),st:o.k==='player'?'radek':'new',ts};
+  if(o.tu){d.tu=o.tu;d.tn=String(o.tn||'').slice(0,20)}
+  await F.setDoc(F.doc(db,'reports',uid+'_'+ts),d);store.set('sd2_rep',true);RP.loaded=false;return true}catch(e){console.warn('zgłoszenie',e);return false}}
+function showSupport(){open(`<div class="step">Pomoc</div><h2>${ic('chat',22)} Napisz do admina</h2>
+  <p>Coś nie działa, masz pytanie albo pomysł? Napisz, odpowiemy w grze.</p>
+  <label class="fl">Czego dotyczy<select class="fi" id="spK">${['bug','score','q','idea','word','other'].map(k=>`<option value="${k}">${RP_K[k]}</option>`).join('')}</select></label>
+  <label class="fl">Opis<textarea class="fi" id="spT" rows="5" maxlength="500" placeholder="Opisz krótko, co się stało albo o co chodzi"></textarea></label><span class="sub" id="spN">0 / 500</span>
+  <p class="sub">Do zgłoszenia dołączymy automatycznie: nick, wersję gry, rodzaj telefonu i przeglądarki, datę oraz to, czy grasz z ikony na pulpicie.</p>
+  <div class="actions"><button class="main" id="spGo">Wyślij</button><button id="aClose">Anuluj</button></div><div id="spMine"></div>`);
+  $('spT').oninput=()=>$('spN').textContent=$('spT').value.length+' / 500';
+  $('spGo').onclick=async()=>{const t=$('spT').value.trim();if(t.length<3){toast('Napisz kilka słów opisu',2000);return}$('spGo').disabled=true;$('spGo').textContent='Wysyłam…';
+    if(await repSend({k:$('spK').value,t}))open(`<div class="step">Pomoc</div><h2>Dzięki!</h2><p>Zgłoszenie wysłane. Admin odpowie w grze: odpowiedź zobaczysz przy kolejnym uruchomieniu albo tutaj, w menu ☰ → Pomoc – napisz do admina.</p><div class="actions"><button class="main" id="aClose">OK</button></div>`);
+    else{$('spGo').disabled=false;$('spGo').textContent='Wyślij';toast('Nie udało się wysłać. Sprawdź internet i spróbuj ponownie.',3000)}};
+  repMine()}
+async function repMineLoad(){const {F,db,uid}=await fb();const q=await F.getDocs(F.query(F.collection(db,'reports'),F.where('ru','==',uid)));return q.docs.map(d=>Object.assign({id:d.id},d.data())).sort((a,b)=>b.ts-a.ts)}
+const repMineHTML=l=>l.map(x=>`<div class="chi rep"><div class="row2"><span class="sub">${repD(x.ts)} · ${RP_K[x.k]||''}</span><span class="st ${x.ans?'done':x.st==='rej'||x.st==='done'?'exp':'new'}">${x.ans?'odpowiedź':x.st==='rej'||x.st==='done'?'zamknięte':'czeka'}</span></div><span class="rtxt">${esc(x.t)}</span>${x.ans?`<div class="rans"><b>Odpowiedź (${esc(x.ab||'admin')}):</b> ${esc(x.ans)}</div>`:''}</div>`).join('');
+async function repMine(){if(!store.get('sd2_rep',false))return;try{const l=(await repMineLoad()).slice(0,10);const el=$('spMine');if(!el||!l.length)return;
+  el.innerHTML='<p><b>Twoje zgłoszenia</b></p>'+repMineHTML(l);const {F,db}=await fb();l.filter(x=>x.ans&&!x.seen).forEach(x=>F.updateDoc(F.doc(db,'reports',x.id),{seen:true}).catch(()=>{}))}catch(e){}}
+async function repNotify(){if(!store.get('sd2_rep',false)||!$('ov').hidden)return;try{const nw=(await repMineLoad()).filter(x=>x.ans&&!x.seen);if(!nw.length||!$('ov').hidden)return;
+  open(`<div class="step">Pomoc</div><h2>${ic('chat',22)} Odpowiedź od admina</h2>${repMineHTML(nw)}<div class="actions"><button class="main" id="aClose">Dzięki!</button><button id="rpMore">Napisz znowu</button></div>`);$('rpMore').onclick=showSupport;
+  const {F,db}=await fb();nw.forEach(x=>F.updateDoc(F.doc(db,'reports',x.id),{seen:true}).catch(()=>{}))}catch(e){}}
+function rpAsk(r){const W=['wulgarny lub obraźliwy nick','podejrzany wynik (oszustwo?)','spam w zaproszeniach lub wyzwaniach','inne'];
+  open(`<div class="step">Opiekun gry</div><h2>${ic('flag',22)} Zgłoś gracza: ${esc(r.nick)}</h2><label class="fl">Powód<select class="fi" id="rpW">${W.map(w=>`<option>${w}</option>`).join('')}</select></label><label class="fl">Uwagi (nieobowiązkowe)<textarea class="fi" id="rpT" rows="3" maxlength="400"></textarea></label><p class="sub">Zgłoszenie trafi od razu do Radka (status „Do Radka”). O usunięciu decyduje twórca gry.</p><div class="actions"><button class="main" id="rpGo">Zgłoś</button><button id="rpNo">Anuluj</button></div>`);
+  $('rpNo').onclick=()=>showRanking();
+  $('rpGo').onclick=async()=>{$('rpGo').disabled=true;const t=$('rpW').value+($('rpT').value.trim()?': '+$('rpT').value.trim():'');
+    if(await repSend({k:'player',t,tu:r.id,tn:r.nick})){toast('Zgłoszono: '+r.nick,2200);showRanking()}else{$('rpGo').disabled=false;toast('Nie udało się wysłać zgłoszenia',2600)}}}
+async function repLoad(){try{const {F,db}=await fb();const q=await F.getDocs(F.collection(db,'reports'));const old=Date.now()-60*DAY;RP.l=[];
+  for(const d of q.docs){const x=Object.assign({id:d.id},d.data());if(ADM.me&&(x.st==='done'||x.st==='rej')&&(+x.upd||+x.ts||0)<old){F.deleteDoc(F.doc(db,'reports',d.id)).catch(()=>{});continue}RP.l.push(x)}
+  RP.loaded=true;updBadge();return true}catch(e){console.warn('zgłoszenia',e);return false}}
+async function cfgLoad(){try{const {F,db}=await fb();const d=await F.getDoc(F.doc(db,'cfg','main'));RP.cfg=d.exists()?d.data():{}}catch(e){RP.cfg=RP.cfg||{}}}
+async function showReports(f){f=f||(ADM.me?'radek':'open');
+  open(`<div class="step">Zgłoszenia</div><h2>${ic('inbox',22)} Zgłoszenia graczy</h2><p class="sub">Wczytuję…</p><div class="actions"><button id="aClose">Zamknij</button></div>`);
+  await admLoad();if(!ADM.staff){$('card').querySelector('.sub').textContent='Zgłoszenia widzą tylko twórca gry i Opiekun gry.';return}
+  if(!await repLoad()){$('card').querySelector('.sub').textContent='Zgłoszenia są chwilowo niedostępne. Sprawdź internet albo czy zasady Firestore v19.1 są opublikowane.';return}
+  if(!RP.cfg)await cfgLoad();
+  const c=repCounts(),tg=RP.cfg&&RP.cfg.tg;
+  const flt={radek:x=>x.st==='radek',open:repOpen,closed:x=>x.st==='done'||x.st==='rej'}[f]||repOpen;
+  let L=RP.l.filter(flt);
+  L=f==='open'?L.sort((a,b)=>((repAgeH(b)>=REP_LATE)-(repAgeH(a)>=REP_LATE))||(a.ts-b.ts)):L.sort((a,b)=>(+b.upd||b.ts)-(+a.upd||a.ts)).slice(0,f==='closed'?40:200);
+  const who=ADM.me?'Twórca gry':'Opiekun gry';
+  const card=x=>{const late=repOpen(x)&&repAgeH(x)>=REP_LATE,h=repAgeH(x),act=x.st!=='done'&&x.st!=='rej';
+    return `<div class="chi rep${late?' late':''}"><div class="row2"><span><b>${esc(x.rn||'?')}</b>${admB(x.ru)} · ${RP_K[x.k]||'Inne'}</span><span class="st ${x.st}">${RP_ST[x.st]||x.st}</span></div>
+    <span class="sub">${repD(x.ts)} · ${h<1?'przed chwilą':h<48?h+' h temu':Math.floor(h/24)+' dni temu'}${late?' · <b style="color:#b42318">czeka ponad 24 h</b>':''}${x.m?' · v'+esc(x.m.v)+' · '+esc(x.m.os)+' · '+esc(x.m.br)+(x.m.ic?' · z ikony':' · w przeglądarce'):''}</span>
+    ${x.tu?`<span>Dotyczy gracza: <b>${esc(x.tn||'?')}</b></span>`:''}<div class="rtxt">${esc(x.t)}</div>
+    ${x.ans?`<div class="rans"><b>Odpowiedź (${esc(x.ab||'')}):</b> ${esc(x.ans)}</div>`:''}
+    ${act?`<select class="fi" data-rr="${esc(x.id)}"><option value="">Gotowa odpowiedź…</option>${RP_READY.map((a,i)=>`<option value="${i}">${a[0]}</option>`).join('')}</select><textarea class="fi" data-rx="${esc(x.id)}" rows="3" maxlength="500" placeholder="Odpowiedź dla gracza (zobaczy ją w grze)"></textarea>
+    <div class="actions"><button class="main" data-rs="${esc(x.id)}">Wyślij odpowiedź</button>${x.st==='new'?`<button data-rg="prog" data-ri="${esc(x.id)}">W toku</button>`:''}${x.st!=='radek'?`<button data-rg="radek" data-ri="${esc(x.id)}">Do Radka</button>`:''}${ADM.me?`<button data-rg="done" data-ri="${esc(x.id)}">Załatwione</button>`:''}<button data-rg="rej" data-ri="${esc(x.id)}">Odrzuć</button>${ADM.me&&x.tu?`<button data-rpl="${esc(x.tu)}" data-rpn="${esc(x.tn||'')}">Gracz…</button>`:''}${ADM.vice&&!ADM.me&&tg?`<button data-tg="${esc(x.id)}">${ic('send',14)} Daj znać Radkowi</button>`:''}</div>`
+    :(ADM.me?`<div class="actions"><button data-rg="new" data-ri="${esc(x.id)}">Otwórz ponownie</button></div>`:'')}</div>`};
+  $('card').innerHTML=`<div class="step">Zgłoszenia</div><h2>${ic('inbox',22)} Zgłoszenia graczy</h2>
+  <div class="rcnt"><button data-rf="radek" aria-pressed="${f==='radek'}" class="${c.radek&&ADM.me?'warn':''}"><b>${c.radek}</b>do Radka</button><button data-rf="open" aria-pressed="${f==='open'}" class="${c.late?'warn':''}"><b>${c.open}</b>u wiceadmina${c.late?'<br>'+c.late+' &gt;24 h':''}</button><button data-rf="closed" aria-pressed="${f==='closed'}"><b>${c.closed}</b>zamknięte</button></div>
+  ${L.length?L.map(card).join(''):'<p class="sub">Brak zgłoszeń w tej grupie.</p>'}
+  ${ADM.vice&&!ADM.me?(tg?`<p class="sub">Pilna sprawa? „Daj znać Radkowi” skopiuje opis zgłoszenia i otworzy czat z Radkiem na Telegramie. Wklej tam opis i wyślij.</p>`:`<p class="sub">Pilną sprawę przekaż statusem „Do Radka”.</p>`):''}
+  <div class="actions"><button id="rpRef">Odśwież</button><button class="main" id="aClose">Zamknij</button></div>`;
+  $('aClose').onclick=close;$('rpRef').onclick=()=>showReports(f);
+  document.querySelectorAll('[data-rf]').forEach(b=>b.onclick=()=>showReports(b.dataset.rf));
+  document.querySelectorAll('[data-rr]').forEach(s=>s.onchange=()=>{const t=document.querySelector(`[data-rx="${s.dataset.rr}"]`);if(t&&s.value!=='')t.value=RP_READY[+s.value][1]});
+  const upd=async(id,o,msg)=>{try{const {F,db}=await fb();await F.updateDoc(F.doc(db,'reports',id),Object.assign(o,{upd:Date.now()}));toast(msg,1800)}catch(e){console.warn('zgłoszenia',e);toast('Nie udało się zapisać. Sprawdź zasady Firestore v19.1.',3200)}showReports(f)};
+  document.querySelectorAll('[data-rs]').forEach(b=>b.onclick=()=>{const t=document.querySelector(`[data-rx="${b.dataset.rs}"]`),v=t?t.value.trim():'';if(v.length<2){toast('Wpisz odpowiedź albo wybierz gotową',2200);return}b.disabled=true;upd(b.dataset.rs,{ans:v.slice(0,500),ab:who,st:'done',seen:false},'Odpowiedź wysłana')});
+  document.querySelectorAll('[data-rg]').forEach(b=>b.onclick=()=>upd(b.dataset.ri,{st:b.dataset.rg},'Status: '+RP_ST[b.dataset.rg]));
+  document.querySelectorAll('[data-rpl]').forEach(b=>b.onclick=async()=>{let r={id:b.dataset.rpl,nick:b.dataset.rpn};try{const {F,db}=await fb();const d=await F.getDoc(F.doc(db,'players',r.id));if(d.exists())r=Object.assign({id:r.id},d.data())}catch(e){}RK.rows=RK.rows||[];admAsk(r,()=>showReports(f))});
+  document.querySelectorAll('[data-tg]').forEach(b=>b.onclick=()=>{const x=RP.l.find(z=>z.id===b.dataset.tg);const t=x?'Literiada – zgłoszenie od '+(x.rn||'?')+' ('+(RP_K[x.k]||'')+(x.tn?', gracz '+x.tn:'')+'): '+x.t:'';if(t){try{navigator.clipboard.writeText(t).catch(()=>legacyCopy(t))}catch(e){legacyCopy(t)}toast('Opis skopiowany, wklej go w czacie',2600)}window.open('https://t.me/'+encodeURIComponent(tg),'_blank','noopener')});
+  updBadge()}
+async function trashList(){const {F,db}=await fb();const q=await F.getDocs(F.collection(db,'trash'));const old=Date.now()-30*DAY,l=[];
+  for(const d of q.docs){const x=Object.assign({id:d.id},d.data());if((+x.ts||0)<old){F.deleteDoc(F.doc(db,'trash',d.id)).catch(()=>{});continue}l.push(x)}return l.sort((a,b)=>b.ts-a.ts)}
+async function trashRestore(x){try{const {F,db}=await fb();const msg=[];
+    if(x.p){const cur=await F.getDoc(F.doc(db,'players',x.id));if(cur.exists())msg.push('wpis gracza już wrócił sam');else{await F.setDoc(F.doc(db,'players',x.id),x.p);msg.push('wpis przywrócony')}}
+    let nd=0;for(const d of (x.du||[])){try{await F.setDoc(F.doc(db,'duels',d.id),d.d);nd++}catch(e){}}if(nd)msg.push('pojedynki: '+nd);
+    if(x.ban){try{await F.deleteDoc(F.doc(db,'bans',x.id));msg.push('blokada zdjęta')}catch(e){}}
+    if(x.why==='merge'&&x.into){const ad=await F.getDoc(F.doc(db,'adj',x.into));if(ad.exists()){const a=ad.data(),v=Math.max(0,(+a.all||0)-(+x.add||0)),fr=Array.isArray(a.from)?a.from.slice():[];const i=fr.lastIndexOf(x.nick);if(i>=0)fr.splice(i,1);
+      if(v>0)await F.setDoc(F.doc(db,'adj',x.into),{all:v,from:fr,upd:Date.now()});else await F.deleteDoc(F.doc(db,'adj',x.into))}msg.push('punkty odjęte od '+(x.inton||'?'))}
+    await F.deleteDoc(F.doc(db,'trash',x.id));RK.cache={};RK.adj=null;toast('Przywrócono: '+x.nick+' ('+msg.join(', ')+')',3600)}
+  catch(e){console.warn('kosz',e);toast('Nie udało się przywrócić. Sprawdź zasady Firestore v19.1.',3600)}
+  showAdminStats()}
+const BK_COLS=['players','duels','invites','invsent','challenges','chset','helps','admins','bans','reports','trash','adj','cfg'];
+function dlFile(name,txt,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}
+async function backupDl(){const b=$('bkDl');if(b){b.disabled=true;b.textContent='Pobieram bazę…'}
+  try{const {F,db}=await fb();const out={app:'Literiada',v:VER,ts:Date.now(),col:{}};let n=0;const miss=[];
+    for(const c of BK_COLS){try{const q=await F.getDocs(F.collection(db,c));out.col[c]={};q.docs.forEach(d=>{out.col[c][d.id]=d.data();n++})}catch(e){miss.push(c)}}
+    const now=new Date(),stamp=todayKey()+'_'+String(now.getHours()).padStart(2,'0')+String(now.getMinutes()).padStart(2,'0');
+    dlFile('Literiada_baza_'+stamp+'.json',JSON.stringify(out,null,1),'application/json');
+    const pl=out.col.players||{},adj=out.col.adj||{},mk=rkMk();
+    const rows=Object.entries(pl).map(([id,p])=>{const a=(adj[id]&&+adj[id].all)||0,ds=Object.keys(p.days||{}).sort();return [p.nick||'',(+p.all||0)+a,a,((p.mm||{})[mk])||0,ds.length?ds[ds.length-1]:'',id]}).sort((x,y)=>y[1]-x[1]);
+    const cell=v=>{v=String(v);return /[;"\r\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+    const csv='﻿'+[['nick','punkty_lacznie','w_tym_dopisane','punkty_'+mk,'ostatni_dzien_gry','identyfikator'],...rows].map(r=>r.map(cell).join(';')).join('\r\n');
+    setTimeout(()=>dlFile('Literiada_ranking_'+todayKey()+'.csv',csv,'text/csv'),900);
+    toast('Kopia gotowa: '+n+' wpisów'+(miss.length?' (bez: '+miss.join(', ')+')':''),3600)}
+  catch(e){console.warn('kopia',e);toast('Nie udało się pobrać kopii bazy',3000)}
+  if(b){b.disabled=false;b.innerHTML=ic('db',16)+' Pobierz kopię bazy'}}
+function backupLoad(){const i=document.createElement('input');i.type='file';i.accept='.json,application/json';
+  i.onchange=()=>{const f=i.files&&i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{let o=null;try{o=JSON.parse(r.result)}catch(e){}
+    if(!o||!o.col||!o.col.players){toast('To nie jest kopia bazy Literiady',2800);return}backupPick(o)};r.readAsText(f)};i.click()}
+function backupPick(o){const pl=Object.entries(o.col.players).map(([id,p])=>({id,p})).sort((a,b)=>(+b.p.all||0)-(+a.p.all||0));
+  open(`<div class="step">Panel twórcy gry</div><h2>Przywróć z kopii</h2><p>Kopia z ${new Date(+o.ts||0).toLocaleString('pl-PL')}: ${pl.length} graczy.</p><p class="sub">Przywrócenie zapisze wpis gracza w stanie z kopii (nadpisze obecny), odtworzy jego pojedynki i zdejmie blokadę. Gdy gracz znów zagra, jego telefon dopisze swoje aktualne wyniki.</p>
+  <div class="dlog">${pl.map(x=>`<div><span>${esc(x.p.nick||'?')} · ${+x.p.all||0} pkt</span><button class="linkbtn" data-bkr="${esc(x.id)}" style="padding:0">Przywróć</button></div>`).join('')}</div><div class="actions"><button id="bkBack">Wróć</button></div>`);
+  $('bkBack').onclick=showAdminStats;
+  document.querySelectorAll('[data-bkr]').forEach(b=>b.onclick=()=>{const id=b.dataset.bkr,p=o.col.players[id];
+    conf('Przywrócić gracza z kopii?',`<b>${esc(p.nick||'?')}</b>, ${+p.all||0} pkt (stan z kopii). Obecny wpis tego gracza zostanie zastąpiony.`,'Przywróć',async()=>{
+      try{const {F,db}=await fb();const keep=['nick','all','days','dd','ww','mm','sv','hl','prev','upd'],q={};keep.forEach(k=>{if(p[k]!==undefined)q[k]=p[k]});if(!q.upd)q.upd=Date.now();
+        await F.setDoc(F.doc(db,'players',id),q);let nd=0;for(const [did,d] of Object.entries(o.col.duels||{}))if(d&&d.su===id){try{await F.setDoc(F.doc(db,'duels',did),d);nd++}catch(e){}}
+        try{await F.deleteDoc(F.doc(db,'bans',id))}catch(e){}RK.cache={};toast('Przywrócono z kopii: '+(p.nick||'?')+(nd?' (pojedynki: '+nd+')':''),3200)}
+      catch(e){console.warn('kopia',e);toast('Nie udało się przywrócić. Sprawdź zasady Firestore v19.1.',3600)}showAdminStats()},()=>backupPick(o))})}
+// ---- v19.1: kafelek „Twoje miejsca w rankingu” w podsumowaniu dnia
+const RKT_TABS=[['d','dziś'],['w','tydzień'],['m',null],['a','łącznie']];
+const mName=()=>new Date(keyToUTC(todayKey())).toLocaleDateString('pl-PL',{month:'long',timeZone:'UTC'});
+async function rkPlaces(){if(RK.pl&&Date.now()-RK.pl.ts<90000)return RK.pl.r;
+  const {F,db,uid}=await fb();if(RK.cnt!=null&&RK.cnt>250)return null;
+  const q=await F.getDocs(F.collection(db,'players'));let rows=dedupPrev(q.docs.map(d=>Object.assign({id:d.id},d.data())));
+  try{const a=await F.getDocs(F.collection(db,'adj'));const m={};a.docs.forEach(d=>m[d.id]=+d.data().all||0);RK.adj=m;RK.adjTs=Date.now()}catch(e){}
+  const prev=store.get('sd2_prev','');rows=rows.filter(r=>r.id!==uid&&r.id!==prev);
+  const r={};for(const [t] of RKT_TABS){const me=myVal(t)+(t==='a'&&RK.adj?(+RK.adj[uid]||0):0),vs=rows.map(x=>rankVal(x,t)).filter(v=>v>0);
+    r[t]={me,pos:me>0?1+vs.filter(v=>v>me).length:0,n:vs.length+(me>0?1:0)}}
+  RK.pl={ts:Date.now(),r};return r}
+function rkTileText(r){const L=RKT_TABS.filter(([t])=>r[t].pos).map(([t,l])=>`${l||mName()}: ${r[t].pos}. miejsce z ${r[t].n}`);
+  const d=new Date(keyToUTC(todayKey())).toLocaleDateString('pl-PL',{day:'numeric',month:'numeric',timeZone:'UTC'});
+  return `Literiada ${d} 🏆\nMoje miejsca w rankingu graczy:\n${L.join('\n')}\nDziś ${Math.round(day.pts.reduce((a,b)=>a+b,0))} pkt\n👉 literiada.github.io · @Literiada`}
+async function rkTileFill(){const el=$('rkTile');if(!el)return;let r=null;try{r=await rkPlaces()}catch(e){}
+  if(!$('rkTile'))return;if(!r){el.remove();return}
+  el.innerHTML=`<b>${ic('trophy',18)} Twoje miejsca w rankingu</b><div class="rkg">${RKT_TABS.map(([t,l])=>`<button data-rkt="${t}" class="${r[t].pos===1?'top':''}" aria-label="Ranking ${l||mName()}"><small>${l||mName()}</small><b>${r[t].pos?r[t].pos+'.':'–'}</b><small>${r[t].pos?'z '+r[t].n:'brak pkt'}</small></button>`).join('')}</div>
+  <div class="actions"><button class="main" id="rktX"><span style="font-weight:800">𝕏</span> Pochwal się na X</button><button id="rktS">${ic('send',16)} Udostępnij</button></div>`;
+  el.querySelectorAll('[data-rkt]').forEach(b=>b.onclick=()=>showRanking(b.dataset.rkt));
+  const t=rkTileText(r);$('rktX').onclick=()=>{const u='https://x.com/intent/post?text='+encodeURIComponent(t);try{extOpen(u)}catch(e){location.href=u}};
+  $('rktS').onclick=()=>{try{if(navigator.share){navigator.share({text:t}).catch(e=>{if(e&&e.name!=='AbortError')copy(t)});return}}catch(e){}copy(t)}}
+// ---- v19.1: powitanie na starcie i „Co nowego”
+function showWelcome(){open(`${logo()}<h2>Witaj w Literiadzie!</h2>
+  <div class="wl"><div><b>1</b><span>Odgadnij 5-literowe słowo w 6 próbach.</span></div><div><b>2</b><span>Kolory podpowiadają: <i style="background:${COL.hit}">zielony</i> litera na swoim miejscu, <i style="background:${COL.near}">żółty</i> litera jest w słowie, <i style="background:${COL.miss}">szary</i> litery nie ma.</span></div><div><b>3</b><span>Codziennie 3 poziomy: każdy kolejny trudniejszy i wyżej punktowany.</span></div></div>
+  <div class="actions"><button class="main" id="aClose">Zagraj</button><button id="wFull">Pełna instrukcja</button></div>`);$('wFull').onclick=showHelp}
+function showNews(){open(`<div class="step">Co nowego</div><h2>Literiada ${VER}</h2><ul class="news">
+  <li><b>Pomoc – napisz do admina.</b> W menu ☰ zgłosisz błąd, zadasz pytanie albo podsuniesz pomysł. Odpowiedź przyjdzie w grze.</li>
+  <li><b>Opiekun gry.</b> Mamy wiceadmina, który pomaga graczom i pilnuje porządku. Poznasz go po znaczku OPIEKUN w rankingu.</li>
+  <li><b>Bezpieczne przenoszenie wyników.</b> Po przeniesieniu gry na inny telefon albo do ikony na pulpicie nie będzie Cię w rankingu dwa razy. Na iPhonie kod wyślesz też przyciskiem „Wyślij kod”.</li>
+  <li><b>Pseudonimy bez powtórek.</b> Dwóch graczy nie może mieć tego samego nicku.</li>
+  <li><b>Twoje miejsca w rankingu</b> od razu w podsumowaniu dnia: dziś, w tygodniu, w miesiącu i łącznie. Jednym przyciskiem pochwalisz się na X albo wyślesz znajomym.</li>
+  <li><b>Nowa ikona pomocnej dłoni</b> ${HI}, widoczna na każdym telefonie.</li></ul>
+  <div class="actions"><button class="main" id="aClose">Gramy!</button></div>`)}
+function greet(){if(!$('ov').hidden)return;const h=store.get('sd2_hist',{});
+  if(store.get('sd2_ver','')!==VER){store.set('sd2_ver',VER);if(Object.keys(h).length){showNews();return}}
+  if(store.get('sd2_greet','')===todayKey())return;store.set('sd2_greet',todayKey());
+  const ks=Object.keys(h).filter(k=>k<todayKey()).sort();if(!ks.length)return;
+  const nk=store.get('sd2_nick',''),gap=Math.round((keyToUTC(todayKey())-keyToUTC(ks[ks.length-1]))/DAY);
+  if(gap>=7){const ap=archPending();toast((nk?'Cześć, '+nk+'! ':'Cześć! ')+'Dawno Cię nie było.'+(ap?' W archiwum czeka '+ap+' dni do nadrobienia (menu ☰).':''),5000);return}
+  const s=streakN(),yp=Math.round(rsum(h[utcToKey(keyToUTC(todayKey())-DAY)]));
+  const bits=[];if(s>1)bits.push('seria: '+s+' dni');if(yp>0&&!RX())bits.push('wczoraj '+yp+' pkt');
+  toast('Cześć'+(nk?', '+nk:'')+'!'+(bits.length?' '+bits.join(' · '):''),3200)}
 // ---- v19: ikona na pulpicie (instalacja jak aplikacja)
 let instEv=null;
 addEventListener('beforeinstallprompt',e=>{e.preventDefault();instEv=e;instLabel()});
@@ -1536,11 +1825,12 @@ $('sArch').innerHTML=ic('cal',20)+'Archiwum<span class="badge" id="arBadge" hidd
 $('sDuel').innerHTML=ic('fencer',20)+'Pojedynek';$('sDuel').onclick=sideGo(showDuel);
 $('sCh').innerHTML=ic('rapier',20)+'Wyzwania<span class="badge" id="chBadge" hidden></span>';$('sCh').onclick=sideGo(()=>showChallenges());
 chOptLabel();$('sChOpt').onclick=sideGo(chOptToggle);
-$('sHlp').innerHTML='<span style="width:20px;text-align:center">🤝</span>Prośby o pomoc<span class="badge" id="hlBadge" hidden></span>';$('sHlp').onclick=sideGo(()=>showHelps());
+$('sHlp').innerHTML=ic('hand',20)+'Prośby o pomoc<span class="badge" id="hlBadge" hidden></span>';$('sHlp').onclick=sideGo(()=>showHelps());
 $('sInst').onclick=sideGo(doInstall);
 $('sTrain').innerHTML=ic('train',20)+'Trening';$('sTrain').onclick=sideGo(showTrain);
 $('sHelp').innerHTML=ic('help',20)+'Jak grać';$('sHelp').onclick=sideGo(showHelp);
 $('sMove').innerHTML=ic('move',20)+'Przenieś wyniki';$('sMove').onclick=sideGo(showMove);
+$('sSup').innerHTML=ic('chat',20)+'Pomoc – napisz do admina';$('sSup').onclick=sideGo(showSupport);
 function relaxLabel(){$('sRelax').innerHTML='<span style="width:20px;text-align:center">🌿</span>Gra na luzie: <b style="margin-left:4px">'+(RX()?'włączona':'wyłączona')+'</b>'}
 async function rankHide(){try{const {F,db,uid}=await fb();await F.deleteDoc(F.doc(db,'players',uid))}catch(e){console.warn('ranking',e)}}
 function setRelax(on){store.set('sd2_relax',on);document.body.classList.toggle('relax',on);relaxLabel();paintLevels();updTimer();
@@ -1567,15 +1857,18 @@ updBadge();showIab();
 if(location.hash==='#ranking'){clearHash();store.set('sd2_seen',true);showRanking()}
 else if(location.hash==='#statystyki'){clearHash();store.set('sd2_seen',true);showAdminStats()}
 else if(startDuelFromHash()||startResultFromHash()){store.set('sd2_seen',true)}
-else if(!store.get('sd2_seen',false)){store.set('sd2_seen',true);showHelp()}
+else if(!store.get('sd2_seen',false)){store.set('sd2_seen',true);store.set('sd2_ver',VER);showWelcome()}
+else if(store.get('sd2_moved',0))showMoved();
+else if(store.get('sd2_ver','')!==VER&&Object.keys(store.get('sd2_hist',{})).length){store.set('sd2_ver',VER);showNews()}
 else if(done3(day)&&lvl!==3)showStats();
 else setTimeout(menuHint,800);
+setTimeout(greet,900);setTimeout(repNotify,6000);
 if(store.get('sd2_nick',''))setTimeout(rankSync,3000);
 setTimeout(chNotify,3500);
 setTimeout(hlNotify,4500);setInterval(()=>{if(!document.hidden)hlNotify()},90000);setTimeout(helpWatch,5000);instLabel();
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){helpPoll()}});
 if('serviceWorker' in navigator&&location.protocol==='https:'&&!inFrame)addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw',e))});
-setTimeout(()=>{if(store.get('sd2_adm',null))admLoad()},2500);
+setTimeout(admLoad,2500);
 addEventListener('hashchange',()=>{if(location.hash==='#statystyki'){clearHash();showAdminStats()}else if(location.hash==='#ranking'){clearHash();showRanking()}else if(/^#p=/.test(location.hash)){close();startDuelFromHash()}else if(/^#r=/.test(location.hash)){close();startResultFromHash()}});
 </script>
 
