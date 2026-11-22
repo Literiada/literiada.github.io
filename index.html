@@ -368,6 +368,19 @@ body.embed .iab{display:none!important}
 .nx.c-hlp{border-color:#0ea5e9;background:rgba(14,165,233,.10)}
 @media (max-width:360px){.hbtn .hl{display:none}.hbtn{padding:3px 9px}}
 
+/* v20 */
+.shdr{font:800 .86rem var(--body);color:var(--ink);padding:14px 10px 4px;border-top:1px solid var(--line);margin-top:6px}
+#side .shdr:first-of-type{border-top:0}
+details.sset>summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center}
+details.sset>summary::-webkit-details-marker{display:none}
+details.sset>summary::after{content:'▸';font-size:1rem}
+details.sset[open]>summary::after{content:'▾'}
+.swait{background:#fff1e6;border:2px solid #ff8a00;border-radius:10px;padding:4px 4px 6px;margin:6px 0}
+.swait .shdr{border:0;margin:0;color:#5a2a00;padding:6px 8px 2px}
+.swait .sitem{color:#3d2400}
+.swait .badge{margin-left:auto}
+.dangerb{background:#b42318!important;border-color:#b42318!important;color:#fff!important}
+@media(max-width:480px){.rlist div{grid-template-columns:1.8em minmax(0,1fr) auto auto;gap:5px;padding:7px 6px}.rlist .acts{flex-wrap:wrap;justify-content:flex-end;gap:3px;max-width:7.8em}.rlist .acts .admx,.rlist .acts .rpx{margin-left:0}.rlist .acts .hlc{margin-right:0}}
 /* v19.1 */
 .rkt{border:2px solid #12a150;border-radius:12px;padding:10px;background:var(--panel);display:flex;flex-direction:column;gap:8px}
 .rkt>b{display:flex;align-items:center;gap:6px;font-size:1rem}
@@ -419,25 +432,32 @@ textarea.fi{resize:vertical}
 <div id="sideBg" hidden></div>
 <nav id="side" aria-label="Menu gry">
   <div class="shead"><span id="sLogo"></span><button class="icon" id="sClose" aria-label="Zwiń menu"></button></div>
+  <div id="sWait" class="swait" hidden></div>
+  <div class="shdr">Wyniki</div>
   <button class="sitem" id="sRank"></button>
   <button class="sitem" id="sStats"></button>
+  <div class="shdr">Graj więcej</div>
   <button class="sitem" id="sArch"></button>
   <button class="sitem" id="sDuel"></button>
+  <button class="sitem" id="sTrain"></button>
+  <div class="shdr">Ze znajomymi</div>
   <button class="sitem" id="sCh"></button>
   <button class="sitem" id="sHlp"></button>
   <button class="sitem" id="sInv"></button>
   <a class="sitem" id="sX" href="https://x.com/Literiada" target="_blank" rel="noopener" style="text-decoration:none"></a>
-  <button class="sitem" id="sTrain"></button>
+  <details class="sset"><summary class="shdr">Ustawienia</summary>
   <button class="sitem" id="sRelax"></button>
   <button class="sitem" id="sChOpt"></button>
-  <div class="ssep"></div>
-  <button class="sitem" id="sHelp"></button>
-  <button class="sitem" id="sSup"></button>
   <button class="sitem" id="sMove"></button>
   <button class="sitem" id="sInst" hidden></button>
+  </details>
+  <div class="shdr">Pomoc</div>
+  <button class="sitem" id="sHelp"></button>
+  <button class="sitem" id="sSup"></button>
+  <div class="shdr" id="sTeamH" hidden>Zespół</div>
   <button class="sitem" id="sAdm" hidden></button>
   <button class="sitem" id="sRep" hidden></button>
-  <div class="sfoot">Literiada · wersja 19.1.1 · 2026-11-21</div>
+  <div class="sfoot">Literiada · wersja 20.0 · 2026-11-22</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -778,6 +798,9 @@ function updBadge(){const n=archPending(),b=$('arBadge');if(!b)return;b.hidden=!
   $('sArch').title=n?'Archiwum · zaległe dni: '+n:'Archiwum poprzednich dni';const c=chCount(),cb=$('chBadge');if(cb){cb.hidden=!c;cb.textContent=c}
   const hc=HL.loaded?hlPending().length:0,hb=$('hlBadge');if(hb){hb.hidden=!hc;hb.textContent=hc}
   const rc=typeof RP!=='undefined'&&RP?repCount():0,rb=$('repBadge');if(rb){rb.hidden=!rc;rb.textContent=rc}
+  const w=$('sWait');if(w){const L=[[c,'sCh','swords','Wyzwania'],[hc,'sHlp','hand','Prośby o pomoc'],[rc,'sRep','inbox','Zgłoszenia graczy'],[n,'sArch','cal','Archiwum']].filter(x=>x[0]>0);
+    w.hidden=!L.length;w.innerHTML=L.length?'<div class="shdr">Czeka na Ciebie</div>'+L.map(x=>`<button class="sitem" data-wt="${x[1]}">${ic(x[2],20)}${x[3]}<span class="badge">${x[0]}</span></button>`).join(''):'';
+    w.querySelectorAll('[data-wt]').forEach(b=>b.onclick=()=>{const t=$(b.dataset.wt);if(t)t.click()})}
   const d=$('mDot');if(d)d.hidden=!(n||c||hc||rc)||document.body.classList.contains('side-on')}
 function close(){$('ov').hidden=true;updBadge();setTimeout(menuHint,400)}
 function open(html){document.querySelectorAll('.hint').forEach(h=>h.remove());$('card').innerHTML=html;$('ov').hidden=false;const c=$('aClose');if(c)c.onclick=close}
@@ -950,7 +973,7 @@ function showHelp(){
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 19.1.1 · 2026-11-21</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 20.0 · 2026-11-22</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
@@ -1446,7 +1469,7 @@ async function admLoad(force){if(ADM.loaded&&!force)return;try{const {F,db,uid}=
 const admB=id=>!id||!ADM.m?'':ADM.m[id]==='admin'?'<span class="adm-b" title="Twórca gry">TWÓRCA</span>':ADM.m[id]==='vice'?'<span class="adm-b vice" title="Opiekun gry">OPIEKUN</span>':'';
 const admDelBtn=r=>ADM.me&&r.id!==FBUID?`<button class="admx" data-ad="${esc(r.id)}" title="Opcje gracza: uprawnienia, łączenie, usuwanie" aria-label="Opcje gracza">${ic('cog',15)}</button>`:'';
 const rpBtn=r=>ADM.vice&&!ADM.me&&r.id!==FBUID?`<button class="rpx" data-rp="${esc(r.id)}" title="Zgłoś gracza" aria-label="Zgłoś gracza">${ic('flag',14)}</button>`:'';
-function admMenu(){const b=$('sAdm');if(!b)return;b.hidden=!ADM.staff;b.innerHTML=ic('chart',20)+(ADM.me?'Panel twórcy gry':'Panel opiekuna gry');b.onclick=sideGo(showAdminStats);
+function admMenu(){const b=$('sAdm');if(!b)return;b.hidden=!ADM.staff;if($('sTeamH'))$('sTeamH').hidden=!ADM.staff;b.innerHTML=ic('chart',20)+(ADM.me?'Panel twórcy gry':'Panel opiekuna gry');b.onclick=sideGo(showAdminStats);
   const r=$('sRep');if(r){r.hidden=!ADM.staff;r.innerHTML=ic('inbox',20)+'Zgłoszenia graczy<span class="badge" id="repBadge" hidden></span>';r.onclick=sideGo(()=>showReports())}
   if(ADM.staff&&!RP.loaded)repLoad()}
 const ROLE_N={admin:'twórca gry',admin2:'admin (bez znaczka)',vice:'Opiekun gry (wiceadmin)'};
@@ -1456,7 +1479,7 @@ function admAsk(r,back){const rl=(ADM.m||{})[r.id],bk=back||(()=>showRanking());
   open(`<div class="step">Panel twórcy gry</div><h2>${esc(r.nick)}${admB(r.id)}</h2>
   <p class="sub">${r.all!=null?'Punkty łącznie: '+(+r.all||0)+' · ':''}rola: <b>${rl?ROLE_N[rl]:'zwykły gracz'}</b></p>
   <p><b>Usunięcie z rankingu</b></p><p class="sub">Przed usunięciem kopia wpisu i pojedynków trafia do Kosza w Panelu twórcy gry. Przez 30 dni możesz go stamtąd przywrócić. „Usuń i zablokuj” dodatkowo nie pozwoli mu wrócić do rankingu z tego urządzenia.</p>
-  <div class="actions"><button class="main" id="adDel">Usuń</button><button id="adBan" style="border-color:#e5484d;color:#b42318">Usuń i zablokuj</button></div>
+  <div class="actions"><button class="main" id="adDel">Usuń</button><button id="adBan" class="dangerb">Usuń i zablokuj</button></div>
   <p><b>Ten sam gracz dwa razy?</b></p><p class="sub">Punkty łączne tego wpisu dopiszę do drugiego wpisu, a ten usunę (kopia w Koszu).</p><div class="actions"><button id="adMrg">Połącz z innym wpisem</button></div>
   <p><b>Uprawnienia</b></p><div class="actions">${rl==='admin'?'<span class="sub">Twórca gry. Zmiana tylko w konsoli Firebase.</span>':rl?'<button id="adRole0">Odbierz uprawnienia</button>':'<button id="adRoleV">Nadaj rolę wiceadmina</button><button id="adRoleA">Nadaj uprawnienia admina</button>'}</div>
   <div class="actions"><button id="adNo">Anuluj</button></div>`);
@@ -1616,7 +1639,7 @@ function helpGive(x){const t=store.get('sd2_day',null),my=t&&t.d===dayNo()?norm(
     catch(e){console.warn('pomoc',e);$('hGo').disabled=false;$('hGo').textContent='Wyślij podpowiedź';toast('Nie udało się wysłać. Prośba mogła zostać anulowana.',3000)}}}
 
 // ---- v19.1: zgłoszenia graczy (kolekcja reports), kosz (trash), kopia bazy, powitanie, zajęty nick
-const VER='19.1';
+const VER='20.0';
 const NICK_MSG='Ten pseudonim już gra w rankingu. Jeśli to Ty na innym urządzeniu albo w ikonie na pulpicie, przenieś wyniki: menu ☰ → Przenieś wyniki. Jeśli nie, wybierz inny pseudonim.';
 async function nickTaken(v){const n=String(v).trim().toLowerCase();try{const {F,db,uid}=await fb();
   let rows=(RK.cnt!=null&&RK.cnt<=250&&RK.cache.a&&Date.now()-RK.cache.a.ts<600000)?RK.cache.a.rows:null;
@@ -1773,12 +1796,10 @@ function showWelcome(){open(`${logo()}<h2>Witaj w Literiadzie!</h2>
   <div class="wl"><div><b>1</b><span>Odgadnij 5-literowe słowo w 6 próbach.</span></div><div><b>2</b><span>Kolory podpowiadają: <i style="background:${COL.hit}">zielony</i> litera na swoim miejscu, <i style="background:${COL.near}">żółty</i> litera jest w słowie, <i style="background:${COL.miss}">szary</i> litery nie ma.</span></div><div><b>3</b><span>Codziennie 3 poziomy: każdy kolejny trudniejszy i wyżej punktowany.</span></div></div>
   <div class="actions"><button class="main" id="aClose">Zagraj</button><button id="wFull">Pełna instrukcja</button></div>`);$('wFull').onclick=showHelp}
 function showNews(){open(`<div class="step">Co nowego</div><h2>Literiada ${VER}</h2><ul class="news">
-  <li><b>Pomoc – napisz do admina.</b> W menu ☰ zgłosisz błąd, zadasz pytanie albo podsuniesz pomysł. Odpowiedź przyjdzie w grze.</li>
-  <li><b>Opiekun gry.</b> Mamy wiceadmina, który pomaga graczom i pilnuje porządku. Poznasz go po znaczku OPIEKUN w rankingu.</li>
-  <li><b>Bezpieczne przenoszenie wyników.</b> Po przeniesieniu gry na inny telefon albo do ikony na pulpicie nie będzie Cię w rankingu dwa razy. Na iPhonie kod wyślesz też przyciskiem „Wyślij kod”.</li>
-  <li><b>Pseudonimy bez powtórek.</b> Dwóch graczy nie może mieć tego samego nicku.</li>
-  <li><b>Twoje miejsca w rankingu</b> od razu w podsumowaniu dnia: dziś, w tygodniu, w miesiącu i łącznie. Jednym przyciskiem pochwalisz się na X albo wyślesz znajomym.</li>
-  <li><b>Nowa ikona pomocnej dłoni</b> ${HI}, widoczna na każdym telefonie.</li></ul>
+  <li><b>Nowe, uporządkowane menu.</b> Opcje są pogrupowane: Wyniki, Graj więcej, Ze znajomymi, Pomoc, a rzadziej używane schowaliśmy w zwijanych Ustawieniach.</li>
+  <li><b>„Czeka na Ciebie” na górze menu.</b> Wyzwania, prośby o pomoc i zaległe dni w archiwum, z licznikami, zawsze pod ręką.</li>
+  <li><b>Lepsza czytelność.</b> Wyraźniejsze przyciski, a ranking mieści się w całości także na wąskich telefonach.</li>
+  <li><b>Przypominamy:</b> w podsumowaniu dnia widzisz swoje miejsca w rankingu, a przez „Pomoc – napisz do admina” zgłosisz każdy problem.</li></ul>
   <div class="actions"><button class="main" id="aClose">Gramy!</button></div>`)}
 function greet(){if(!$('ov').hidden)return;const h=store.get('sd2_hist',{});
   if(store.get('sd2_ver','')!==VER){store.set('sd2_ver',VER);if(Object.keys(h).length){showNews();return}}
