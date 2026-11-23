@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
 <title>Literiada – codzienna gra słowna</title>
 <meta name="description" content="Literiada: 3 hasła dziennie, punkty jak w Scrabble i premia za szybkość. Gra w przeglądarce, bez instalacji.">
 <meta property="og:type" content="website">
@@ -457,7 +458,7 @@ textarea.fi{resize:vertical}
   <div class="shdr" id="sTeamH" hidden>Zespół</div>
   <button class="sitem" id="sAdm" hidden></button>
   <button class="sitem" id="sRep" hidden></button>
-  <div class="sfoot">Literiada · wersja 20.0 · 2026-11-22</div>
+  <div class="sfoot">Literiada · wersja 20.1 · 2026-11-23</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -565,6 +566,13 @@ function keyToUTC(k){const [y,m,d]=k.split('-').map(Number);return Date.UTC(y,m-
 function utcToKey(t){return new Date(t).toISOString().slice(0,10)}
 function dayNo(){return Math.round((keyToUTC(todayKey())-START)/DAY)}
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+// v20.1: walidacja danych z zewnątrz (linki, import, pseudonim)
+const NICK_RE=/^[A-Za-z0-9\u00C0-\u017F_.-](?:[A-Za-z0-9\u00C0-\u017F _.-]*[A-Za-z0-9\u00C0-\u017F_.-])$/;
+const nickOk=v=>typeof v==='string'&&v.length>=2&&v.length<=20&&NICK_RE.test(v);
+const NICK_BAD='Pseudonim: 2–20 znaków, tylko litery, cyfry, spacja oraz _ . - (bez emoji i znaków specjalnych).';
+const uidOk=v=>typeof v==='string'&&/^[A-Za-z0-9]{20,40}$/.test(v);
+const refOk=v=>typeof v==='string'&&/^[A-Za-z0-9_-]{1,64}$/.test(v);
+const cleanName=(v,d)=>{const t=String(v==null?'':v).replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u2028-\u202f\u2060-\u206f\ufeff<>]/g,'').replace(/\s+/g,' ').trim().slice(0,20);return t||d};
 
 let mode='day', lvl=0, answer, guesses=[], cur='', done=false, busy=false;
 let day=null, freeLvl=0, archKey=null, duel=null;
@@ -923,6 +931,7 @@ function showStats(){
   if($('rkInv')){store.set('sd2_rk_first',true);
     $('rJoin').onclick=async()=>{const v=$('rIn').value.replace(/\s+/g,' ').trim().slice(0,20);
       if(v.length<2){$('rErr').hidden=false;$('rErr').textContent='Pseudonim musi mieć co najmniej 2 znaki.';return}
+      if(!nickOk(v)){$('rErr').hidden=false;$('rErr').textContent=NICK_BAD;return}
       $('rJoin').textContent='Sprawdzam…';if(await nickTaken(v)){$('rErr').hidden=false;$('rErr').innerHTML=NICK_MSG;$('rJoin').textContent='Dołącz do rankingu';return}
       store.set('sd2_nick',v);if(!store.get('sd2_duel_name',''))store.set('sd2_duel_name',v);$('rJoin').textContent='Dołączam…';await rankSync();showRanking('d')};
     $('rkLater').onclick=()=>{store.set('sd2_rk_ask',todayKey());$('rkInv').remove()};
@@ -973,7 +982,7 @@ function showHelp(){
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 20.0 · 2026-11-22</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 20.1 · 2026-11-23</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
@@ -1091,7 +1100,7 @@ async function inviteFriends(){const url=await inviteURL(),t=INV_TXT+' 👉 '+ur
 function copy2(t){try{navigator.clipboard.writeText(t).then(()=>toast('Zaproszenie skopiowane! Wklej je znajomym w Messengerze lub SMS-ie',2600),()=>fallback(t))}catch(e){fallback(t)}}
 // zaproszony: zapamiętaj, kto zaprosił (tylko nowy gracz), zapisz po ukończeniu pierwszego poziomu
 (function(){try{const q=new URLSearchParams(location.search),z=q.get('z');if(!z)return;
-  if(!store.get('sd2_ref_from','')&&!Object.keys(store.get('sd2_hist',{})).length)store.set('sd2_ref_from',z.slice(0,64));
+  if(!store.get('sd2_ref_from','')&&!Object.keys(store.get('sd2_hist',{})).length)if(refOk(z.slice(0,64)))store.set('sd2_ref_from',z.slice(0,64));
   q.delete('z');const rest=q.toString();history.replaceState(null,'',location.pathname+(rest?'?'+rest:'')+location.hash)}catch(e){}})();
 async function refPush(){const z=store.get('sd2_ref_from','');if(!z||store.get('sd2_ref_sent',false))return;
   try{const {F,db,uid}=await fb();if(z===uid){store.set('sd2_ref_sent',true);return}
@@ -1116,7 +1125,7 @@ function decObj(code){try{const s=atob(code.replace(/-/g,'+').replace(/_/g,'/'))
 function duelEncode(w,f){const o={w,f,t:Date.now()%1e7};if(FBUID)o.u=FBUID;return encObj(o)}
 function duelDecode(code){try{let s=atob(code.replace(/-/g,'+').replace(/_/g,'/'));const b=new Uint8Array([...s].map((c,i)=>c.charCodeAt(0)^DKEY[i%DKEY.length]^((i*7)&255)));
   const o=JSON.parse(new TextDecoder().decode(b));if(!o||typeof o.w!=='string'||[...o.w].length!==5||!/^[a-ząćęłńóśźż]{5}$/.test(o.w))return null;
-  return {w:o.w,f:String(o.f||'Znajomy').slice(0,20)||'Znajomy',u:typeof o.u==='string'?o.u.slice(0,64):null}}catch(e){return null}}
+  return {w:o.w,f:cleanName(o.f,'Znajomy'),u:uidOk(o.u)?o.u:null}}catch(e){return null}}
 function duelSave(part){const a=store.get('sd2_duels_in',{});a[duel.code]=Object.assign(a[duel.code]||{f:duel.f,ts:Date.now()},part);store.set('sd2_duels_in',a)}
 function clearHash(){try{if(location.hash)history.replaceState(null,'',location.pathname+location.search)}catch(e){}}
 function endDuel(){if(!duel)return;duel=null;document.body.classList.remove('duel');clearHash()}
@@ -1164,7 +1173,7 @@ function sendResult(won){const n=($('rName').value.trim()||'Znajomy').slice(0,20
 function startResultFromHash(){const m=location.hash.match(/^#r=([A-Za-z0-9_-]+)$/);if(!m)return false;clearHash();
   const o=decObj(m[1]),ok=w=>typeof w==='string'&&/^[a-ząćęłńóśźż]{5}$/.test(w);
   if(!o||!ok(o.w)||!Array.isArray(o.g)){toast('Ten link z wynikiem jest uszkodzony',2600);return true}
-  const g=o.g.filter(ok).slice(0,6),won=o.res==='won'&&g.length>0&&g[g.length-1]===o.w,n=String(o.n||'Znajomy').slice(0,20)||'Znajomy',pts=won?pointsFor(o.w,g.length):0;
+  const g=o.g.filter(ok).slice(0,6),won=o.res==='won'&&g.length>0&&g[g.length-1]===o.w,n=cleanName(o.n,'Znajomy'),pts=won?pointsFor(o.w,g.length):0;
   const out=store.get('sd2_duels_out',[]);let it=out.find(x=>x.w===o.w);const rr={n,res:won?'won':'lost',tries:g.length,pts,ts:Date.now()};
   if(it){it.r=(it.r||[]).filter(x=>x.n!==n);it.r.unshift(rr)}else out.unshift({w:o.w,ts:Date.now(),r:[rr]});store.set('sd2_duels_out',out.slice(0,50));
   const mini=`<span class="mini">${g.map(w=>{const s=score(w,o.w);return `<span class="mr">${[...w].map((ch,j)=>`<i style="background:${COL[s[j]]}">${ch}</i>`).join('')}</span>`}).join('')}</span>`;
@@ -1175,6 +1184,19 @@ function startResultFromHash(){const m=location.hash.match(/^#r=([A-Za-z0-9_-]+)
   $('aNewD').onclick=showDuel;return true}
 // ---- Eksport i import wyników (przeprowadzka na inne urządzenie lub nowy adres)
 const MV_PRE='LITERIADA1:';
+// v20.1: import wyników – tylko znane klucze, sprawdzone typy i długości
+const MV_KEYS=new Set(['sd2_nick','sd2_hist','sd2_arch','sd2_log','sd2_duel_name','sd2_seen','sd2_help_n','sd2_prev','sd2_duels_out','sd2_duels_in','sd2_day','sd2_ref_sent','sd2_ontime','sd2_kola','sd2_hl_seen','sd2_side','sd2_rep','sd2_ref_from','sd2_hint_menu','sd2_rk_never','sd2_rk_first','sd2_rk_ask','sd2_relax','sd2_iab_x','sd2_greet','sd2_ch_sent','sd2_ch_seen','sd2_ch_ok','lt_sound']);
+function mvClean(k,v){if(!MV_KEYS.has(k)||typeof v!=='string'||v.length>400000)return null;let j;try{j=JSON.parse(v)}catch(e){return null}
+  if(k==='sd2_nick')return j===''||nickOk(j)?v:null;
+  if(k==='sd2_duel_name')return typeof j==='string'?JSON.stringify(cleanName(j,'')):null;
+  if(k==='sd2_prev')return j===''||uidOk(j)?v:null;
+  if(k==='sd2_ref_from')return j===''||refOk(j)?v:null;
+  if(k==='sd2_help_n')return typeof j==='number'&&isFinite(j)&&j>=0&&j<=100000?v:null;
+  if(k==='sd2_hist'){if(!j||typeof j!=='object'||Array.isArray(j)||Object.keys(j).length>800)return null;
+    for(const d in j){if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||!Array.isArray(j[d])||j[d].length>5||j[d].some(n=>n!==null&&(typeof n!=='number'||!isFinite(n)||n<0||n>800)))return null}return v}
+  if(k==='sd2_arch'||k==='sd2_log'||k==='sd2_day'||k==='sd2_duels_in'||k==='sd2_duels_out'||k==='sd2_ontime'||k==='sd2_kola')return j!==null&&typeof j==='object'?v:null;
+  return v}
+
 function mvKeys(){const o={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(/^(sd2_|lt_)/.test(k))o[k]=localStorage.getItem(k)}}catch(e){}return o}
 function b64e(t){const b=new TextEncoder().encode(t);let s='';b.forEach(x=>s+=String.fromCharCode(x));return btoa(s)}
 function b64d(t){const s=atob(t);return new TextDecoder().decode(new Uint8Array([...s].map(c=>c.charCodeAt(0))))}
@@ -1204,10 +1226,10 @@ function mvAsk(){const o=mvParse($('mIn').value);const inf=$('mInfo');
   if(!o){inf.className='dbad';inf.textContent='To nie wygląda na kod wyników Literiady. Sprawdź, czy skopiowałeś całość.';return}
   const nw=mvInfo(o.d),me=mvInfo(mvKeys());
   open(`<h2>Zaimportować wyniki?</h2><p>W kodzie: <b>${dni(nw.days)}, ${nw.pts} pkt</b>${o.ts?' (eksport z '+new Date(o.ts).toLocaleDateString('pl-PL')+')':''}.</p>
-  ${me.days?`<p>Wyniki zapisane teraz na tej stronie (${dni(me.days)}, ${me.pts} pkt) zostaną zastąpione.</p>`:'<p>Na tej stronie nie ma jeszcze wyników.</p>'}
+  <p class="sub">Importuj tylko kod, który sam wygenerowałeś w Literiadzie. Kod od kogoś innego może zmienić Twoje wyniki.</p>${me.days?`<p>Wyniki zapisane teraz na tej stronie (${dni(me.days)}, ${me.pts} pkt) zostaną zastąpione.</p>`:'<p>Na tej stronie nie ma jeszcze wyników.</p>'}
   <div class="actions"><button class="main" id="mYes">Tak, importuj</button><button id="mNo">Anuluj</button></div>`);
   $('mNo').onclick=showMove;
-  $('mYes').onclick=()=>{try{Object.keys(mvKeys()).forEach(k=>localStorage.removeItem(k));for(const k in o.d)if(/^(sd2_|lt_)/.test(k)&&typeof o.d[k]==='string')localStorage.setItem(k,o.d[k]);localStorage.setItem('sd2_seen','true');localStorage.setItem('sd2_hint_menu','true');localStorage.setItem('sd2_ver',JSON.stringify(VER));localStorage.removeItem('sd2_moved');if(o.u&&o.u!==FBUID)localStorage.setItem('sd2_prev',JSON.stringify(String(o.u).slice(0,128)))}catch(e){toast('Nie udało się zapisać wyników',2600);return}
+  $('mYes').onclick=()=>{try{Object.keys(mvKeys()).forEach(k=>localStorage.removeItem(k));for(const k in o.d){const cv=mvClean(k,o.d[k]);if(cv!=null)localStorage.setItem(k,cv)}localStorage.setItem('sd2_seen','true');localStorage.setItem('sd2_hint_menu','true');localStorage.setItem('sd2_ver',JSON.stringify(VER));localStorage.removeItem('sd2_moved');if(uidOk(o.u)&&o.u!==FBUID)localStorage.setItem('sd2_prev',JSON.stringify(o.u))}catch(e){toast('Nie udało się zapisać wyników',2600);return}
     close();setMode('day');rankSync();toast('Wyniki zaimportowane: '+dni(nw.days)+', '+nw.pts+' pkt',2600)}}
 function legacyCopy(t){try{const a=document.createElement('textarea');a.value=t;a.setAttribute('readonly','');a.style.position='fixed';a.style.top='-1000px';document.body.appendChild(a);a.select();a.setSelectionRange(0,t.length);const ok=document.execCommand('copy');a.remove();return ok}catch(e){return false}}
 function mvMoveAsk(){const el=$('mAsk');if(!el||!store.get('sd2_nick','')||store.get('sd2_moved',0))return;
@@ -1306,7 +1328,8 @@ function rankBind(){document.querySelectorAll('[data-rt]').forEach(b=>b.onclick=
   if($('rRetry'))$('rRetry').onclick=()=>{RK.err=null;rankLoad(true)};
   if($('rJoin'))$('rJoin').onclick=async()=>{const v=$('rIn').value.replace(/\s+/g,' ').trim().slice(0,20);
     if(v.length<2){$('rErr').hidden=false;$('rErr').textContent='Pseudonim musi mieć co najmniej 2 znaki.';return}
-    $('rJoin').textContent='Sprawdzam…';if(await nickTaken(v)){$('rErr').hidden=false;$('rErr').innerHTML=NICK_MSG;$('rJoin').textContent='Dołącz';return}
+    if(!nickOk(v)){$('rErr').hidden=false;$('rErr').textContent=NICK_BAD;return}
+      $('rJoin').textContent='Sprawdzam…';if(await nickTaken(v)){$('rErr').hidden=false;$('rErr').innerHTML=NICK_MSG;$('rJoin').textContent='Dołącz';return}
     store.set('sd2_moved',0);store.set('sd2_nick',v);if(!store.get('sd2_duel_name',''))store.set('sd2_duel_name',v);$('rJoin').textContent='Dołączam…';await rankSync();if(!rankOk&&await admBanned()){store.set('sd2_nick','');rankDraw();toast('Ten profil został zablokowany w rankingu przez administratora gry',3600);return}RK.cache={};rankLoad(true)};
   if($('rNick'))$('rNick').onclick=()=>{store.set('sd2_nick','');rankDraw();setTimeout(()=>{const i=$('rIn');if(i)i.focus()},50)};
   if($('rOut'))$('rOut').onclick=async()=>{let nd=0;try{const {F,db,uid}=await fb();await F.deleteDoc(F.doc(db,'players',uid));
@@ -1324,13 +1347,13 @@ async function rankLoad(force){const tab=RK.tab,c=RK.cache[tab];await admLoad();
     else{if(RK.cnt==null){try{RK.cnt=(await F.getCountFromServer(col)).data().count}catch(e){console.warn('ranking',e)}}
       let big=RK.cnt!=null&&RK.cnt>250,f=rkField(tab),fp=f.length>1?new F.FieldPath(f[0],f[1]):f[0];
       if(big){try{const ps=await F.getDocs(F.query(col,F.orderBy(fp,'desc'),F.limit(50)));rows=ps.docs.map(d=>Object.assign({id:d.id},d.data()))}catch(e){console.warn('ranking',e);big=false}}
-      if(!big){const ps=await F.getDocs(col);rows=ps.docs.map(d=>Object.assign({id:d.id},d.data()))}
+      if(!big){const ps=await F.getDocs(F.query(col,F.limit(500)));rows=ps.docs.map(d=>Object.assign({id:d.id},d.data()))}
       rows=dedupPrev(rows);
-      if(tab==='a'&&(!RK.adj||Date.now()-RK.adjTs>300000)){try{const q=await F.getDocs(F.collection(db,'adj'));const a={};q.docs.forEach(d=>a[d.id]=+d.data().all||0);RK.adj=a;RK.adjTs=Date.now()}catch(e){RK.adj=RK.adj||{}}}
+      if(tab==='a'&&(!RK.adj||Date.now()-RK.adjTs>300000)){try{const q=await F.getDocs(F.query(F.collection(db,'adj'),F.limit(500)));const a={};q.docs.forEach(d=>a[d.id]=+d.data().all||0);RK.adj=a;RK.adjTs=Date.now()}catch(e){RK.adj=RK.adj||{}}}
       const mv=myVal(tab);
       if(big&&store.get('sd2_nick','')&&!RX()&&mv>0&&!rows.some(r=>r.id===uid)){try{const q=await F.getCountFromServer(F.query(col,F.where(fp,'>',mv)));mePos=q.data().count+1}catch(e){console.warn('ranking',e)}}}
     if(RK.cnt==null||force){try{RK.cnt=(await F.getCountFromServer(col)).data().count}catch(e){}}
-    if(Date.now()-RK.offTs>60000){try{const [cs,so]=await Promise.all([F.getDocs(F.collection(db,'chset')),F.getDocs(F.query(F.collection(db,'challenges'),F.where('fu','==',uid)))]);
+    if(Date.now()-RK.offTs>60000){try{const [cs,so]=await Promise.all([F.getDocs(F.query(F.collection(db,'chset'),F.limit(500))),F.getDocs(F.query(F.collection(db,'challenges'),F.where('fu','==',uid),F.limit(100)))]);
       RK.off=new Set(cs.docs.filter(d=>d.data().off===true).map(d=>d.id));CH.out=so.docs.map(d=>Object.assign({id:d.id},d.data()));RK.offTs=Date.now()}catch(e){console.warn('wyzwania',e);RK.off=RK.off||new Set()}}
     RK.cache[tab]={ts:Date.now(),rows,mePos,duels,mine};
     if(RK.tab!==tab)return;
@@ -1410,7 +1433,7 @@ function chNew(r){const me=store.get('sd2_nick','');
       info.className='dbad';info.textContent=String(e&&e.code||'').includes('permission')?'Nie da się wysłać: ten gracz nie przyjmuje wyzwań, zmienił nick albo wysłałeś mu już dziś wyzwanie. Sprawdź też, czy data i godzina w telefonie są ustawione automatycznie.':'Nie udało się wysłać. Sprawdź internet i spróbuj ponownie.'}};
   setTimeout(()=>wi.focus(),50)}
 async function chLoad(){try{const {F,db,uid}=await fb();await admLoad();
-    const [a,b]=await Promise.all([F.getDocs(F.query(F.collection(db,'challenges'),F.where('tu','==',uid))),F.getDocs(F.query(F.collection(db,'challenges'),F.where('fu','==',uid)))]);
+    const [a,b]=await Promise.all([F.getDocs(F.query(F.collection(db,'challenges'),F.where('tu','==',uid),F.limit(100))),F.getDocs(F.query(F.collection(db,'challenges'),F.where('fu','==',uid),F.limit(100)))]);
     const old=Date.now()-7*DAY,keep=[];
     for(const d of [...a.docs,...b.docs]){const x=Object.assign({id:d.id},d.data());if((+x.ts||0)<old){F.deleteDoc(F.doc(db,'challenges',d.id)).catch(()=>{})}else keep.push(x)}
     for(const x of keep)if(x.tu===uid&&x.st==='new'&&!VALID.has(String(x.w))){x.st='bad';F.updateDoc(F.doc(db,'challenges',x.id),{st:'rej',upd:Date.now()}).catch(()=>{})}
@@ -1568,7 +1591,7 @@ async function helpClick(){if(!helpOk()||done)return;const q=day.hq[lvl];
 async function helpCancel(i){const q=day.hq[i];if(!q)return;try{const {F,db}=await fb();await F.deleteDoc(F.doc(db,'helps',q.id))}catch(e){}day.hq[i]=null;saveDay();paint()}
 async function helpPick(){open(`<div class="step">Pomocna dłoń</div><h2>${HI} Poproś o pomoc</h2><p class="sub">Szukam graczy, którzy dziś odgadli ${lvTxtOf(lvl)}…</p><div class="actions"><button id="aClose">Zamknij</button></div>`);
   let list=[];try{const {F,db,uid}=await fb();const tk=todayKey();await admLoad();
-    const q=await F.getDocs(F.query(F.collection(db,'players'),F.where(new F.FieldPath('sv',tk),'>',0)));
+    const q=await F.getDocs(F.query(F.collection(db,'players'),F.where(new F.FieldPath('sv',tk),'>',0),F.limit(300)));
     list=q.docs.map(d=>Object.assign({id:d.id},d.data())).filter(r=>r.id!==uid&&((+((r.sv||{})[tk])||0)&(1<<lvl)))}
   catch(e){console.warn('pomoc',e);const sb=$('card').querySelector('.sub');if(sb)sb.textContent='Nie udało się wczytać graczy. Sprawdź internet i spróbuj ponownie.';return}
   list.sort((a,b)=>(+b.hl||0)-(+a.hl||0));
@@ -1600,7 +1623,7 @@ async function helpPoll(manual){const D0=mode==='day'?day:null;if(!D0)return;con
     else if(x.st==='rej'){q.st='rej';saveDay();if(i===lvl)paint();toast(q.hn+' nie może teraz pomóc. Możesz poprosić kogoś innego.',3200)}}}
   catch(e){console.warn('pomoc',e)}
   if(manual===true&&!got)toast('Jeszcze bez odpowiedzi. Sprawdzę ponownie za chwilę.',2400)}
-async function hlLoad(){try{const {F,db,uid}=await fb();const q=await F.getDocs(F.query(F.collection(db,'helps'),F.where('hu','==',uid)));
+async function hlLoad(){try{const {F,db,uid}=await fb();const q=await F.getDocs(F.query(F.collection(db,'helps'),F.where('hu','==',uid),F.limit(100)));
   const old=Date.now()-3*DAY;HL.inb=[];for(const d of q.docs){const x=Object.assign({id:d.id},d.data());if((+x.ts||0)<old)F.deleteDoc(F.doc(db,'helps',d.id)).catch(()=>{});else HL.inb.push(x)}
   HL.loaded=true;updBadge();return true}catch(e){console.warn('pomoc',e);return false}}
 const hlPending=()=>HL.inb.filter(x=>x.st==='new'&&x.dk===todayKey()).sort((a,b)=>b.ts-a.ts);
@@ -1639,7 +1662,7 @@ function helpGive(x){const t=store.get('sd2_day',null),my=t&&t.d===dayNo()?norm(
     catch(e){console.warn('pomoc',e);$('hGo').disabled=false;$('hGo').textContent='Wyślij podpowiedź';toast('Nie udało się wysłać. Prośba mogła zostać anulowana.',3000)}}}
 
 // ---- v19.1: zgłoszenia graczy (kolekcja reports), kosz (trash), kopia bazy, powitanie, zajęty nick
-const VER='20.0';
+const VER='20.1';
 const NICK_MSG='Ten pseudonim już gra w rankingu. Jeśli to Ty na innym urządzeniu albo w ikonie na pulpicie, przenieś wyniki: menu ☰ → Przenieś wyniki. Jeśli nie, wybierz inny pseudonim.';
 async function nickTaken(v){const n=String(v).trim().toLowerCase();try{const {F,db,uid}=await fb();
   let rows=(RK.cnt!=null&&RK.cnt<=250&&RK.cache.a&&Date.now()-RK.cache.a.ts<600000)?RK.cache.a.rows:null;
@@ -1671,7 +1694,11 @@ function devInfo(){const u=navigator.userAgent||'';
 async function repSend(o){try{const {F,db,uid}=await fb();const ts=Date.now();
   const d={k:o.k,t:String(o.t).slice(0,500),ru:uid,rn:String(store.get('sd2_nick','')||'bez nicku').slice(0,20),m:devInfo(),st:o.k==='player'?'radek':'new',ts};
   if(o.tu){d.tu=o.tu;d.tn=String(o.tn||'').slice(0,20)}
-  await F.setDoc(F.doc(db,'reports',uid+'_'+ts),d);store.set('sd2_rep',true);RP.loaded=false;return true}catch(e){console.warn('zgłoszenie',e);return false}}
+  // v20.1: id = uid_RRRR-MM-DD_n; zwykły gracz do 3 zgłoszeń dziennie, zespół do 20
+  const dk=todayKey(),max=(typeof ADM!=='undefined'&&ADM.staff)?20:3;RP.err=null;let sent=false,denied=0;
+  for(let n=1;n<=max&&!sent;n++){try{await F.setDoc(F.doc(db,'reports',uid+'_'+dk+'_'+n),d);sent=true}catch(e){if(e&&e.code==='permission-denied')denied++;else throw e}}
+  if(!sent){RP.err=denied>=max?'limit':'err';return false}
+  store.set('sd2_rep',true);RP.loaded=false;return true}catch(e){console.warn('zgłoszenie',e);return false}}
 function showSupport(){open(`<div class="step">Pomoc</div><h2>${ic('chat',22)} Napisz do admina</h2>
   <p>Coś nie działa, masz pytanie albo pomysł? Napisz, odpowiemy w grze.</p>
   <label class="fl">Czego dotyczy<select class="fi" id="spK">${['bug','score','q','idea','word','other'].map(k=>`<option value="${k}">${RP_K[k]}</option>`).join('')}</select></label>
@@ -1681,7 +1708,7 @@ function showSupport(){open(`<div class="step">Pomoc</div><h2>${ic('chat',22)} N
   $('spT').oninput=()=>$('spN').textContent=$('spT').value.length+' / 500';
   $('spGo').onclick=async()=>{const t=$('spT').value.trim();if(t.length<3){toast('Napisz kilka słów opisu',2000);return}$('spGo').disabled=true;$('spGo').textContent='Wysyłam…';
     if(await repSend({k:$('spK').value,t}))open(`<div class="step">Pomoc</div><h2>Dzięki!</h2><p>Zgłoszenie wysłane. Admin odpowie w grze: odpowiedź zobaczysz przy kolejnym uruchomieniu albo tutaj, w menu ☰ → Pomoc – napisz do admina.</p><div class="actions"><button class="main" id="aClose">OK</button></div>`);
-    else{$('spGo').disabled=false;$('spGo').textContent='Wyślij';toast('Nie udało się wysłać. Sprawdź internet i spróbuj ponownie.',3000)}};
+    else{$('spGo').disabled=false;$('spGo').textContent='Wyślij';toast(RP.err==='limit'?'Na dziś limit zgłoszeń wyczerpany (3). Spróbuj jutro.':'Nie udało się wysłać. Sprawdź internet i spróbuj ponownie.',3000)}};
   repMine()}
 async function repMineLoad(){const {F,db,uid}=await fb();const q=await F.getDocs(F.query(F.collection(db,'reports'),F.where('ru','==',uid)));return q.docs.map(d=>Object.assign({id:d.id},d.data())).sort((a,b)=>b.ts-a.ts)}
 const repMineHTML=l=>l.map(x=>`<div class="chi rep"><div class="row2"><span class="sub">${repD(x.ts)} · ${RP_K[x.k]||''}</span><span class="st ${x.ans?'done':x.st==='rej'||x.st==='done'?'exp':'new'}">${x.ans?'odpowiedź':x.st==='rej'||x.st==='done'?'zamknięte':'czeka'}</span></div><span class="rtxt">${esc(x.t)}</span>${x.ans?`<div class="rans"><b>Odpowiedź (${esc(x.ab||'admin')}):</b> ${esc(x.ans)}</div>`:''}</div>`).join('');
@@ -1694,8 +1721,8 @@ function rpAsk(r){const W=['wulgarny lub obraźliwy nick','podejrzany wynik (osz
   open(`<div class="step">Opiekun gry</div><h2>${ic('flag',22)} Zgłoś gracza: ${esc(r.nick)}</h2><label class="fl">Powód<select class="fi" id="rpW">${W.map(w=>`<option>${w}</option>`).join('')}</select></label><label class="fl">Uwagi (nieobowiązkowe)<textarea class="fi" id="rpT" rows="3" maxlength="400"></textarea></label><p class="sub">Zgłoszenie trafi od razu do Radka (status „Do Radka”). O usunięciu decyduje twórca gry.</p><div class="actions"><button class="main" id="rpGo">Zgłoś</button><button id="rpNo">Anuluj</button></div>`);
   $('rpNo').onclick=()=>showRanking();
   $('rpGo').onclick=async()=>{$('rpGo').disabled=true;const t=$('rpW').value+($('rpT').value.trim()?': '+$('rpT').value.trim():'');
-    if(await repSend({k:'player',t,tu:r.id,tn:r.nick})){toast('Zgłoszono: '+r.nick,2200);showRanking()}else{$('rpGo').disabled=false;toast('Nie udało się wysłać zgłoszenia',2600)}}}
-async function repLoad(){try{const {F,db}=await fb();const q=await F.getDocs(F.collection(db,'reports'));const old=Date.now()-60*DAY;RP.l=[];
+    if(await repSend({k:'player',t,tu:r.id,tn:r.nick})){toast('Zgłoszono: '+r.nick,2200);showRanking()}else{$('rpGo').disabled=false;toast(RP.err==='limit'?'Na dziś limit zgłoszeń wyczerpany. Spróbuj jutro.':'Nie udało się wysłać zgłoszenia',2600)}}}
+async function repLoad(){try{const {F,db}=await fb();const q=await F.getDocs(F.query(F.collection(db,'reports'),F.limit(500)));const old=Date.now()-60*DAY;RP.l=[];
   for(const d of q.docs){const x=Object.assign({id:d.id},d.data());if(ADM.me&&(x.st==='done'||x.st==='rej')&&(+x.upd||+x.ts||0)<old){F.deleteDoc(F.doc(db,'reports',d.id)).catch(()=>{});continue}RP.l.push(x)}
   RP.loaded=true;updBadge();return true}catch(e){console.warn('zgłoszenia',e);return false}}
 async function cfgLoad(){try{const {F,db}=await fb();const d=await F.getDoc(F.doc(db,'cfg','main'));RP.cfg=d.exists()?d.data():{}}catch(e){RP.cfg=RP.cfg||{}}}
