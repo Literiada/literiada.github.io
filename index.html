@@ -189,6 +189,11 @@ table.vals td:last-child{text-transform:uppercase;letter-spacing:.08em}
 .medal{flex:none;animation:drop .8s cubic-bezier(.2,1.5,.4,1) both}
 .cel .msg{font-family:var(--display);font-weight:800;font-size:1.15rem;line-height:1.25}
 .cel .msg small{display:block;font:400 .82rem var(--body);color:var(--muted);margin-top:3px}
+.klb{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:2px 10px 2px 6px;font:800 .78rem var(--body);margin:6px 4px 0 0}
+.klb.fs{background:#fde047;color:#1a1300}
+.cel .msg{min-width:0}.cel .msg .bolt{white-space:normal;max-width:100%}.klb.pk{background:#a78bfa;color:#160b33}
+.ktitle{display:inline-block;font:700 .72rem var(--body);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:1px 7px;margin-left:6px;vertical-align:middle}
+.rtabs.k2{margin-top:4px}.rtabs.k2 button{font-size:.78rem}
 .bolt{display:inline-flex;align-items:center;gap:4px;background:#ff8a00;color:#fff;border-radius:999px;padding:2px 10px 2px 6px;font:800 .78rem var(--body);margin-top:6px;animation:pulse 1.2s ease 2}
 .full{background:var(--lvwon);border-radius:8px;padding:8px 12px;font-weight:600;text-align:center}
 @keyframes drop{0%{transform:translateY(-70px) rotate(-25deg) scale(.6);opacity:0}100%{transform:none;opacity:1}}
@@ -458,7 +463,7 @@ textarea.fi{resize:vertical}
   <div class="shdr" id="sTeamH" hidden>Zespół</div>
   <button class="sitem" id="sAdm" hidden></button>
   <button class="sitem" id="sRep" hidden></button>
-  <div class="sfoot">Literiada · wersja 20.1 · 2026-11-23</div>
+  <div class="sfoot">Literiada · wersja 20.2.1 · 2026-11-24</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -490,7 +495,7 @@ const isWknd=k=>{const d=new Date(keyToUTC(k)).getUTCDay();return d===0||d===6};
 const P3OLD=247,P3CUT=14;
 function wordFor(i,n){const pool=L[Math.min(i,2)],len=(i>=2&&n<P3CUT)?P3OLD:pool.length;const k=i===3?n+Math.floor(len/2):n;return pool[((k%len)+len)%len]}
 // uzupełnia zapis dnia do 4 poziomów (starsze zapisy miały 3)
-function norm(d){const def={g:()=>[],res:()=>null,pts:()=>0,t:()=>0,te:()=>null,tb:()=>0,jk:()=>0,jc:()=>0,jp:()=>null,kr:()=>0,hq:()=>null,hpos:()=>null,hc:()=>0};
+function norm(d){const def={g:()=>[],res:()=>null,pts:()=>0,t:()=>0,te:()=>null,tb:()=>0,jk:()=>0,jc:()=>0,jp:()=>null,kr:()=>0,hq:()=>null,hpos:()=>null,hc:()=>0,fs:()=>0,pk:()=>0};
   for(const f in def){if(!Array.isArray(d[f]))d[f]=[];while(d[f].length<4)d[f].push(def[f]())}return d}
 const done3=d=>!!(d.res[2]||d.res.slice(0,3).includes('lost'));
 const p4open=()=>!!day&&isWknd(curKey())&&done3(day);
@@ -508,6 +513,8 @@ const SVG={
   joker:'<path d="M12 2.8l2.4 5.6 6 .6-4.5 4 1.3 6-5.2-3.1-5.2 3.1 1.3-6L3.6 9l6-.6z"/>',
   gift:'<rect x="3.5" y="9.5" width="17" height="11" rx="1.5"/><path d="M2.5 9.5h19v3.5h-19zM12 9.5v11M12 9.5C10 5 5.5 5 5.5 7.5S9 9.5 12 9.5zm0 0c2-4.5 6.5-4.5 6.5-2S15 9.5 12 9.5z"/>',
   del:'<path d="M9 5.5h11v13H9l-6-6.5z"/><path d="M12.5 9.5l5 5M17.5 9.5l-5 5"/>',
+  bulb:'<path d="M9 17.5h6M9.8 20.5h4.4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.4 1.1 2.2v1.5h5V16c0-.8.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/>',
+  hglass:'<path d="M6.5 3h11M6.5 21h11M7.5 3c0 5 4.5 6 4.5 9s-4.5 4-4.5 9M16.5 3c0 5-4.5 6-4.5 9s4.5 4 4.5 9"/><path d="M9.5 18.5h5"/>',
   bolt:'<path d="M13.5 2.5L5 13.5h6l-1.5 8 8.5-11h-6z" fill="currentColor"/>',
   menu:'<path d="M4 6.5h16M4 12h16M4 17.5h16"/>',
   chart:'<path d="M5 20V11M12 20V4M19 20v-7"/>',
@@ -730,12 +737,13 @@ function submit(){
   const s=score(cur,answer);guesses.push({w:cur,s});const won=cur===answer;cur='';
   busy=true;
   if(mode!=='free'){day.g[lvl]=guesses;saveDay()}
+  const klGot=klCheck(s),klMsg=klAnnounce(klGot);if(klGot.length)rankSync();
   if(duel)duelSave({g:guesses});
   paint();
   const tiles=$('board').children[guesses.length-1].children;
   [...tiles].forEach((t,i)=>{t.style.animationDelay=(i*90)+'ms';t.classList.add('rev');SFX.tile(s[i],i*0.09)});
   if(!won&&guesses.length<maxG()&&s.every(x=>x==='miss'))SFX.none(0.6);
-  setTimeout(()=>{busy=false;if(won)finish(true);else if(guesses.length>=maxG()){if(canKolo())offerKolo();else finish(false)}else attemptToast()},5*90+450);
+  setTimeout(()=>{busy=false;if(won)finish(true);else if(guesses.length>=maxG()){if(canKolo())offerKolo();else finish(false)}else if(klMsg){toast(klMsg,3200)}else attemptToast()},5*90+450);
 }
 function finish(won){
   done=true;
@@ -775,7 +783,7 @@ function shareLines(withGrid,compact){const G=i=>Array.isArray(withGrid)?!!withG
   if(RX()){let t='Literiada #'+(curN()+1)+' 🌿 na luzie\n';day.res.forEach((r,i)=>{if(!r)return;const g=day.g[i]||[];t+='\n'+(i===3?'🎁 P4':'P'+(i+1))+' '+(r==='won'?(day.kr[i]?'🛟 7/6':(g.length||'✓')+'/6'):'X/6')+(day.hpos[i]!=null?' 🤝':'');if(G(i)&&g.length)t+='\n'+grid(g)});return t+'\n\n👉 '+SHARE_URL}
   const tot=day.pts.reduce((a,b)=>a+b,0),sk=mode==='day'?streakN():0;let t='Literiada #'+(curN()+1)+' · '+tot+' pkt'+(done3(day)&&day.res.slice(0,3).every(r=>r==='won')?' 🏆':'')+(sk>=2?'\n🔥 '+dniPL(sk)+' z rzędu':'')+'\n';
   day.res.forEach((r,i)=>{if(!r)return;const g=day.g[i]||[];
-    t+='\n'+(i===3?'🎁 P4':'P'+(i+1))+' '+(r==='won'?(day.kr[i]?'🛟 7/6':medE(g.length||6)+' '+(g.length||'✓')+'/6'):'❌ X/6')+(day.hpos[i]!=null?' 🤝':'')+' · '+day.pts[i]+' pkt'+(!compact&&day.te&&day.te[i]!=null&&r==='won'?' · ⏱'+fmtT(day.te[i]):'');
+    t+='\n'+(i===3?'🎁 P4':'P'+(i+1))+' '+(r==='won'?(day.kr[i]?'🛟 7/6':medE(g.length||6)+' '+(g.length||'✓')+'/6'):'❌ X/6')+(day.hpos[i]!=null?' 🤝':'')+(mode==='day'&&day.fs&&day.fs[i]?' 💡':'')+(mode==='day'&&day.pk&&day.pk[i]?' ⏳':'')+' · '+day.pts[i]+' pkt'+(!compact&&day.te&&day.te[i]!=null&&r==='won'?' · ⏱'+fmtT(day.te[i]):'');
     if(G(i)&&g.length)t+='\n'+grid(g)});
   if(day.pts[4])t+='\n🏁 Bonus dnia +'+day.pts[4]+' pkt';
   return t+'\n\n👉 '+SHARE_URL}
@@ -823,7 +831,7 @@ function showResult(won,p){
   const bolt=won&&mode!=='free'&&tbNow>=TMAX[lvl]/2?`<span class="bolt">${ic('bolt',14)} Błyskawica! Ponad połowa bonusu za czas</span>`:'';
   const cel=koloW?`<div class="cel"><span style="color:#e5484d">${ic('ring',64)}</span><div class="msg">Koło ratunkowe zadziałało!<small>Odgadnięte w 7. próbie${lvl<2?' · poziom '+(lvl+2)+' odblokowany':''}</small></div></div>`
     :won&&RX()&&mode!=='free'?`<div class="cel"><span style="font-size:64px;line-height:1">🌿</span><div class="msg">${pick(CHEER[mk])}<small>Odgadnięte w ${guesses.length}. próbie</small></div></div>`
-    :won?`<div class="cel">${medal(mk)}<div class="msg">${pick(CHEER[mk])}<small>${medalName[mk][0].toUpperCase()+medalName[mk].slice(1)} za ${guesses.length}. próbę</small>${bolt}</div></div>`
+    :won?`<div class="cel">${medal(mk)}<div class="msg">${pick(CHEER[mk])}<small>${medalName[mk][0].toUpperCase()+medalName[mk].slice(1)} za ${guesses.length}. próbę</small>${bolt}${mode==='day'?'<span>'+klBadges(lvl)+'</span>':''}</div></div>`
     :`<div class="cel"><span style="color:var(--near)">${ic('sun',64)}</span><div class="msg">${pick(CHEER.lost)}<small>${mode==='arch'?'W archiwum czekają kolejne dni.':'Każdy dzień to nowe hasła.'}</small></div></div>`;
   const full=won&&mode!=='free'&&lvl===2?`<div class="full">Komplet! Wszystkie 3 hasła ${mode==='arch'?'tego dnia':'dnia'} odgadnięte.</div>`:'';
   if(mode!=='free'&&RX()){
@@ -891,7 +899,7 @@ function showStats(){
     const word=r?w:(unlocked(i)?'…':ic('lock',15));const note=r==='won'&&day.kr[i]?'uratowane kołem ratunkowym, 7. próba':r==='won'?(g.length?'odgadnięte w '+g.length+'. próbie':'odgadnięte'):r==='lost'?'nie odgadnięte':unlocked(i)?(g.length?'w trakcie · dotknij, żeby grać':'dotknij, żeby grać'):i===3?'po zakończeniu poziomu 3':'zablokowane';
     const mini=g.length&&r?`<span class="mini" hidden>${g.map(x=>`<span class="mr">${[...x.w].map((ch,j)=>`<i style="background:${COL[x.s[j]]}">${ch}</i>`).join('')}</span>`).join('')}</span>`:'';
     const act=g.length&&r?` data-tog="${i}" role="button" tabindex="0" aria-expanded="false"`:(!r&&unlocked(i))?` data-play="${i}" role="button" tabindex="0"`:'';
-    return `<div${act} class="${r==='lost'?'lostr':''}"><span class="lvn">${i===3?'P4':'P'+(i+1)}</span><span class="w">${word}<small>${note}${!RX()&&day.te&&day.te[i]!=null&&r?' · '+ic('clock',12)+' '+fmtT(day.te[i])+(day.tb[i]?' (+'+day.tb[i]+')':''):''}</small></span><span class="pt">${RX()?'':(r==='won'&&g.length?(day.kr[i]?'<span style="color:#e5484d">'+ic('ring',18)+'</span>':medal(medalKind(g.length),18)):'')+day.pts[i]+' pkt'}${mini?' <span class="chev">'+ic('chev',16)+'</span>':''}</span>${mini}</div>`}).join('');
+    return `<div${act} class="${r==='lost'?'lostr':''}"><span class="lvn">${i===3?'P4':'P'+(i+1)}</span><span class="w">${word}<small>${note}${!RX()&&day.te&&day.te[i]!=null&&r?' · '+ic('clock',12)+' '+fmtT(day.te[i])+(day.tb[i]?' (+'+day.tb[i]+')':''):''}${!RX()&&mode==='day'?['fs','pk'].filter(k=>day[k]&&day[k][i]).map(k=>' · '+ic(KL[k].ic,12)+' '+KL[k].ev).join(''):''}</small></span><span class="pt">${RX()?'':(r==='won'&&g.length?(day.kr[i]?'<span style="color:#e5484d">'+ic('ring',18)+'</span>':medal(medalKind(g.length),18)):'')+day.pts[i]+' pkt'}${mini?' <span class="chev">'+ic('chev',16)+'</span>':''}</span>${mini}</div>`}).join('');
   const boards=day.g.some(x=>x&&x.length)?LVA.map((l,i)=>{const g=day.g[i]||[],r=day.res[i];if(!g.length)return '';const w=wordFor(i,curN());
     return `<div class="bl"><div class="bh"><span>${l.n} · <span class="w">${r?w:'w trakcie'}</span></span><span>${RX()?(r==='won'?(day.kr[i]?'7/6 koło':g.length+'/6'):''):(r==='won'?(day.kr[i]?'<span style="color:#e5484d">'+ic('ring',18)+'</span>':medal(medalKind(g.length),18)):'')+day.pts[i]+' pkt'}</span></div><span class="mini">${g.map(x=>`<span class="mr">${[...x.w].map((ch,j)=>`<i style="background:${COL[x.s[j]]}">${ch}</i>`).join('')}</span>`).join('')}</span></div>`}).join('')
     :'<p class="sub">Plansze z tego dnia nie zostały zapisane: ten dzień rozegrano w starszej wersji gry, która zapamiętywała tylko wynik. Punkty są policzone.</p>';
@@ -965,6 +973,7 @@ function showHelp(){
   <p><b>Wyzwania z rankingu.</b> Przy każdym graczu w rankingu jest przycisk „Wyzwij”: wpisujesz hasło, a gracz znajdzie je w menu ☰ → Wyzwania. Może je przyjąć albo odrzucić, a Ty dostaniesz informację o wyniku. Jedno wyzwanie dziennie do tej samej osoby, wyzwanie wygasa po 48 godzinach. Wyzwania wyłączysz w menu: Przyjmuję wyzwania.</p>
   <p><b>Seria dni.</b> Każdy dzień rozegrany w swoim dniu przedłuża serię 🔥. Dni nadrabiane w archiwum serii nie przedłużają. Serię widać w podsumowaniu dnia i w udostępnianym wyniku.</p>
   <p><b>Ranking graczy.</b> W menu ☰ wybierz Ranking graczy i podaj pseudonim (bez maila i hasła). Twoje punkty trafią do wspólnego rankingu: dziś, w tym tygodniu, w miesiącu i łącznie. Jest tam też tabela pojedynków. Ranking jest dobrowolny i w każdej chwili możesz się z niego usunąć.</p>
+  <p><b>Klasyfikacje poboczne.</b> Obok rankingu głównego są dwie zabawowe klasyfikacje, bez punktów. <b>Błysk geniuszu</b> 💡: co najmniej 3 zielone litery w pierwszej minucie poziomu, liczy się do klasyfikacji <b>Sigm</b> (sigma to ktoś, kto od razu bierze się do roboty). <b>Za pięć dwunasta</b> ⏳: co najmniej 3 zielone litery w ostatniej minucie czasu z bonusem, liczy się do klasyfikacji <b>Prokrastynatorów</b>. Każde najwyżej raz na poziom dziennie. Za 1, 10, 25 i 50 zaliczeń dostajesz kolejne tytuły.</p>
   <p><b>Gra na luzie 🌿.</b> Wolisz grać bez presji? W menu ☰ włącz „Grę na luzie”: znika zegar, punkty, medale i ranking, zostają same słowa. Wyłączysz to w każdej chwili.</p>
   <p><b>Literiada na X.</b> Obserwuj @Literiada (x.com/Literiada): nowości, wyzwania i najlepsze wyniki graczy. Wrzucając wynik na X, oznacz @Literiada.</p>
   <p><b>Zaproś znajomych.</b> W menu ☰ albo w podsumowaniu dnia kliknij „Zaproś do gry” i wybierz komunikator: Messenger, WhatsApp, SMS, Telegram, e-mail, X albo Facebook.</p>
@@ -982,7 +991,7 @@ function showHelp(){
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 20.1 · 2026-11-23</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 20.2.1 · 2026-11-24</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
@@ -1006,6 +1015,37 @@ const TMAX=[20,40,60,60], tl=l=>l===3?600:300;
 const fmtT=ms=>{const x=Math.max(0,Math.floor(ms/1000));return Math.floor(x/60)+':'+String(x%60).padStart(2,'0')};
 const bonusFor=(L0,ms)=>ms>=tl(L0)*1000?0:Math.max(0,Math.ceil(TMAX[L0]*(1-ms/(tl(L0)*1000))));
 let timeupFired=null;
+// ---- v20.2: klasyfikacje poboczne (poza rankingiem głównym)
+// Błysk geniuszu: min. 3 zielone litery w pierwszej minucie poziomu -> Sigmy (v20.2.1, wcześniej Falstarterzy)
+// Za pięć dwunasta: min. 3 zielone litery w ostatniej minucie czasu z bonusem -> Prokrastynatorzy
+// najwyżej raz na poziom dziennie; tylko gra w swoim dniu, próby 1–6, bez gry na luzie, pojedynków i wyzwań
+const KL={fs:{ev:'Błysk geniuszu',rk:'Sigmy',ic:'bulb',e:'💡',t:['Iskra','Petarda','Rakieta','Sigma'],
+    m:['Ledwo start, a już 3 zielone!','Kawa jeszcze nie wystygła, a tu 3 zielone!','Pełna sigma: od razu do roboty!']},
+  pk:{ev:'Za pięć dwunasta',rk:'Prokrastynatorzy',ic:'hglass',e:'⏳',t:['Odkładacz','Kunktator','Mistrz Mañany','Wielki Prokrastynator'],
+    m:['Zdążone jak student przed sesją 😅','Termin to tylko sugestia, prawda?','Najlepsze pomysły przychodzą na końcu!']}};
+const KL_PROG=[1,10,25,50],KL_MIN=3,KL_WIN=60000;
+const klTitle=(k,n)=>{let t='';KL_PROG.forEach((p,i)=>{if(n>=p)t=KL[k].t[i]});return t};
+function klStore(){const o=store.get('sd2_klas',{});if(!o||typeof o!=='object')return {fs:{},pk:{}};o.fs=o.fs&&typeof o.fs==='object'?o.fs:{};o.pk=o.pk&&typeof o.pk==='object'?o.pk:{};return o}
+function klSum(k,a,b){const o=klStore()[k];let n=0;for(const x in o){const t=keyToUTC(x);if(t>=a&&t<=b)n+=Math.max(0,Math.min(4,+o[x]||0))}return n}
+function klVal(k,tab){if(tab==='a')return klSum(k,0,9e15);const [a,b]=rankRange(tab);return klSum(k,a,b)}
+// wywoływane po każdej próbie: zwraca listę zdobytych dziś zaliczeń (np. ['fs'])
+function klCheck(s){const got=[];
+  if(mode!=='day'||duel||RX()||!day||!day.t||!day.t[lvl])return got;
+  if(guesses.length>6)return got;
+  if(s.filter(x=>x==='hit').length<KL_MIN)return got;
+  const e=Date.now()-day.t[lvl],T=tl(lvl)*1000;
+  const tryK=k=>{if(day[k][lvl])return;day[k][lvl]=1;got.push(k);const o=klStore(),dk=curKey();
+    const before=klSum(k,0,9e15);o[k][dk]=Math.min(4,(+o[k][dk]||0)+1);store.set('sd2_klas',o);
+    const after=before+1;if(klTitle(k,after)!==klTitle(k,before))got.push('t'+k)};
+  if(e<=KL_WIN)tryK('fs');
+  if(e>=T-KL_WIN&&e<T)tryK('pk');
+  if(got.length)saveDay();
+  return got}
+function klAnnounce(got){if(!got.length)return '';const parts=[];
+  for(const k of ['fs','pk'])if(got.includes(k))parts.push(KL[k].e+' '+KL[k].ev+'! '+pick(KL[k].m));
+  for(const k of ['fs','pk'])if(got.includes('t'+k))parts.push('Nowy tytuł: '+klTitle(k,klVal(k,'a'))+' ('+KL[k].rk+')');
+  return parts.join(' · ')}
+const klBadges=i=>['fs','pk'].filter(k=>day&&day[k]&&day[k][i]).map(k=>`<span class="klb ${k}">${ic(KL[k].ic,13)} ${KL[k].ev}</span>`).join('');
 function updTimer(){const el=$('timer');if(!el)return;
   if(mode==='free'||!day||!day.t||RX()){el.hidden=true;return}
   el.hidden=false;el.className='timer';
@@ -1185,7 +1225,7 @@ function startResultFromHash(){const m=location.hash.match(/^#r=([A-Za-z0-9_-]+)
 // ---- Eksport i import wyników (przeprowadzka na inne urządzenie lub nowy adres)
 const MV_PRE='LITERIADA1:';
 // v20.1: import wyników – tylko znane klucze, sprawdzone typy i długości
-const MV_KEYS=new Set(['sd2_nick','sd2_hist','sd2_arch','sd2_log','sd2_duel_name','sd2_seen','sd2_help_n','sd2_prev','sd2_duels_out','sd2_duels_in','sd2_day','sd2_ref_sent','sd2_ontime','sd2_kola','sd2_hl_seen','sd2_side','sd2_rep','sd2_ref_from','sd2_hint_menu','sd2_rk_never','sd2_rk_first','sd2_rk_ask','sd2_relax','sd2_iab_x','sd2_greet','sd2_ch_sent','sd2_ch_seen','sd2_ch_ok','lt_sound']);
+const MV_KEYS=new Set(['sd2_nick','sd2_hist','sd2_arch','sd2_log','sd2_duel_name','sd2_seen','sd2_help_n','sd2_prev','sd2_duels_out','sd2_duels_in','sd2_day','sd2_ref_sent','sd2_ontime','sd2_kola','sd2_hl_seen','sd2_side','sd2_klas','sd2_rep','sd2_ref_from','sd2_hint_menu','sd2_rk_never','sd2_rk_first','sd2_rk_ask','sd2_relax','sd2_iab_x','sd2_greet','sd2_ch_sent','sd2_ch_seen','sd2_ch_ok','lt_sound']);
 function mvClean(k,v){if(!MV_KEYS.has(k)||typeof v!=='string'||v.length>400000)return null;let j;try{j=JSON.parse(v)}catch(e){return null}
   if(k==='sd2_nick')return j===''||nickOk(j)?v:null;
   if(k==='sd2_duel_name')return typeof j==='string'?JSON.stringify(cleanName(j,'')):null;
@@ -1280,6 +1320,11 @@ async function rankSync(){const nick=store.get('sd2_nick','');if(!nick||RX()||st
     for(const k in h){const s=Math.round(rsum(h[k]));all+=s;if(s>0&&keyToUTC(k)>=cut)days[k]=s}
     const one=(k,v)=>v>0?{[k]:v}:{};
     await F.setDoc(F.doc(db,'players',uid),{nick,all:Math.round(all),days,dd:one(todayKey(),myVal('d')),ww:one(rkWk(),myVal('w')),mm:one(rkMk(),myVal('m')),sv:one(todayKey(),svMask()),hl:Math.min(100000,Math.max(0,+store.get('sd2_help_n',0)||0)),...(store.get('sd2_prev','')?{prev:String(store.get('sd2_prev','')).slice(0,128)}:{}),upd:Date.now()});RK.cache={};rankOk=true}catch(e){console.warn('ranking',e);rankOk=false}
+  if(rankOk){try{const {F,db,uid}=await fb();const one=(k,v)=>v>0?{[k]:v}:{},kv=(k,t)=>Math.round(klVal(k,t));
+    const fa=kv('fs','a'),pa=kv('pk','a');
+    if(fa>0||pa>0)await F.setDoc(F.doc(db,'klas',uid),{nick,fa,pa,fd:one(todayKey(),kv('fs','d')),fw:one(rkWk(),kv('fs','w')),fm:one(rkMk(),kv('fs','m')),
+      pd:one(todayKey(),kv('pk','d')),pw:one(rkWk(),kv('pk','w')),pm:one(rkMk(),kv('pk','m')),...(store.get('sd2_prev','')?{prev:String(store.get('sd2_prev','')).slice(0,128)}:{}),upd:Date.now()})}
+    catch(e){console.warn('klasyfikacje',e)}}
   rankBusy=false;if(rankAgain){rankAgain=false;rankSync()}}
 async function duelPush(sn,won){try{if(!duel)return;const {F,db,uid}=await fb();
   const id=String(duel.code||'x').replace(/[^A-Za-z0-9_-]/g,'').slice(0,40)+'_'+uid;
@@ -1298,10 +1343,23 @@ function rankVal(r,tab){if(tab==='a')return (+r.all||0)+(RK.adj&&+RK.adj[r.id]||
   const [a,b]=rankRange(tab);let lv=0;const d=r.days||{};for(const x in d){const t=keyToUTC(x);if(t>=a&&t<=b)lv+=+d[x]||0}return Math.max(nv,lv)}
 function myVal(tab){const h=store.get('sd2_hist',{});if(tab==='a')return Math.round(sumRange(h,0,9e15));const [a,b]=rankRange(tab);return Math.round(sumRange(h,a,b))}
 function rankHTML(){const tab=RK.tab,nick=store.get('sd2_nick','');
-  const tabs=[['d','Dziś'],['w','Tydzień'],['m',new Date(keyToUTC(todayKey())).toLocaleDateString('pl-PL',{month:'long',timeZone:'UTC'})],['a','Łącznie'],['p','Pojedynki']].map(([k,l])=>`<button data-rt="${k}" aria-pressed="${tab===k}">${l}</button>`).join('');
+  const tabs=[['d','Dziś'],['w','Tydzień'],['m',new Date(keyToUTC(todayKey())).toLocaleDateString('pl-PL',{month:'long',timeZone:'UTC'})],['a','Łącznie'],['p','Pojedynki']].map(([k,l])=>`<button data-rt="${k}" aria-pressed="${tab===k}">${l}</button>`).join('')
+    +'</div><div class="rtabs k2">'+[['fs',ic('bulb',13)+' Sigmy'],['pk',ic('hglass',13)+' Prokrastynatorzy']].map(([k,l])=>`<button data-rt="${k}" aria-pressed="${tab===k}">${l}</button>`).join('');
+  const isK=tab==='fs'||tab==='pk',kp=RK.kp||'a';
   let body='';
   if(RK.err)body=`<p class="dbad">Ranking jest chwilowo niedostępny. Sprawdź połączenie z internetem i spróbuj ponownie.</p><div class="actions"><button id="rRetry">Spróbuj ponownie</button></div>`;
   else if(!RK.rows)body='<p class="sub">Wczytuję ranking…</p>';
+  else if(isK){
+    const per=[['d','Dziś'],['w','Tydzień'],['m','Miesiąc'],['a','Łącznie']].map(([k,l])=>`<button data-kp="${k}" aria-pressed="${kp===k}">${l}</button>`).join('');
+    const f=tab==='fs'?{a:'fa',d:'fd',w:'fw',m:'fm'}:{a:'pa',d:'pd',w:'pw',m:'pm'},key=kp==='d'?todayKey():kp==='w'?rkWk():kp==='m'?rkMk():null;
+    const v=r=>kp==='a'?(+r[f.a]||0):(+((r[f[kp]]||{})[key])||0);
+    const list=RK.rows.map(r=>({id:r.id,nick:r.nick||'?',v:v(r),n:+r[f.a]||0})).filter(r=>r.v>0).sort((a,b)=>b.v-a.v).slice(0,50);
+    const row=(r,i)=>`<div class="${r.id===FBUID?'me':''}"><span class="pos">${i<3?medal(['gold','silver','bronze'][i],22):i+1}</span><span class="nk">${esc(r.nick)}${admB(r.id)}<span class="ktitle">${esc(klTitle(tab,r.n))}</span></span><span class="pt">${r.v}×</span></div>`;
+    const myN=klVal(tab,'a');
+    body=`<p class="sub">${ic(KL[tab].ic,14)} <b>${KL[tab].ev}</b>: co najmniej 3 zielone litery w ${tab==='fs'?'pierwszej minucie poziomu':'ostatniej minucie czasu z bonusem'}. ${tab==='fs'?' Sigma to ktoś, kto od razu bierze się do roboty.':''} Osobna klasyfikacja, nie dolicza punktów do rankingu głównego.</p><div class="rtabs k2">${per}</div>`
+      +(list.length?`<div class="rlist">${list.map(row).join('')}</div>`:'<p class="sub">Nikt jeszcze nie trafił do tej klasyfikacji w tym okresie.</p>')
+      +`<p class="sub">Tytuły: ${KL[tab].t.map((t,i)=>esc(t)+' ('+KL_PROG[i]+')').join(' → ')}${nick?' · Ty: <b>'+myN+'×</b>'+(klTitle(tab,myN)?', '+esc(klTitle(tab,myN)):''):''}</p>`;
+  }
   else if(tab==='p'){
     const line=d=>`<div><span><b>${esc(d.sn)}</b>${admB(d.su)} ${d.res==='won'?'odgadł(a)':'nie odgadł(a)'} zagadki od <b>${esc(d.an)}</b>${admB(d.au)}</span><span style="white-space:nowrap">${d.res==='won'?d.tries+'. próba · '+d.pts+' pkt':'—'}${ADM.me&&d.id?`<button class="admx" data-dd="${esc(d.id)}" title="Usuń wpis" aria-label="Usuń wpis">${ic('trash',14)}</button>`:''}</span></div>`;
     const mine=(RK.mine||[]).sort((a,b)=>b.ts-a.ts).slice(0,20);
@@ -1318,8 +1376,9 @@ function rankHTML(){const tab=RK.tab,nick=store.get('sd2_nick','');
   }
   const join=nick?`<p class="sub">Grasz jako <b>${esc(nick)}</b>. <button class="linkbtn" id="rNick" style="padding:0">Zmień nick</button> · <button class="linkbtn" id="rOut" style="padding:0">Usuń mnie z rankingu</button></p>`
     :`<div class="rjoin"><b>Dołącz do rankingu</b><span style="font-size:.85rem">Wpisz pseudonim, który zobaczą inni gracze. Bez maila i hasła, zapisujemy tylko pseudonim i punkty.</span><input id="rIn" maxlength="20" placeholder="np. Radek z Pręgowa" autocomplete="off"><button id="rJoin">Dołącz</button><span class="dbad" id="rErr" hidden></span></div>`;
-  return `<div class="step">Ranking</div><h2>${ic('trophy',24)} Ranking graczy</h2>${join}<div class="rtabs">${tabs}</div>${body}${nick&&tab!=='p'?'<p class="sub">Przycisk „Wyzwij” wysyła graczowi Twoje hasło do odgadnięcia. Jedno wyzwanie dziennie do tej samej osoby.</p><p class="sub">'+HI+' to licznik pomocy udzielonych innym graczom. Świecąca ikona oznacza, że ten gracz odgadł dziś Twój bieżący poziom: dotknij jej, żeby poprosić go o jedną literę.</p>':''}<div class="actions"><button id="aClose">Zamknij</button></div><p class="sub">Link do rankingu: literiada.github.io/#ranking</p>`}
+  return `<div class="step">Ranking</div><h2>${ic('trophy',24)} Ranking graczy</h2>${join}<div class="rtabs">${tabs}</div>${body}${nick&&tab!=='p'&&!isK?'<p class="sub">Przycisk „Wyzwij” wysyła graczowi Twoje hasło do odgadnięcia. Jedno wyzwanie dziennie do tej samej osoby.</p><p class="sub">'+HI+' to licznik pomocy udzielonych innym graczom. Świecąca ikona oznacza, że ten gracz odgadł dziś Twój bieżący poziom: dotknij jej, żeby poprosić go o jedną literę.</p>':''}<div class="actions"><button id="aClose">Zamknij</button></div><p class="sub">Link do rankingu: literiada.github.io/#ranking</p>`}
 function rankBind(){document.querySelectorAll('[data-rt]').forEach(b=>b.onclick=()=>{RK.tab=b.dataset.rt;rankLoad()});
+  document.querySelectorAll('[data-kp]').forEach(b=>b.onclick=()=>{RK.kp=b.dataset.kp;rankDraw()});
   document.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{const r=(RK.rows||[]).find(x=>x.id===b.dataset.ch);if(r)chNew(r)});
   document.querySelectorAll('[data-hreq]').forEach(b=>b.onclick=()=>{const r=(RK.rows||[]).find(x=>x.id===b.dataset.hreq);if(r)helpAsk(r)});
   document.querySelectorAll('[data-ad]').forEach(b=>b.onclick=()=>{const r=(RK.rows||[]).find(x=>x.id===b.dataset.ad);if(r)admAsk(r)});
@@ -1332,7 +1391,7 @@ function rankBind(){document.querySelectorAll('[data-rt]').forEach(b=>b.onclick=
       $('rJoin').textContent='Sprawdzam…';if(await nickTaken(v)){$('rErr').hidden=false;$('rErr').innerHTML=NICK_MSG;$('rJoin').textContent='Dołącz';return}
     store.set('sd2_moved',0);store.set('sd2_nick',v);if(!store.get('sd2_duel_name',''))store.set('sd2_duel_name',v);$('rJoin').textContent='Dołączam…';await rankSync();if(!rankOk&&await admBanned()){store.set('sd2_nick','');rankDraw();toast('Ten profil został zablokowany w rankingu przez administratora gry',3600);return}RK.cache={};rankLoad(true)};
   if($('rNick'))$('rNick').onclick=()=>{store.set('sd2_nick','');rankDraw();setTimeout(()=>{const i=$('rIn');if(i)i.focus()},50)};
-  if($('rOut'))$('rOut').onclick=async()=>{let nd=0;try{const {F,db,uid}=await fb();await F.deleteDoc(F.doc(db,'players',uid));
+  if($('rOut'))$('rOut').onclick=async()=>{let nd=0;try{const {F,db,uid}=await fb();await F.deleteDoc(F.doc(db,'players',uid));try{await F.deleteDoc(F.doc(db,'klas',uid))}catch(e){}
       const qs=await Promise.all([F.getDocs(F.query(F.collection(db,'duels'),F.where('su','==',uid))),F.getDocs(F.query(F.collection(db,'duels'),F.where('au','==',uid)))]);
       const seen=new Set();for(const q of qs)for(const d of q.docs){if(seen.has(d.id))continue;seen.add(d.id);try{await F.deleteDoc(F.doc(db,'duels',d.id));nd++}catch(e){}}
       await chWipe();await hlWipe()}catch(e){}
@@ -1342,7 +1401,8 @@ async function rankLoad(force){const tab=RK.tab,c=RK.cache[tab];await admLoad();
   if(!force&&c&&Date.now()-c.ts<180000){RK.rows=c.rows;RK.mePos=c.mePos;if(tab==='p'){RK.duels=c.duels;RK.mine=c.mine}RK.err=null;rankDraw();return}
   RK.rows=null;RK.err=null;rankDraw();
   try{const {F,db,uid}=await fb();const col=F.collection(db,'players');let rows=[],duels=null,mine=null,mePos=null;
-    if(tab==='p'){const [ds,ms]=await Promise.all([F.getDocs(F.query(F.collection(db,'duels'),F.orderBy('ts','desc'),F.limit(30))),F.getDocs(F.query(F.collection(db,'duels'),F.where('au','==',uid),F.limit(40)))]);
+    if(tab==='fs'||tab==='pk'){const ks=await F.getDocs(F.query(F.collection(db,'klas'),F.limit(500)));rows=dedupPrev(ks.docs.map(d=>Object.assign({id:d.id},d.data())))}
+    else if(tab==='p'){const [ds,ms]=await Promise.all([F.getDocs(F.query(F.collection(db,'duels'),F.orderBy('ts','desc'),F.limit(30))),F.getDocs(F.query(F.collection(db,'duels'),F.where('au','==',uid),F.limit(40)))]);
       duels=ds.docs.map(d=>Object.assign({id:d.id},d.data()));mine=ms.docs.map(d=>Object.assign({id:d.id},d.data()))}
     else{if(RK.cnt==null){try{RK.cnt=(await F.getCountFromServer(col)).data().count}catch(e){console.warn('ranking',e)}}
       let big=RK.cnt!=null&&RK.cnt>250,f=rkField(tab),fp=f.length>1?new F.FieldPath(f[0],f[1]):f[0];
@@ -1520,7 +1580,7 @@ async function admDel(r,ban){try{const {F,db,uid}=await fb();
     const q=await F.getDocs(F.query(F.collection(db,'duels'),F.where('su','==',r.id)));
     await F.setDoc(F.doc(db,'trash',r.id),{nick:String(r.nick||(p&&p.nick)||'?').slice(0,20),p,du:q.docs.slice(0,150).map(d=>({id:d.id,d:d.data()})),ban:!!ban,why:'del',by:uid,byn:myNick(),ts:Date.now()});
     if(ban)await F.setDoc(F.doc(db,'bans',r.id),{nick:String(r.nick||'').slice(0,20),by:uid,ts:Date.now()});
-    await F.deleteDoc(F.doc(db,'players',r.id));let nd=0;
+    await F.deleteDoc(F.doc(db,'players',r.id));try{await F.deleteDoc(F.doc(db,'klas',r.id))}catch(e){}let nd=0;
     for(const d of q.docs){try{await F.deleteDoc(F.doc(db,'duels',d.id));nd++}catch(e){}}
     RK.cache={};toast((ban?'Usunięto i zablokowano: ':'Usunięto: ')+r.nick+(nd?' (pojedynki: '+nd+')':'')+' · kopia w Koszu',3000)}
   catch(e){console.warn('admin',e);toast('Nie udało się usunąć (nic nie zmieniono). Sprawdź, czy zasady Firestore v19.1 są opublikowane.',4000)}
@@ -1662,7 +1722,7 @@ function helpGive(x){const t=store.get('sd2_day',null),my=t&&t.d===dayNo()?norm(
     catch(e){console.warn('pomoc',e);$('hGo').disabled=false;$('hGo').textContent='Wyślij podpowiedź';toast('Nie udało się wysłać. Prośba mogła zostać anulowana.',3000)}}}
 
 // ---- v19.1: zgłoszenia graczy (kolekcja reports), kosz (trash), kopia bazy, powitanie, zajęty nick
-const VER='20.1';
+const VER='20.2.1';
 const NICK_MSG='Ten pseudonim już gra w rankingu. Jeśli to Ty na innym urządzeniu albo w ikonie na pulpicie, przenieś wyniki: menu ☰ → Przenieś wyniki. Jeśli nie, wybierz inny pseudonim.';
 async function nickTaken(v){const n=String(v).trim().toLowerCase();try{const {F,db,uid}=await fb();
   let rows=(RK.cnt!=null&&RK.cnt<=250&&RK.cache.a&&Date.now()-RK.cache.a.ts<600000)?RK.cache.a.rows:null;
@@ -1823,7 +1883,8 @@ function showWelcome(){open(`${logo()}<h2>Witaj w Literiadzie!</h2>
   <div class="wl"><div><b>1</b><span>Odgadnij 5-literowe słowo w 6 próbach.</span></div><div><b>2</b><span>Kolory podpowiadają: <i style="background:${COL.hit}">zielony</i> litera na swoim miejscu, <i style="background:${COL.near}">żółty</i> litera jest w słowie, <i style="background:${COL.miss}">szary</i> litery nie ma.</span></div><div><b>3</b><span>Codziennie 3 poziomy: każdy kolejny trudniejszy i wyżej punktowany.</span></div></div>
   <div class="actions"><button class="main" id="aClose">Zagraj</button><button id="wFull">Pełna instrukcja</button></div>`);$('wFull').onclick=showHelp}
 function showNews(){open(`<div class="step">Co nowego</div><h2>Literiada ${VER}</h2><ul class="news">
-  <li><b>Nowe, uporządkowane menu.</b> Opcje są pogrupowane: Wyniki, Graj więcej, Ze znajomymi, Pomoc, a rzadziej używane schowaliśmy w zwijanych Ustawieniach.</li>
+  <li><b>Błysk geniuszu 💡 i Za pięć dwunasta ⏳.</b> Trzy zielone litery w pierwszej minucie poziomu albo w ostatniej minucie czasu z bonusem trafiają do nowych klasyfikacji: <b>Sigmy</b> i <b>Prokrastynatorzy</b>. Bez punktów, dla zabawy, z tytułami od Iskry do Sigmy i od Odkładacza do Wielkiego Prokrastynatora. Znajdziesz je w Rankingu.</li>
+  <li><b>Z poprzedniej wersji:</b> nowe, uporządkowane menu. Opcje są pogrupowane: Wyniki, Graj więcej, Ze znajomymi, Pomoc, a rzadziej używane schowaliśmy w zwijanych Ustawieniach.</li>
   <li><b>„Czeka na Ciebie” na górze menu.</b> Wyzwania, prośby o pomoc i zaległe dni w archiwum, z licznikami, zawsze pod ręką.</li>
   <li><b>Lepsza czytelność.</b> Wyraźniejsze przyciski, a ranking mieści się w całości także na wąskich telefonach.</li>
   <li><b>Przypominamy:</b> w podsumowaniu dnia widzisz swoje miejsca w rankingu, a przez „Pomoc – napisz do admina” zgłosisz każdy problem.</li></ul>
