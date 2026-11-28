@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://www.google.com/recaptcha/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseapp.com https://www.gstatic.com https://www.google.com/recaptcha/; frame-src https://*.firebaseapp.com https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
 <title>Literiada – codzienna gra słowna</title>
 <meta name="description" content="Literiada: 3 hasła dziennie, punkty jak w Scrabble i premia za szybkość. Gra w przeglądarce, bez instalacji.">
 <meta property="og:type" content="website">
@@ -297,6 +297,40 @@ body.relax .ptsblock{display:none!important}
 .dlog{display:flex;flex-direction:column;gap:4px;font-size:.88rem}
 .dlog div{border-bottom:1px solid var(--line);padding:5px 0;display:flex;justify-content:space-between;gap:8px}
 .rkbtn{width:100%;border:2px solid #ff8a00;border-radius:8px;padding:11px;font:800 .95rem var(--body);background:var(--panel);color:#b45309;cursor:pointer;display:inline-flex;gap:6px;justify-content:center;align-items:center}
+/* v20.3: kolorowe grupy menu, jaśniejsze rankingi */
+.sgrp{--gc:#6b7280;border-left:6px solid var(--gc);background:#1d2420;margin:0 0 10px;padding:2px 6px 6px 8px;border-radius:0}
+.sgrp .shdr{border-top:0;margin:0;padding:10px 6px 2px;color:var(--gc);letter-spacing:.3px;text-transform:uppercase}
+.sgrp .sitem svg{color:var(--gc)}
+.sgrp.g1{--gc:#4caf50}.sgrp.g2{--gc:#f57c00}.sgrp.g3{--gc:#29a3c7}.sgrp.g4{--gc:#9aa0a6}.sgrp.g5{--gc:#9c7bea}
+@supports (background:color-mix(in srgb,red 10%,blue)){
+ .sgrp{background:color-mix(in srgb,var(--gc) 14%,var(--bg))}
+ .sgrp .shdr,.sgrp .sitem svg{color:color-mix(in srgb,var(--gc) 62%,var(--ink))}}
+#sTeamH:not([hidden]){border-left:6px solid #e0527a;padding-left:12px;margin-top:10px}
+.rtabs{background:var(--rbg,#1e3a26);border:1px solid var(--rbd,#3f8f55);border-radius:12px;padding:8px;margin-bottom:8px;--tc:#58c878;--tk:#07210f}
+.rtabs::before{content:'Ranking';flex:0 0 100%;font:700 .72rem var(--body);letter-spacing:.4px;text-transform:uppercase;color:var(--tc);padding:0 2px 2px}
+.rtabs.k2::before{content:'Klasyfikacja'}
+.rtabs.k2{--rbg:#2b2a1c;--rbd:#c79534;--tc:#f2b84b;--tk:#2b1d00;margin-top:0}
+.rtabs button{border:1px solid color-mix(in srgb,var(--tc) 45%,transparent);background:color-mix(in srgb,var(--tc) 20%,var(--panel));font-weight:500}
+.rtabs button[data-rt="d"],.rtabs button[data-kp="d"]{font-weight:900}
+.rtabs button[aria-pressed="true"]{background:var(--tc);color:var(--tk);border-color:var(--tc);font-weight:800}
+.rtabs button[aria-pressed="true"]::before{content:'\2713 '}
+.rtabs button[data-rt="d"][aria-pressed="true"],.rtabs button[data-kp="d"][aria-pressed="true"]{font-weight:900}
+.rtabs.k2 button[data-rt="pk"]{--tc:#4a90e2;border-color:#4a90e2;background:color-mix(in srgb,#4a90e2 24%,var(--panel))}
+.rtabs.k2 button[data-rt="pk"][aria-pressed="true"]{background:#4a90e2;color:#06182e}
+.rk-fs,.rk-pk{border-radius:12px;padding:10px;margin-top:6px}
+.rk-fs{background:#2b2a1c;border:1px solid #c79534;--rowc:#f2b84b}
+.rk-pk{background:#13294a;border:1px solid #4a90e2;--rowc:#4a90e2}
+.rtabs.k3{margin-top:4px}.rtabs.k3::before{content:'Okres'}.rtabs.k3 button{font-size:.78rem}
+.rk-fs .rtabs.k3{--rbg:#3a3418;--rbd:#c79534;--tc:#f2b84b;--tk:#2b1d00}
+.rk-pk .rtabs.k3{--rbg:#1b3a6b;--rbd:#4a90e2;--tc:#4a90e2;--tk:#06182e}
+.rlist{--rowc:#6a7fa8}
+.rlist div{background:color-mix(in srgb,var(--rowc) 14%,var(--panel));border-color:color-mix(in srgb,var(--rowc) 40%,transparent)}
+.rlist div:nth-child(1){background:#5a4510;border-color:#d9a92a}
+.rlist div:nth-child(2){background:#3f4750;border-color:#aab4bf}
+.rlist div:nth-child(3){background:#5a3418;border-color:#d38a50}
+.rlist div.gap{background:none;border:0}
+.rlist div.me{border:2px solid #58c878;background:#1e5a30}
+.actions button[id^="aX"]{background:var(--panel);color:var(--ink);border:2px solid var(--ink)}
 /* v17.6: menu w podsumowaniach, „Co dalej?”, wyzwania z rankingu */
 .nextbox{display:flex;flex-direction:column;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px}
 .nextbox h3{margin:0 0 2px;font:800 1.05rem var(--display)}
@@ -311,7 +345,7 @@ body.relax .ptsblock{display:none!important}
 .nx.c-ch{border-color:#e5484d;background:rgba(229,72,77,.10)}.nx.c-ch .ico{color:#e5484d}
 .nx.c-inv{border-color:#12a150;background:rgba(18,161,80,.10)}.nx.c-inv .ico{color:#12a150}
 .actions .menub{background:var(--ink);color:var(--bg)}
-.actions button[id^="aX"]{background:#000;color:#fff}.actions button[id^="aCp"]{background:#ff8a00;color:#fff}#aBoards{background:#6b7280;color:#fff}#aBack{background:#12a150;color:#fff}#aArch{background:#3b82f6;color:#fff}
+.actions button[id^="aCp"]{background:#ff8a00;color:#fff}#aBoards{background:#6b7280;color:#fff}#aBack{background:#12a150;color:#fff}#aArch{background:#3b82f6;color:#fff}
 .cdown{text-align:center;font-weight:600;color:var(--muted);font-size:.85rem;font-variant-numeric:tabular-nums}
 .menub{display:inline-flex;align-items:center;gap:6px}
 .rlist div{grid-template-columns:2.2em minmax(0,1fr) auto auto}
@@ -439,31 +473,32 @@ textarea.fi{resize:vertical}
 <nav id="side" aria-label="Menu gry">
   <div class="shead"><span id="sLogo"></span><button class="icon" id="sClose" aria-label="Zwiń menu"></button></div>
   <div id="sWait" class="swait" hidden></div>
-  <div class="shdr">Wyniki</div>
+  <div class="sgrp g1"><div class="shdr">Wyniki</div>
   <button class="sitem" id="sRank"></button>
-  <button class="sitem" id="sStats"></button>
-  <div class="shdr">Graj więcej</div>
+  <button class="sitem" id="sStats"></button></div>
+  <div class="sgrp g2"><div class="shdr">Graj więcej</div>
   <button class="sitem" id="sArch"></button>
   <button class="sitem" id="sDuel"></button>
-  <button class="sitem" id="sTrain"></button>
-  <div class="shdr">Ze znajomymi</div>
+  <button class="sitem" id="sTrain"></button></div>
+  <div class="sgrp g3"><div class="shdr">Ze znajomymi</div>
   <button class="sitem" id="sCh"></button>
   <button class="sitem" id="sHlp"></button>
   <button class="sitem" id="sInv"></button>
-  <a class="sitem" id="sX" href="https://x.com/Literiada" target="_blank" rel="noopener" style="text-decoration:none"></a>
-  <details class="sset"><summary class="shdr">Ustawienia</summary>
+  <a class="sitem" id="sX" href="https://x.com/Literiada" target="_blank" rel="noopener" style="text-decoration:none"></a></div>
+  <details class="sset sgrp g4"><summary class="shdr">Ustawienia</summary>
   <button class="sitem" id="sRelax"></button>
   <button class="sitem" id="sChOpt"></button>
   <button class="sitem" id="sMove"></button>
   <button class="sitem" id="sInst" hidden></button>
+  <button class="sitem" id="sReset"></button>
   </details>
-  <div class="shdr">Pomoc</div>
+  <div class="sgrp g5"><div class="shdr">Pomoc</div>
   <button class="sitem" id="sHelp"></button>
-  <button class="sitem" id="sSup"></button>
+  <button class="sitem" id="sSup"></button></div>
   <div class="shdr" id="sTeamH" hidden>Zespół</div>
   <button class="sitem" id="sAdm" hidden></button>
   <button class="sitem" id="sRep" hidden></button>
-  <div class="sfoot">Literiada · wersja 20.2.1 · 2026-11-24</div>
+  <div class="sfoot">Literiada · wersja 20.3 · 2026-11-28</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -927,9 +962,8 @@ function showStats(){
   <div class="legend ptsblock"><span style="--c:var(--hit)">Poziom 1</span><span style="--c:var(--near)">Poziom 2</span><span style="--c:var(--ink)">Poziom 3</span>${played[3]?'<span style="--c:#8b5cf6">Niespodzianka</span>':''}${Object.values(h).some(a=>Array.isArray(a)&&a[4])?'<span style="--c:#3b82f6">Bonus dnia</span>':''}</div>
   <div class="lvres">${LVA.map((l,i)=>i===3&&!played[3]?'':`<div><span>${l.n} (${l.r})</span><b>${won[i]} z ${played[i]} odgadniętych</b></div>`).join('')}${(+store.get('sd2_kola',0)||0)?`<div><span>Koło ratunkowe</span><b>użyte ${razy(+store.get('sd2_kola',0))}</b></div>`:''}${(+store.get('sd2_help_n',0)||0)?`<div><span>Pomocna dłoń ${HI}</span><b>pomogłeś ${razy(+store.get('sd2_help_n',0))}</b></div>`:''}</div>
   <p class="sub">Tydzień liczony od poniedziałku. Wyniki zapisują się w tej przeglądarce. Przeniesiesz je na inne urządzenie w menu: Przenieś wyniki.</p>
-  <h2>Trening</h2>${trainPicker()}
-  <button class="linkbtn" id="aReset">Zacznij od nowa (wyzeruj wyniki)</button>`);
-  $('aReset').onclick=askReset;bindTrain();
+  <h2>Trening</h2>${trainPicker()}`);
+  bindTrain();
   bindShare('S');rkTileFill();
   if($('aBoards'))$('aBoards').onclick=()=>{const b=$('boards');b.hidden=!b.hidden;$('aBoards').textContent=b.hidden?'Zobacz plansze':'Ukryj plansze';if(!b.hidden)b.scrollIntoView({behavior:'smooth',block:'nearest'})};
   if($('aBack'))$('aBack').onclick=()=>{close();if(mode==='free')setMode('day')};
@@ -940,7 +974,7 @@ function showStats(){
     $('rJoin').onclick=async()=>{const v=$('rIn').value.replace(/\s+/g,' ').trim().slice(0,20);
       if(v.length<2){$('rErr').hidden=false;$('rErr').textContent='Pseudonim musi mieć co najmniej 2 znaki.';return}
       if(!nickOk(v)){$('rErr').hidden=false;$('rErr').textContent=NICK_BAD;return}
-      $('rJoin').textContent='Sprawdzam…';if(await nickTaken(v)){$('rErr').hidden=false;$('rErr').innerHTML=NICK_MSG;$('rJoin').textContent='Dołącz do rankingu';return}
+      $('rJoin').textContent='Sprawdzam…';if(await nickTaken(v)||await nickClaim(v)==='taken'){$('rErr').hidden=false;$('rErr').innerHTML=NICK_MSG;$('rJoin').textContent='Dołącz do rankingu';return}
       store.set('sd2_nick',v);if(!store.get('sd2_duel_name',''))store.set('sd2_duel_name',v);$('rJoin').textContent='Dołączam…';await rankSync();showRanking('d')};
     $('rkLater').onclick=()=>{store.set('sd2_rk_ask',todayKey());$('rkInv').remove()};
     $('rkNever').onclick=()=>{store.set('sd2_rk_never',true);$('rkInv').remove();toast('Ranking znajdziesz zawsze w menu ☰',2200)}}
@@ -949,11 +983,17 @@ function showStats(){
   document.querySelectorAll('[data-play]').forEach(d=>{const f=()=>{lvl=+d.dataset.play;close();loadDayLevel();fitBoard()};d.onclick=f;d.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();f()}}});
 }
 function askReset(){
-  open(`<h2>Zacząć od nowa?</h2><p>Usunę wszystkie punkty, statystyki i dzisiejsze postępy na wszystkich poziomach. Tego nie da się cofnąć.</p>
+  open(`<h2>Zacząć od nowa?</h2><p>Usunę punkty, statystyki i archiwum z poprzednich dni. Tego nie da się cofnąć.</p>
+  <p class="sub">Dzisiejsze poziomy, które już zacząłeś albo ukończyłeś, i punkty z dzisiaj zostają. Dzięki temu nie da się dziś zagrać drugi raz tych samych haseł.</p>
   <div class="actions"><button class="main" id="aYes">Tak, wyzeruj</button><button id="aClose">Anuluj</button></div>`);
-  $('aYes').onclick=()=>{['sd2_day','sd2_hist','sd2_log','sd2_arch'].forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});
+  $('aYes').onclick=()=>{
+    const tk=todayKey();let kd=store.get('sd2_day',null);if(!(kd&&typeof kd==='object'&&kd.d===dayNo()))kd=null;
+    const ot0=store.get('sd2_ontime',{}),kot=ot0&&ot0[tk]?{[tk]:ot0[tk]}:null;
+    const h=store.get('sd2_hist',{}),lg=store.get('sd2_log',{}),kh=h&&h[tk]?{[tk]:h[tk]}:null,kl=lg&&lg[tk]?{[tk]:lg[tk]}:null;
+    ['sd2_day','sd2_hist','sd2_log','sd2_arch'].forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});
     try{localStorage.removeItem('sd2_ontime')}catch(e){}RK.cache={};
-    close();setMode('day');rankSync();toast('Wyniki wyzerowane. Powodzenia!',2000)};
+    if(kot)store.set('sd2_ontime',kot);if(kd)store.set('sd2_day',kd);if(kh)store.set('sd2_hist',kh);if(kl)store.set('sd2_log',kl);
+    close();setMode('day');rankSync();toast('Wyniki wyzerowane. Dzisiejsze poziomy zostają. Powodzenia!',2600)};
 }
 function showHelp(){
   const ex=(w,s)=>`<div class="ex">${[...w].map((ch,i)=>`<div class="t ${s[i]||''}">${tileHTML(ch)}</div>`).join('')}</div>`;
@@ -991,7 +1031,7 @@ function showHelp(){
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 20.2.1 · 2026-11-24</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 20.3 · 2026-11-28</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
@@ -1304,11 +1344,14 @@ function showIab(){const el=$('iab');if(!el||!inApp())return;
 // ---- v13: wspólny ranking i tabela pojedynków (Firebase, logowanie anonimowe)
 const FB_CFG={apiKey:"AIzaSyAM_0VdKyhhi6KoPC2VKZwdhYapYk5yMHA",authDomain:"literiada-80262.firebaseapp.com",projectId:"literiada-80262",storageBucket:"literiada-80262.firebasestorage.app",messagingSenderId:"672966951809",appId:"1:672966951809:web:86c721f8bda822a6d91e80"};
 const FBV='12.18.0';let fbP=null,FBUID=null;
+const APPCHECK_KEY='';// klucz witryny reCAPTCHA v3 (publiczny); pusty = App Check wyłączony
 function fb(){if(window.__FBMOCK)return window.__FBMOCK().then(x=>{FBUID=x.uid;return x});
   if(fbP)return fbP;
   fbP=(async()=>{const B='https://www.gstatic.com/firebasejs/'+FBV+'/';
     const [A,U,F]=await Promise.all([import(B+'firebase-app.js'),import(B+'firebase-auth.js'),import(B+'firebase-firestore.js')]);
-    const app=A.initializeApp(FB_CFG),auth=U.getAuth(app),db=F.getFirestore(app);
+    const app=A.initializeApp(FB_CFG);
+    if(APPCHECK_KEY){try{const AC=await import(B+'firebase-app-check.js');AC.initializeAppCheck(app,{provider:new AC.ReCaptchaV3Provider(APPCHECK_KEY),isTokenAutoRefreshEnabled:true})}catch(e){console.warn('AppCheck',e)}}
+    const auth=U.getAuth(app),db=F.getFirestore(app);
     if(auth.authStateReady)await auth.authStateReady();
     if(!auth.currentUser)await U.signInAnonymously(auth);
     FBUID=auth.currentUser.uid;return {F,db,uid:FBUID}})();
@@ -1325,6 +1368,7 @@ async function rankSync(){const nick=store.get('sd2_nick','');if(!nick||RX()||st
     if(fa>0||pa>0)await F.setDoc(F.doc(db,'klas',uid),{nick,fa,pa,fd:one(todayKey(),kv('fs','d')),fw:one(rkWk(),kv('fs','w')),fm:one(rkMk(),kv('fs','m')),
       pd:one(todayKey(),kv('pk','d')),pw:one(rkWk(),kv('pk','w')),pm:one(rkMk(),kv('pk','m')),...(store.get('sd2_prev','')?{prev:String(store.get('sd2_prev','')).slice(0,128)}:{}),upd:Date.now()})}
     catch(e){console.warn('klasyfikacje',e)}}
+  if(rankOk&&nick&&Date.now()-NICK_MIG>600000){NICK_MIG=Date.now();nickClaim(nick).then(r=>{if(r==='ok')NICK_MIG=Infinity})}
   rankBusy=false;if(rankAgain){rankAgain=false;rankSync()}}
 async function duelPush(sn,won){try{if(!duel)return;const {F,db,uid}=await fb();
   const id=String(duel.code||'x').replace(/[^A-Za-z0-9_-]/g,'').slice(0,40)+'_'+uid;
@@ -1356,7 +1400,7 @@ function rankHTML(){const tab=RK.tab,nick=store.get('sd2_nick','');
     const list=RK.rows.map(r=>({id:r.id,nick:r.nick||'?',v:v(r),n:+r[f.a]||0})).filter(r=>r.v>0).sort((a,b)=>b.v-a.v).slice(0,50);
     const row=(r,i)=>`<div class="${r.id===FBUID?'me':''}"><span class="pos">${i<3?medal(['gold','silver','bronze'][i],22):i+1}</span><span class="nk">${esc(r.nick)}${admB(r.id)}<span class="ktitle">${esc(klTitle(tab,r.n))}</span></span><span class="pt">${r.v}×</span></div>`;
     const myN=klVal(tab,'a');
-    body=`<p class="sub">${ic(KL[tab].ic,14)} <b>${KL[tab].ev}</b>: co najmniej 3 zielone litery w ${tab==='fs'?'pierwszej minucie poziomu':'ostatniej minucie czasu z bonusem'}. ${tab==='fs'?' Sigma to ktoś, kto od razu bierze się do roboty.':''} Osobna klasyfikacja, nie dolicza punktów do rankingu głównego.</p><div class="rtabs k2">${per}</div>`
+    body=`<p class="sub">${ic(KL[tab].ic,14)} <b>${KL[tab].ev}</b>: co najmniej 3 zielone litery w ${tab==='fs'?'pierwszej minucie poziomu':'ostatniej minucie czasu z bonusem'}. ${tab==='fs'?' Sigma to ktoś, kto od razu bierze się do roboty.':''} Osobna klasyfikacja, nie dolicza punktów do rankingu głównego.</p><div class="rtabs k3">${per}</div>`
       +(list.length?`<div class="rlist">${list.map(row).join('')}</div>`:'<p class="sub">Nikt jeszcze nie trafił do tej klasyfikacji w tym okresie.</p>')
       +`<p class="sub">Tytuły: ${KL[tab].t.map((t,i)=>esc(t)+' ('+KL_PROG[i]+')').join(' → ')}${nick?' · Ty: <b>'+myN+'×</b>'+(klTitle(tab,myN)?', '+esc(klTitle(tab,myN)):''):''}</p>`;
   }
@@ -1376,7 +1420,7 @@ function rankHTML(){const tab=RK.tab,nick=store.get('sd2_nick','');
   }
   const join=nick?`<p class="sub">Grasz jako <b>${esc(nick)}</b>. <button class="linkbtn" id="rNick" style="padding:0">Zmień nick</button> · <button class="linkbtn" id="rOut" style="padding:0">Usuń mnie z rankingu</button></p>`
     :`<div class="rjoin"><b>Dołącz do rankingu</b><span style="font-size:.85rem">Wpisz pseudonim, który zobaczą inni gracze. Bez maila i hasła, zapisujemy tylko pseudonim i punkty.</span><input id="rIn" maxlength="20" placeholder="np. Radek z Pręgowa" autocomplete="off"><button id="rJoin">Dołącz</button><span class="dbad" id="rErr" hidden></span></div>`;
-  return `<div class="step">Ranking</div><h2>${ic('trophy',24)} Ranking graczy</h2>${join}<div class="rtabs">${tabs}</div>${body}${nick&&tab!=='p'&&!isK?'<p class="sub">Przycisk „Wyzwij” wysyła graczowi Twoje hasło do odgadnięcia. Jedno wyzwanie dziennie do tej samej osoby.</p><p class="sub">'+HI+' to licznik pomocy udzielonych innym graczom. Świecąca ikona oznacza, że ten gracz odgadł dziś Twój bieżący poziom: dotknij jej, żeby poprosić go o jedną literę.</p>':''}<div class="actions"><button id="aClose">Zamknij</button></div><p class="sub">Link do rankingu: literiada.github.io/#ranking</p>`}
+  return `<div class="step">Ranking</div><h2>${ic('trophy',24)} Ranking graczy</h2>${join}<div class="${isK?'rk-'+tab:''}"><div class="rtabs">${tabs}</div>${body}</div>${nick&&tab!=='p'&&!isK?'<p class="sub">Przycisk „Wyzwij” wysyła graczowi Twoje hasło do odgadnięcia. Jedno wyzwanie dziennie do tej samej osoby.</p><p class="sub">'+HI+' to licznik pomocy udzielonych innym graczom. Świecąca ikona oznacza, że ten gracz odgadł dziś Twój bieżący poziom: dotknij jej, żeby poprosić go o jedną literę.</p>':''}<div class="actions"><button id="aClose">Zamknij</button></div><p class="sub">Link do rankingu: literiada.github.io/#ranking</p>`}
 function rankBind(){document.querySelectorAll('[data-rt]').forEach(b=>b.onclick=()=>{RK.tab=b.dataset.rt;rankLoad()});
   document.querySelectorAll('[data-kp]').forEach(b=>b.onclick=()=>{RK.kp=b.dataset.kp;rankDraw()});
   document.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{const r=(RK.rows||[]).find(x=>x.id===b.dataset.ch);if(r)chNew(r)});
@@ -1388,14 +1432,14 @@ function rankBind(){document.querySelectorAll('[data-rt]').forEach(b=>b.onclick=
   if($('rJoin'))$('rJoin').onclick=async()=>{const v=$('rIn').value.replace(/\s+/g,' ').trim().slice(0,20);
     if(v.length<2){$('rErr').hidden=false;$('rErr').textContent='Pseudonim musi mieć co najmniej 2 znaki.';return}
     if(!nickOk(v)){$('rErr').hidden=false;$('rErr').textContent=NICK_BAD;return}
-      $('rJoin').textContent='Sprawdzam…';if(await nickTaken(v)){$('rErr').hidden=false;$('rErr').innerHTML=NICK_MSG;$('rJoin').textContent='Dołącz';return}
+      $('rJoin').textContent='Sprawdzam…';if(await nickTaken(v)||await nickClaim(v)==='taken'){$('rErr').hidden=false;$('rErr').innerHTML=NICK_MSG;$('rJoin').textContent='Dołącz';return}
     store.set('sd2_moved',0);store.set('sd2_nick',v);if(!store.get('sd2_duel_name',''))store.set('sd2_duel_name',v);$('rJoin').textContent='Dołączam…';await rankSync();if(!rankOk&&await admBanned()){store.set('sd2_nick','');rankDraw();toast('Ten profil został zablokowany w rankingu przez administratora gry',3600);return}RK.cache={};rankLoad(true)};
-  if($('rNick'))$('rNick').onclick=()=>{store.set('sd2_nick','');rankDraw();setTimeout(()=>{const i=$('rIn');if(i)i.focus()},50)};
+  if($('rNick'))$('rNick').onclick=()=>{nickRelease(store.get('sd2_nick',''));store.set('sd2_nick','');rankDraw();setTimeout(()=>{const i=$('rIn');if(i)i.focus()},50)};
   if($('rOut'))$('rOut').onclick=async()=>{let nd=0;try{const {F,db,uid}=await fb();await F.deleteDoc(F.doc(db,'players',uid));try{await F.deleteDoc(F.doc(db,'klas',uid))}catch(e){}
       const qs=await Promise.all([F.getDocs(F.query(F.collection(db,'duels'),F.where('su','==',uid))),F.getDocs(F.query(F.collection(db,'duels'),F.where('au','==',uid)))]);
       const seen=new Set();for(const q of qs)for(const d of q.docs){if(seen.has(d.id))continue;seen.add(d.id);try{await F.deleteDoc(F.doc(db,'duels',d.id));nd++}catch(e){}}
       await chWipe();await hlWipe()}catch(e){}
-    store.set('sd2_nick','');RK.cache={};toast('Usunięto Cię z rankingu'+(nd?' i z tabeli pojedynków ('+nd+')':''),2600);rankLoad(true)}}
+    await nickRelease(store.get('sd2_nick',''));store.set('sd2_nick','');RK.cache={};toast('Usunięto Cię z rankingu'+(nd?' i z tabeli pojedynków ('+nd+')':''),2600);rankLoad(true)}}
 function rankDraw(){if($('ov').hidden||!$('card').querySelector('.rtabs'))return;$('card').innerHTML=rankHTML();const c=$('aClose');if(c)c.onclick=close;rankBind()}
 async function rankLoad(force){const tab=RK.tab,c=RK.cache[tab];await admLoad();
   if(!force&&c&&Date.now()-c.ts<180000){RK.rows=c.rows;RK.mePos=c.mePos;if(tab==='p'){RK.duels=c.duels;RK.mine=c.mine}RK.err=null;rankDraw();return}
@@ -1580,7 +1624,7 @@ async function admDel(r,ban){try{const {F,db,uid}=await fb();
     const q=await F.getDocs(F.query(F.collection(db,'duels'),F.where('su','==',r.id)));
     await F.setDoc(F.doc(db,'trash',r.id),{nick:String(r.nick||(p&&p.nick)||'?').slice(0,20),p,du:q.docs.slice(0,150).map(d=>({id:d.id,d:d.data()})),ban:!!ban,why:'del',by:uid,byn:myNick(),ts:Date.now()});
     if(ban)await F.setDoc(F.doc(db,'bans',r.id),{nick:String(r.nick||'').slice(0,20),by:uid,ts:Date.now()});
-    await F.deleteDoc(F.doc(db,'players',r.id));try{await F.deleteDoc(F.doc(db,'klas',r.id))}catch(e){}let nd=0;
+    await F.deleteDoc(F.doc(db,'players',r.id));try{await F.deleteDoc(F.doc(db,'klas',r.id))}catch(e){}await nickDropAdm(String(r.nick||(p&&p.nick)||''));let nd=0;
     for(const d of q.docs){try{await F.deleteDoc(F.doc(db,'duels',d.id));nd++}catch(e){}}
     RK.cache={};toast((ban?'Usunięto i zablokowano: ':'Usunięto: ')+r.nick+(nd?' (pojedynki: '+nd+')':'')+' · kopia w Koszu',3000)}
   catch(e){console.warn('admin',e);toast('Nie udało się usunąć (nic nie zmieniono). Sprawdź, czy zasady Firestore v19.1 są opublikowane.',4000)}
@@ -1595,7 +1639,7 @@ async function admMerge(src,dst){try{const {F,db,uid}=await fb();const pd=await 
     await F.setDoc(F.doc(db,'trash',src.id),{nick:String(src.nick||'?').slice(0,20),p,du:[],ban:false,why:'merge',into:dst.id,inton:String(dst.nick||'').slice(0,20),add,by:uid,byn:myNick(),ts:Date.now()});
     const ad=await F.getDoc(F.doc(db,'adj',dst.id)),cur=ad.exists()?ad.data():{all:0,from:[]};
     await F.setDoc(F.doc(db,'adj',dst.id),{all:(+cur.all||0)+add,from:[...(Array.isArray(cur.from)?cur.from:[]),String(src.nick||'?').slice(0,20)].slice(-20),upd:Date.now()});
-    await F.deleteDoc(F.doc(db,'players',src.id));RK.cache={};RK.adj=null;toast('Połączono: +'+add+' pkt dla '+dst.nick,3000)}
+    await F.deleteDoc(F.doc(db,'players',src.id));if(String(src.nick||'').trim().toLowerCase()!==String(dst.nick||'').trim().toLowerCase())await nickDropAdm(String(src.nick||''));RK.cache={};RK.adj=null;toast('Połączono: +'+add+' pkt dla '+dst.nick,3000)}
   catch(e){console.warn('admin',e);toast('Nie udało się połączyć. Sprawdź, czy zasady Firestore v19.1 są opublikowane.',4000)}
   showRanking('a')}
 async function admDelDuel(id){try{const {F,db}=await fb();await F.deleteDoc(F.doc(db,'duels',id));RK.cache={};toast('Wpis pojedynku usunięty',1800)}catch(e){toast('Nie udało się usunąć wpisu',2400)}rankLoad(true)}
@@ -1722,8 +1766,17 @@ function helpGive(x){const t=store.get('sd2_day',null),my=t&&t.d===dayNo()?norm(
     catch(e){console.warn('pomoc',e);$('hGo').disabled=false;$('hGo').textContent='Wyślij podpowiedź';toast('Nie udało się wysłać. Prośba mogła zostać anulowana.',3000)}}}
 
 // ---- v19.1: zgłoszenia graczy (kolekcja reports), kosz (trash), kopia bazy, powitanie, zajęty nick
-const VER='20.2.1';
+const VER='20.3';
 const NICK_MSG='Ten pseudonim już gra w rankingu. Jeśli to Ty na innym urządzeniu albo w ikonie na pulpicie, przenieś wyniki: menu ☰ → Przenieś wyniki. Jeśli nie, wybierz inny pseudonim.';
+const nickKey=v=>'n-'+String(v).trim().toLowerCase().replace(/ /g,'~');
+async function nickClaim(v){try{const {F,db,uid}=await fb();const ref=F.doc(db,'nicks',nickKey(v));let d=null;
+  try{d=await F.getDoc(ref)}catch(e){}
+  if(d&&d.exists()&&d.data().uid!==uid)return d.data().uid===store.get('sd2_prev','')?'prev':'taken';
+  try{await F.setDoc(ref,{uid,ts:Date.now()});return 'ok'}
+  catch(e){try{const d2=await F.getDoc(ref);if(d2.exists()&&d2.data().uid!==uid)return 'taken'}catch(e2){}return 'err'}}catch(e){return 'err'}}
+async function nickRelease(v){try{if(!v)return;const {F,db,uid}=await fb();const ref=F.doc(db,'nicks',nickKey(v)),d=await F.getDoc(ref);if(d.exists()&&d.data().uid===uid)await F.deleteDoc(ref)}catch(e){}}
+async function nickDropAdm(v){try{if(!v)return;const {F,db}=await fb();await F.deleteDoc(F.doc(db,'nicks',nickKey(v)))}catch(e){}}
+let NICK_MIG=0;
 async function nickTaken(v){const n=String(v).trim().toLowerCase();try{const {F,db,uid}=await fb();
   let rows=(RK.cnt!=null&&RK.cnt<=250&&RK.cache.a&&Date.now()-RK.cache.a.ts<600000)?RK.cache.a.rows:null;
   if(!rows){if(RK.cnt!=null&&RK.cnt>250){const q=await F.getDocs(F.query(F.collection(db,'players'),F.where('nick','==',String(v).trim())));rows=q.docs.map(d=>Object.assign({id:d.id},d.data()))}
@@ -1884,6 +1937,8 @@ function showWelcome(){open(`${logo()}<h2>Witaj w Literiadzie!</h2>
   <div class="actions"><button class="main" id="aClose">Zagraj</button><button id="wFull">Pełna instrukcja</button></div>`);$('wFull').onclick=showHelp}
 function showNews(){open(`<div class="step">Co nowego</div><h2>Literiada ${VER}</h2><ul class="news">
   <li><b>Błysk geniuszu 💡 i Za pięć dwunasta ⏳.</b> Trzy zielone litery w pierwszej minucie poziomu albo w ostatniej minucie czasu z bonusem trafiają do nowych klasyfikacji: <b>Sigmy</b> i <b>Prokrastynatorzy</b>. Bez punktów, dla zabawy, z tytułami od Iskry do Sigmy i od Odkładacza do Wielkiego Prokrastynatora. Znajdziesz je w Rankingu.</li>
+  <li><b>Kolorowe menu i jaśniejsze rankingi.</b> Każda grupa w menu ma swój kolor, zakładki rankingu są wyraźniejsze, podium świeci złotem, srebrem i brązem, a Prokrastynatorzy mają niebieskie tło.</li>
+  <li><b>Unikalne pseudonimy.</b> Dwóch graczy nie może już mieć tego samego pseudonimu w rankingu.</li>
   <li><b>Z poprzedniej wersji:</b> nowe, uporządkowane menu. Opcje są pogrupowane: Wyniki, Graj więcej, Ze znajomymi, Pomoc, a rzadziej używane schowaliśmy w zwijanych Ustawieniach.</li>
   <li><b>„Czeka na Ciebie” na górze menu.</b> Wyzwania, prośby o pomoc i zaległe dni w archiwum, z licznikami, zawsze pod ręką.</li>
   <li><b>Lepsza czytelność.</b> Wyraźniejsze przyciski, a ranking mieści się w całości także na wąskich telefonach.</li>
@@ -1940,9 +1995,10 @@ $('sInst').onclick=sideGo(doInstall);
 $('sTrain').innerHTML=ic('train',20)+'Trening';$('sTrain').onclick=sideGo(showTrain);
 $('sHelp').innerHTML=ic('help',20)+'Jak grać';$('sHelp').onclick=sideGo(showHelp);
 $('sMove').innerHTML=ic('move',20)+'Przenieś wyniki';$('sMove').onclick=sideGo(showMove);
+$('sReset').innerHTML=ic('trash',20)+'Zacznij od nowa';$('sReset').onclick=sideGo(askReset);
 $('sSup').innerHTML=ic('chat',20)+'Pomoc – napisz do admina';$('sSup').onclick=sideGo(showSupport);
 function relaxLabel(){$('sRelax').innerHTML='<span style="width:20px;text-align:center">🌿</span>Gra na luzie: <b style="margin-left:4px">'+(RX()?'włączona':'wyłączona')+'</b>'}
-async function rankHide(){try{const {F,db,uid}=await fb();await F.deleteDoc(F.doc(db,'players',uid))}catch(e){console.warn('ranking',e)}}
+async function rankHide(){try{const {F,db,uid}=await fb();await F.deleteDoc(F.doc(db,'players',uid));await nickRelease(store.get('sd2_nick',''))}catch(e){console.warn('ranking',e)}}
 function setRelax(on){store.set('sd2_relax',on);document.body.classList.toggle('relax',on);relaxLabel();paintLevels();updTimer();
   const nk=store.get('sd2_nick','');
   if(on){if(nk)rankHide();toast('Gra na luzie: bez zegara, punktów i rankingu 🌿',2600)}
