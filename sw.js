@@ -1,5 +1,5 @@
-// Literiada – service worker v20.3.1 (2026-11-28): sieć najpierw, pamięć podręczna jako zapas offline
-const CACHE='literiada-v20.3.1';
+// Literiada – service worker v20.3.2 (2026-11-28): sieć najpierw, pamięć podręczna jako zapas offline
+const CACHE='literiada-v20.3.2';
 const CORE=['./','index.html','manifest.webmanifest'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).catch(()=>{}))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});

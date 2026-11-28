@@ -25,34 +25,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Literiada">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2312a150'/%3E%3Ctext x='32' y='47' font-size='44' font-family='Arial Black,Arial' font-weight='900' text-anchor='middle' fill='white'%3EL%3C/text%3E%3C/svg%3E">
-<style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}body{margin:0}[hidden]{display:none!important}/* v20.3.1: ekran Start, wyższy kontrast (ciemny motyw) */
-.board-wrap{position:relative}
-#startov{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;background:var(--ovbg);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);padding:8px}
-#startov[hidden]{display:none!important}
-#startov .sc{background:var(--panel);border:2px solid var(--hit);border-radius:14px;padding:14px 16px;text-align:center;max-width:300px;box-shadow:0 6px 24px rgba(0,0,0,.45)}
-#startov .st1{font:700 .75rem var(--body);letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
-#startov h2{margin:4px 0 6px;font:800 1.2rem var(--display)}
-#startov p{margin:0 0 12px;font-size:.88rem;line-height:1.35}
-#startov .sbtn{width:100%;border:0;border-radius:10px;background:#12a150;color:#fff;font:800 1.15rem var(--body);padding:13px 16px;cursor:pointer;min-height:48px}
-#startov .sbtn:focus-visible{outline:3px solid #fff;outline-offset:2px}
-body.startp .board{opacity:.25}
-.kb.pend{opacity:.55}
-.tnudge{animation:tnud .5s}@keyframes tnud{30%{transform:scale(1.06)}60%{transform:scale(.98)}}
-:root:not([data-theme="light"]) .rtabs button:not([aria-pressed="true"]){background:#0b0f0d;color:#fff;border:1.5px solid var(--tc);font-weight:700}
-:root[data-theme="light"]{color-scheme:light}
-:root:not([data-theme="light"]) .rtabs::before{color:#fff}
-:root:not([data-theme="light"]) .rlist div:nth-child(n+4){background:#0e1311;color:#fff;border:1.5px solid color-mix(in srgb,var(--rowc) 65%,#fff 0%)}
-:root:not([data-theme="light"]) .rlist div.me{background:#14502a;color:#fff;border:2px solid #7ee29a}
-:root:not([data-theme="light"]) .rlist .ktitle{background:#000;color:#fff;border:1.5px solid #f2b84b}
-:root:not([data-theme="light"]) .rlist .pt{color:#fff}
-:root:not([data-theme="light"]) #ov .sub,:root:not([data-theme="light"]) .rk-fs .sub,:root:not([data-theme="light"]) .rk-pk .sub{color:#e3eae5}
-:root:not([data-theme="light"]) .chb{background:#0b0f0d;color:#e9ddff;border:2px solid #b794f6;font-weight:800}
-:root:not([data-theme="light"]) .chb:disabled{color:#c9d1cc;border-color:#6b7570}
-:root:not([data-theme="light"]) .sgrp{background:color-mix(in srgb,var(--gc) 9%,#0b0f0d)}
-:root:not([data-theme="light"]) .sgrp .shdr{color:#fff;font-weight:900}
-:root:not([data-theme="light"]) .sgrp .shdr::first-letter{color:inherit}
-:root:not([data-theme="light"]) .sgrp .sitem{color:#fff}
-</style>
+<style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}body{margin:0}[hidden]{display:none!important}</style>
 </head>
 <body>
 <meta name="color-scheme" content="dark light">
@@ -481,6 +454,69 @@ textarea.fi{resize:vertical}
 .news{padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:.95rem}
 .mvq{display:flex;flex-direction:column;gap:6px;background:#fff7e6;border:2px solid #ff8a00;border-radius:8px;padding:10px;color:#3d2400}
 .team div span{display:flex;flex-direction:column}
+/* v20.3.1: ekran Start, wyższy kontrast (ciemny motyw) */
+.board-wrap{position:relative}
+#startov{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;background:var(--ovbg);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);padding:8px}
+#startov[hidden]{display:none!important}
+#startov .sc{background:var(--panel);border:2px solid var(--hit);border-radius:14px;padding:14px 16px;text-align:center;max-width:300px;box-shadow:0 6px 24px rgba(0,0,0,.45)}
+#startov .st1{font:700 .75rem var(--body);letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+#startov h2{margin:4px 0 6px;font:800 1.2rem var(--display)}
+#startov p{margin:0 0 12px;font-size:.88rem;line-height:1.35}
+#startov .sbtn{width:100%;border:0;border-radius:10px;background:#12a150;color:#fff;font:800 1.15rem var(--body);padding:13px 16px;cursor:pointer;min-height:48px}
+#startov .sbtn:focus-visible{outline:3px solid #fff;outline-offset:2px}
+body.startp .board{opacity:.25}
+.kb.pend{opacity:.55}
+.tnudge{animation:tnud .5s}@keyframes tnud{30%{transform:scale(1.06)}60%{transform:scale(.98)}}
+:root:not([data-theme="light"]) .rtabs button:not([aria-pressed="true"]){background:#0b0f0d;color:#fff;border:1.5px solid var(--tc);font-weight:700}
+:root[data-theme="light"]{color-scheme:light}
+:root:not([data-theme="light"]) .rtabs::before{color:#fff}
+:root:not([data-theme="light"]) .rlist div:nth-child(n+4){background:#0e1311;color:#fff;border:1.5px solid color-mix(in srgb,var(--rowc) 65%,#fff 0%)}
+:root:not([data-theme="light"]) .rlist div.me{background:#14502a;color:#fff;border:2px solid #7ee29a}
+:root:not([data-theme="light"]) .rlist .ktitle{background:#000;color:#fff;border:1.5px solid #f2b84b}
+:root:not([data-theme="light"]) .rlist .pt{color:#fff}
+:root:not([data-theme="light"]) #ov .sub,:root:not([data-theme="light"]) .rk-fs .sub,:root:not([data-theme="light"]) .rk-pk .sub{color:#e3eae5}
+:root:not([data-theme="light"]) .chb{background:#0b0f0d;color:#e9ddff;border:2px solid #b794f6;font-weight:800}
+:root:not([data-theme="light"]) .chb:disabled{color:#c9d1cc;border-color:#6b7570}
+:root:not([data-theme="light"]) .sgrp{background:color-mix(in srgb,var(--gc) 9%,#0b0f0d)}
+:root:not([data-theme="light"]) .sgrp .shdr{color:#fff;font-weight:900}
+:root:not([data-theme="light"]) .sgrp .shdr::first-letter{color:inherit}
+:root:not([data-theme="light"]) .sgrp .sitem{color:#fff}
+/* v20.3.2: okno wyniku, belka położenia gry, kolory okna Sigm */
+.rk-fs,.rk-pk{background:#090c0a;border-width:2px;padding:12px;margin-top:10px}
+.rk-fs{border-color:#f2b84b}.rk-pk{border-color:#4a90e2}
+.rk-fs .rtabs.k3{--rbg:#3f3612;--rbd:#f2b84b}
+.rk-pk .rtabs.k3{--rbg:#17376b;--rbd:#4a90e2}
+.rk-fs .rlist,.rk-pk .rlist{margin-top:6px}
+#sSplit{display:none}
+@media (min-width:1100px){
+ body.side-on #sSplit{display:block;position:fixed;top:0;bottom:0;width:14px;margin-left:-7px;cursor:col-resize;z-index:33;touch-action:none}
+ #sSplit::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:rgba(88,200,120,.0);transition:background .15s}
+ #sSplit::after{content:'';position:absolute;left:3px;top:50%;width:8px;height:44px;margin-top:-22px;border-radius:4px;background:#2a332e;border:1px solid #58c878;opacity:.55}
+ #sSplit:hover::before,#sSplit.drag::before,#sSplit:focus-visible::before{background:#58c878}
+ #sSplit:hover::after,#sSplit.drag::after,#sSplit:focus-visible::after{opacity:1}
+ body.side-on.gxon .app{margin-left:calc(260px + var(--gx) - 16px);margin-right:auto}
+ body.side-on.gxon .ov{justify-items:start;padding-left:calc(var(--gx) + 16px)}
+ body.side-on.gxon .ov .card{margin:0}
+}
+.rpop{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(0,0,0,.62);padding:16px;cursor:pointer}
+.rpop[hidden]{display:none!important}
+.rpc{position:relative;overflow:hidden;background:#101512;color:#fff;border:2px solid #58c878;border-radius:16px;padding:16px 18px 20px;width:min(100%,340px);box-shadow:0 10px 40px rgba(0,0,0,.6);animation:rppop .28s ease-out}
+.rpc.lost{border-color:#d38a50}
+@keyframes rppop{from{transform:scale(.88);opacity:0}to{transform:none;opacity:1}}
+.rpc .rph{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.rpc .rph b{font:800 1.15rem var(--display);line-height:1.15}
+.rpc .rph small{display:block;font:600 .82rem var(--body);color:#d6ddd8}
+.rpc .rpl{display:flex;justify-content:space-between;gap:10px;font-size:.92rem;padding:3px 0;border-bottom:1px solid #2b342f}
+.rpc .rpt{display:flex;justify-content:space-between;align-items:baseline;margin:8px 0 6px;font:800 1rem var(--body)}
+.rpc .rpt span:last-child{font:800 2rem var(--display);color:#7ee29a;font-variant-numeric:tabular-nums}
+.rpc.lost .rpt span:last-child{color:#f2b84b}
+.rpc .rpr{display:flex;justify-content:space-between;gap:10px;background:#0a0d0b;border:1.5px solid #f2b84b;border-radius:10px;padding:7px 10px;margin-top:6px;font-size:.92rem}
+.rpc .rpr b{font-variant-numeric:tabular-nums}
+.rpc .rpr .up{color:#7ee29a}.rpc .rpr .dn{color:#ff8a8a}
+.rpc .rpx{font-size:.78rem;color:#c9d1cc;text-align:center;margin-top:8px}
+.rpc .rpbar{position:absolute;left:0;bottom:0;height:5px;width:100%;background:#58c878;animation:rpbar 4.5s linear forwards}
+.rpc.lost .rpbar{background:#f2b84b}
+@keyframes rpbar{to{width:0}}
 </style>
 
 <div class="app">
@@ -497,6 +533,8 @@ textarea.fi{resize:vertical}
   <div class="board-wrap"><div class="board" id="board"></div><div id="startov" hidden></div></div>
   <div class="kb" id="kb"></div>
 </div>
+<div id="rpop" class="rpop" hidden role="dialog" aria-label="Wynik poziomu"></div>
+<div id="sSplit" role="separator" aria-orientation="vertical" aria-label="Położenie okna gry (przeciągnij; dwuklik: wyśrodkuj)" tabindex="0" title="Przeciągnij, żeby przybliżyć grę do menu. Dwuklik: wyśrodkuj"></div>
 <div id="sideBg" hidden></div>
 <nav id="side" aria-label="Menu gry">
   <div class="shead"><span id="sLogo"></span><button class="icon" id="sClose" aria-label="Zwiń menu"></button></div>
@@ -527,7 +565,7 @@ textarea.fi{resize:vertical}
   <div class="shdr" id="sTeamH" hidden>Zespół</div>
   <button class="sitem" id="sAdm" hidden></button>
   <button class="sitem" id="sRep" hidden></button>
-  <div class="sfoot">Literiada · wersja 20.3.1 · 2026-11-28</div>
+  <div class="sfoot">Literiada · wersja 20.3.2 · 2026-11-28</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -838,8 +876,40 @@ function finish(won){
   view=null;paint();updTimer();
   if(won)SFX.win(0);else SFX.lose(0);
   toast(won?['Genialnie!','Wspaniale!','Świetnie!','Brawo!','Nieźle!','Uff, udało się!','Uratowane!'][guesses.length-1]:'Hasło: '+answer.toUpperCase(),2000);
-  setTimeout(()=>{showResult(won,p);if(won)confetti(mode==='free'?70:(lvl>=2?240:120))},900);
+  setTimeout(()=>{if(won)confetti(mode==='free'?70:(lvl>=2?240:120));if(popOK())showPop(won,p,()=>showResult(won,p));else showResult(won,p)},900);
 }
+// ---- v20.3.2: okno wyniku (4,5 s) z punktacją i miejscami w rankingu, potem zwykły ekran końcowy
+const popOK=()=>mode!=='free'&&!duel&&!RX()&&!!day&&!!day.pts;
+async function popRanks(){const nick=store.get('sd2_nick','');if(!nick||store.get('sd2_moved',0))return null;
+  const {F,db}=await fb();const col=F.collection(db,'players'),out={};
+  for(const t of (mode==='day'?['d','a']:['a'])){const mv=myVal(t);if(mv<=0)continue;const f=rkField(t),fp=f.length>1?new F.FieldPath(f[0],f[1]):f[0];
+    out[t]=(await F.getCountFromServer(F.query(col,F.where(fp,'>',mv)))).data().count+1}
+  try{out.n=(await F.getCountFromServer(col)).data().count}catch(e){}
+  if(out.n)out.n=Math.max(out.n,out.d||0,out.a||0);
+  return out}
+function showPop(won,p,next){
+  const el=$('rpop');if(!el){next();return}
+  let closed=false,timer=0;
+  const kolo=won&&!!day.kr[lvl],base=won&&!kolo?pointsFor(answer,guesses.length):0,tb=won?(day.tb[lvl]||0):0,
+    jc=won&&day.jk[lvl]===2?(day.jc[lvl]||0):0,hc=won&&day.hpos[lvl]!=null?(day.hc[lvl]||0):0,bd=won&&lvl===2?(day.pts[4]||0):0,tot=(+p||0)+bd;
+  const L=[];
+  if(won){L.push(kolo?['Koło ratunkowe','bez punktów za słowo']:['Słowo × premia za próby ('+guesses.length+'.)','+'+base]);
+    if(tb)L.push(['Bonus za czas','+'+tb]);if(jc)L.push(['Joker','−'+jc]);if(hc)L.push(['Pomoc znajomego','−'+hc]);if(bd)L.push(['Bonus za dzień','+'+bd])}
+  const ico=won?medal(medalKind(guesses.length),44):`<span style="color:var(--near)">${ic('sun',44)}</span>`;
+  el.innerHTML=`<div class="rpc ${won?'':'lost'}"><div class="rph">${ico}<div><b>${won?'Odgadnięte w '+guesses.length+'. próbie':'Tym razem się nie udało'}</b><small>${mode==='arch'?'Archiwum '+shortDate(archKey)+' · ':''}${lvl===3?'Niespodzianka':'Poziom '+(lvl+1)}${won?'':' · hasło: '+esc(answer.toUpperCase())}</small></div></div>`
+    +L.map(r=>`<div class="rpl"><span>${esc(r[0])}</span><b>${esc(r[1])}</b></div>`).join('')
+    +`<div class="rpt"><span>Razem</span><span id="rpTot">0</span></div><div id="rpRk"></div><div class="rpx">Dotknij, żeby przejść dalej</div><div class="rpbar"></div></div>`;
+  el.hidden=false;
+  const close=()=>{if(closed)return;closed=true;clearTimeout(timer);document.removeEventListener('keydown',kd,true);el.hidden=true;el.innerHTML='';next()};
+  const kd=e=>{if(['Enter',' ','Escape'].includes(e.key)){e.preventDefault();e.stopPropagation();close()}};
+  document.addEventListener('keydown',kd,true);el.onclick=close;timer=setTimeout(close,4500);
+  const t0=performance.now(),tn=$('rpTot');(function tick(now){if(closed)return;const k=Math.min(1,((now||performance.now())-t0)/800);tn.textContent=Math.round(tot*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(tick)})();
+  if(won||tot>0)Promise.race([popRanks(),new Promise(r=>setTimeout(()=>r(null),3000))]).then(o=>{
+    const box=$('rpRk');if(closed||!box||!o)return;let h='';
+    if(o.d)h+=`<div class="rpr"><span>Ranking: dziś</span><b>${o.d}. miejsce${o.n?' z '+o.n:''}</b></div>`;
+    if(o.a){const pr=store.get('sd2_lastpos',0),ar=pr&&o.a<pr?` <span class="up">▲ z ${pr}.</span>`:pr&&o.a>pr?` <span class="dn">▼ z ${pr}.</span>`:'';
+      h+=`<div class="rpr"><span>Ranking: łącznie</span><b>${o.a}. miejsce${o.n?' z '+o.n:''}${ar}</b></div>`;store.set('sd2_lastpos',o.a)}
+    box.innerHTML=h}).catch(()=>{})}
 // ---- v18 (P1): seria dni z rzędu (liczą się dni rozegrane w swoim dniu, nie nadrabiane w archiwum)
 function streakN(){const lg=store.get('sd2_log',{}),a=store.get('sd2_arch',{}),ot=store.get('sd2_ontime',{});
   const on=k=>!!ot[k]||((lg[k]||[]).some(Boolean)&&!(a[k]&&a[k].late));
@@ -1068,7 +1138,7 @@ function showHelp(){
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 20.3.1 · 2026-11-28</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 20.3.2 · 2026-11-28</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
@@ -1358,7 +1428,12 @@ function showMoved(){open(`<div class="step">Przeniesione wyniki</div><h2>${ic('
 // ---- Panel boczny (menu)
 const mqWide=window.matchMedia?matchMedia('(min-width:1100px)'):{matches:false};
 const isWide=()=>mqWide.matches;
-function sideSet(on,save){document.body.classList.toggle('side-on',on);$('sideBg').hidden=!on||isWide();$('bMenu').setAttribute('aria-expanded',String(on));
+const GXMAX=()=>Math.max(0,innerWidth-260-520);
+function setGX(v,save){const rt=document.documentElement;if(v==null){rt.style.removeProperty('--gx');document.body.classList.remove('gxon');if(save)store.set('sd2_gx',null)}
+  else{v=Math.max(0,Math.min(GXMAX(),Math.round(v)));rt.style.setProperty('--gx',v+'px');document.body.classList.add('gxon');if(save)store.set('sd2_gx',v)}
+  posSplit();fitBoard()}
+function posSplit(){const sp=$('sSplit');if(!sp)return;const a=document.querySelector('.app');if(!a)return;sp.style.left=Math.round(a.getBoundingClientRect().left)+'px'}
+function sideSet(on,save){document.body.classList.toggle('side-on',on);setTimeout(posSplit,30);$('sideBg').hidden=!on||isWide();$('bMenu').setAttribute('aria-expanded',String(on));
   if(save&&isWide())store.set('sd2_side',on);updBadge();setTimeout(fitBoard,260)}
 function sideGo(fn){return()=>{if(!isWide())sideSet(false);fn()}}
 function menuHint(){if(store.get('sd2_hint_menu',false)||!$('ov').hidden)return;store.set('sd2_hint_menu',true);
@@ -1803,7 +1878,7 @@ function helpGive(x){const t=store.get('sd2_day',null),my=t&&t.d===dayNo()?norm(
     catch(e){console.warn('pomoc',e);$('hGo').disabled=false;$('hGo').textContent='Wyślij podpowiedź';toast('Nie udało się wysłać. Prośba mogła zostać anulowana.',3000)}}}
 
 // ---- v19.1: zgłoszenia graczy (kolekcja reports), kosz (trash), kopia bazy, powitanie, zajęty nick
-const VER='20.3.1';
+const VER='20.3.2';
 const NICK_MSG='Ten pseudonim już gra w rankingu. Jeśli to Ty na innym urządzeniu albo w ikonie na pulpicie, przenieś wyniki: menu ☰ → Przenieś wyniki. Jeśli nie, wybierz inny pseudonim.';
 const nickKey=v=>'n-'+String(v).trim().toLowerCase().replace(/ /g,'~');
 async function nickClaim(v){try{const {F,db,uid}=await fb();const ref=F.doc(db,'nicks',nickKey(v));let d=null;
@@ -1973,11 +2048,14 @@ function showWelcome(){open(`${logo()}<h2>Witaj w Literiadzie!</h2>
   <div class="wl"><div><b>1</b><span>Odgadnij 5-literowe słowo w 6 próbach.</span></div><div><b>2</b><span>Kolory podpowiadają: <i style="background:${COL.hit}">zielony</i> litera na swoim miejscu, <i style="background:${COL.near}">żółty</i> litera jest w słowie, <i style="background:${COL.miss}">szary</i> litery nie ma.</span></div><div><b>3</b><span>Codziennie 3 poziomy: każdy kolejny trudniejszy i wyżej punktowany.</span></div></div>
   <div class="actions"><button class="main" id="aClose">Zagraj</button><button id="wFull">Pełna instrukcja</button></div>`);$('wFull').onclick=showHelp}
 function showNews(){open(`<div class="step">Co nowego</div><h2>Literiada ${VER}</h2><ul class="news">
+  <li><b>Okno wyniku po poziomie.</b> Zaraz po zakończeniu poziomu na kilka sekund pojawia się podsumowanie z rozpisaną punktacją i Twoimi miejscami w rankingu, a potem zwykły ekran końcowy. Dotknięcie przechodzi dalej od razu.</li>
+  <li><b>Belka przy menu (komputer).</b> Na szerokim ekranie możesz przeciągnąć pionową belkę przy oknie gry i przybliżyć grę do menu. Dwuklik wraca do środka.</li>
+  <li><b>Wyraźniejsze okna klasyfikacji.</b> Sigmy i Prokrastynatorzy mają ciemne tło okna, odcięte od kafelków.</li>
   <li><b>Przycisk Start.</b> Każdy poziom zaczyna się od ekranu z przyciskiem Start. Zegar bonusu rusza dopiero po jego naciśnięciu, więc możesz spokojnie usiąść i się przygotować.</li>
   <li><b>Ciemny motyw wszędzie.</b> Gra otwiera się ciemna także w przeglądarce z X czy Messengera. Jasny motyw włączysz w Ustawieniach.</li>
   <li><b>Wyraźniejszy ranking i menu.</b> Wyższy kontrast zakładek, wierszy, tytułów i przycisku Wyzwij.</li>
   <li><b>Błysk geniuszu 💡 i Za pięć dwunasta ⏳.</b> Trzy zielone litery w pierwszej minucie poziomu albo w ostatniej minucie czasu z bonusem trafiają do nowych klasyfikacji: <b>Sigmy</b> i <b>Prokrastynatorzy</b>. Bez punktów, dla zabawy, z tytułami od Iskry do Sigmy i od Odkładacza do Wielkiego Prokrastynatora. Znajdziesz je w Rankingu.</li>
-  <li><b>Kolorowe menu i jaśniejsze rankingi.</b> Każda grupa w menu ma swój kolor, zakładki rankingu są wyraźniejsze, podium świeci złotem, srebrem i brązem, a Prokrastynatorzy mają niebieskie tło.</li>
+  <li><b>Kolorowe menu i wyraźniejsze rankingi.</b> Każda grupa w menu ma swój kolor, zakładki rankingu są wyraźniejsze, podium świeci złotem, srebrem i brązem, a Prokrastynatorzy mają niebieskie tło.</li>
   <li><b>Unikalne pseudonimy.</b> Dwóch graczy nie może już mieć tego samego pseudonimu w rankingu.</li>
   <li><b>Z poprzedniej wersji:</b> nowe, uporządkowane menu. Opcje są pogrupowane: Wyniki, Graj więcej, Ze znajomymi, Pomoc, a rzadziej używane schowaliśmy w zwijanych Ustawieniach.</li>
   <li><b>„Czeka na Ciebie” na górze menu.</b> Wyzwania, prośby o pomoc i zaległe dni w archiwum, z licznikami, zawsze pod ręką.</li>
@@ -2023,6 +2101,12 @@ document.addEventListener('keydown',e=>{
 });
 $('ov').addEventListener('click',e=>{if(e.target.id==='ov')close()});
 $('bMenu').innerHTML=ic('menu',22)+'<span class="mdot" id="mDot" hidden></span>';$('bMenu').onclick=()=>sideSet(!document.body.classList.contains('side-on'),true);
+(function(){const sp=$('sSplit');if(!sp)return;const g=store.get('sd2_gx',null);if(g!=null&&isWide())setGX(+g);setTimeout(posSplit,200);addEventListener('resize',()=>{if(document.body.classList.contains('gxon'))setGX(parseInt(getComputedStyle(document.documentElement).getPropertyValue('--gx'))||0);else posSplit()});
+  sp.addEventListener('pointerdown',e=>{if(!isWide())return;e.preventDefault();try{sp.setPointerCapture(e.pointerId)}catch(x){}sp.classList.add('drag');
+    const mv=ev=>setGX(ev.clientX-260),up=()=>{sp.classList.remove('drag');sp.removeEventListener('pointermove',mv);sp.removeEventListener('pointerup',up);sp.removeEventListener('pointercancel',up);const v=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--gx'));if(!isNaN(v))store.set('sd2_gx',v)};
+    sp.addEventListener('pointermove',mv);sp.addEventListener('pointerup',up);sp.addEventListener('pointercancel',up)});
+  sp.addEventListener('dblclick',()=>setGX(null,true));
+  sp.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();const cur=document.body.classList.contains('gxon')?parseInt(getComputedStyle(document.documentElement).getPropertyValue('--gx'))||0:Math.max(0,Math.round(document.querySelector('.app').getBoundingClientRect().left-260));setGX(cur+(e.key==='ArrowRight'?20:-20),true)}if(e.key==='Home'||e.key==='Escape')setGX(null,true)})})();
 $('sClose').innerHTML=ic('back',20);$('sClose').onclick=()=>sideSet(false,true);$('sideBg').onclick=()=>sideSet(false);$('sLogo').innerHTML=brandT();
 $('sRank').innerHTML=ic('trophy',20)+'Ranking graczy';$('sRank').onclick=sideGo(()=>showRanking());
 $('sStats').innerHTML=ic('chart',20)+'Podsumowanie i wyniki';$('sStats').onclick=sideGo(()=>{if(mode==='free')setMode('day');showStats()});
@@ -2050,7 +2134,7 @@ function themeLabel(){$('sTheme').innerHTML='<span style="width:20px;text-align:
 $('sTheme').onclick=sideGo(()=>{const l=!isLight();if(l)document.documentElement.setAttribute('data-theme','light');else document.documentElement.removeAttribute('data-theme');try{localStorage.setItem('lt_light',l?'1':'0')}catch(e){}themeLabel();toast(l?'Motyw jasny':'Motyw ciemny')});
 themeLabel();
 $('sInv').innerHTML=ic('send',20)+'Zaproś do gry';$('sX').innerHTML='<span style="font:900 1.15rem var(--body);width:20px;text-align:center">𝕏</span>Obserwuj nas na X';$('sInv').onclick=sideGo(()=>inviteFriends());
-if(mqWide.addEventListener)mqWide.addEventListener('change',()=>sideSet(isWide()&&store.get('sd2_side',true)));
+if(mqWide.addEventListener)mqWide.addEventListener('change',()=>{sideSet(isWide()&&store.get('sd2_side',true));posSplit()});
 if(isWide()&&store.get('sd2_side',true))sideSet(true);
 $('bJoker').onclick=jokerClick;$('bHelp').onclick=helpClick;$('bKolo').onclick=offerKolo;$('bSnd').onclick=()=>{SFX.unlock();SFX.toggle();sndIcon()};sndIcon();$('bStats').onclick=()=>{setMode('day');toast('Wracasz do haseł dnia')};
 // ---- v14: duże ekrany (Full HD+, 2K, 4K) – proporcjonalne powiększenie całej gry
