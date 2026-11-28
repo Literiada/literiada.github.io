@@ -489,9 +489,9 @@ body.startp .board{opacity:.25}
 .rk-fs .rlist,.rk-pk .rlist{margin-top:6px}
 #sSplit{display:none}
 @media (min-width:1100px){
- body.side-on #sSplit{display:block;position:fixed;top:0;bottom:0;width:14px;margin-left:-7px;cursor:col-resize;z-index:33;touch-action:none}
- #sSplit::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:rgba(88,200,120,.0);transition:background .15s}
- #sSplit::after{content:'';position:absolute;left:3px;top:50%;width:8px;height:44px;margin-top:-22px;border-radius:4px;background:#2a332e;border:1px solid #58c878;opacity:.55}
+ body.side-on #sSplit{display:block;position:fixed;top:0;bottom:0;width:22px;margin-left:-11px;cursor:col-resize;z-index:50;touch-action:none}
+ #sSplit::before{content:'';position:absolute;left:10px;top:0;bottom:0;width:2px;background:rgba(88,200,120,.35);transition:background .15s}
+ #sSplit::after{content:'\22EE';display:flex;align-items:center;justify-content:center;color:#06210f;font:900 18px/1 var(--body);position:absolute;left:3px;top:50%;width:16px;height:72px;margin-top:-36px;border-radius:8px;background:#58c878;border:1px solid #bff0cc;opacity:.85}
  #sSplit:hover::before,#sSplit.drag::before,#sSplit:focus-visible::before{background:#58c878}
  #sSplit:hover::after,#sSplit.drag::after,#sSplit:focus-visible::after{opacity:1}
  body.side-on.gxon .app{margin-left:calc(260px + var(--gx) - 16px);margin-right:auto}
@@ -554,6 +554,7 @@ body.startp .board{opacity:.25}
   <details class="sset sgrp g4"><summary class="shdr">Ustawienia</summary>
   <button class="sitem" id="sRelax"></button>
   <button class="sitem" id="sTheme"></button>
+  <button class="sitem" id="sGame"></button>
   <button class="sitem" id="sChOpt"></button>
   <button class="sitem" id="sMove"></button>
   <button class="sitem" id="sInst" hidden></button>
@@ -565,7 +566,7 @@ body.startp .board{opacity:.25}
   <div class="shdr" id="sTeamH" hidden>Zespół</div>
   <button class="sitem" id="sAdm" hidden></button>
   <button class="sitem" id="sRep" hidden></button>
-  <div class="sfoot">Literiada · wersja 20.3.2 · 2026-11-28</div>
+  <div class="sfoot">Literiada · wersja 20.3.3 · 2026-11-28</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -1138,7 +1139,7 @@ function showHelp(){
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 20.3.2 · 2026-11-28</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 20.3.3 · 2026-11-28</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
@@ -1431,8 +1432,9 @@ const isWide=()=>mqWide.matches;
 const GXMAX=()=>Math.max(0,innerWidth-260-520);
 function setGX(v,save){const rt=document.documentElement;if(v==null){rt.style.removeProperty('--gx');document.body.classList.remove('gxon');if(save)store.set('sd2_gx',null)}
   else{v=Math.max(0,Math.min(GXMAX(),Math.round(v)));rt.style.setProperty('--gx',v+'px');document.body.classList.add('gxon');if(save)store.set('sd2_gx',v)}
-  posSplit();fitBoard()}
+  posSplit();fitBoard();try{gameLabel()}catch(e){}}
 function posSplit(){const sp=$('sSplit');if(!sp)return;const a=document.querySelector('.app');if(!a)return;sp.style.left=Math.round(a.getBoundingClientRect().left)+'px'}
+function gameLabel(){const b=$('sGame');if(!b)return;const on=document.body.classList.contains('gxon');b.innerHTML='<span style="width:20px;text-align:center">↔</span>Gra na komputerze: <b style="margin-left:4px">'+(on?'przy menu':'na środku')+'</b>'}
 function sideSet(on,save){document.body.classList.toggle('side-on',on);setTimeout(posSplit,30);$('sideBg').hidden=!on||isWide();$('bMenu').setAttribute('aria-expanded',String(on));
   if(save&&isWide())store.set('sd2_side',on);updBadge();setTimeout(fitBoard,260)}
 function sideGo(fn){return()=>{if(!isWide())sideSet(false);fn()}}
@@ -1878,7 +1880,7 @@ function helpGive(x){const t=store.get('sd2_day',null),my=t&&t.d===dayNo()?norm(
     catch(e){console.warn('pomoc',e);$('hGo').disabled=false;$('hGo').textContent='Wyślij podpowiedź';toast('Nie udało się wysłać. Prośba mogła zostać anulowana.',3000)}}}
 
 // ---- v19.1: zgłoszenia graczy (kolekcja reports), kosz (trash), kopia bazy, powitanie, zajęty nick
-const VER='20.3.2';
+const VER='20.3.3';
 const NICK_MSG='Ten pseudonim już gra w rankingu. Jeśli to Ty na innym urządzeniu albo w ikonie na pulpicie, przenieś wyniki: menu ☰ → Przenieś wyniki. Jeśli nie, wybierz inny pseudonim.';
 const nickKey=v=>'n-'+String(v).trim().toLowerCase().replace(/ /g,'~');
 async function nickClaim(v){try{const {F,db,uid}=await fb();const ref=F.doc(db,'nicks',nickKey(v));let d=null;
@@ -2048,6 +2050,7 @@ function showWelcome(){open(`${logo()}<h2>Witaj w Literiadzie!</h2>
   <div class="wl"><div><b>1</b><span>Odgadnij 5-literowe słowo w 6 próbach.</span></div><div><b>2</b><span>Kolory podpowiadają: <i style="background:${COL.hit}">zielony</i> litera na swoim miejscu, <i style="background:${COL.near}">żółty</i> litera jest w słowie, <i style="background:${COL.miss}">szary</i> litery nie ma.</span></div><div><b>3</b><span>Codziennie 3 poziomy: każdy kolejny trudniejszy i wyżej punktowany.</span></div></div>
   <div class="actions"><button class="main" id="aClose">Zagraj</button><button id="wFull">Pełna instrukcja</button></div>`);$('wFull').onclick=showHelp}
 function showNews(){open(`<div class="step">Co nowego</div><h2>Literiada ${VER}</h2><ul class="news">
+  <li><b>Poprawka belki (komputer).</b> Belka przy oknie gry jest teraz szersza i wyraźniejsza, a w Ustawieniach jest przycisk „Gra na komputerze: na środku / przy menu”, który robi to samo jednym kliknięciem.</li>
   <li><b>Okno wyniku po poziomie.</b> Zaraz po zakończeniu poziomu na kilka sekund pojawia się podsumowanie z rozpisaną punktacją i Twoimi miejscami w rankingu, a potem zwykły ekran końcowy. Dotknięcie przechodzi dalej od razu.</li>
   <li><b>Belka przy menu (komputer).</b> Na szerokim ekranie możesz przeciągnąć pionową belkę przy oknie gry i przybliżyć grę do menu. Dwuklik wraca do środka.</li>
   <li><b>Wyraźniejsze okna klasyfikacji.</b> Sigmy i Prokrastynatorzy mają ciemne tło okna, odcięte od kafelków.</li>
@@ -2101,7 +2104,8 @@ document.addEventListener('keydown',e=>{
 });
 $('ov').addEventListener('click',e=>{if(e.target.id==='ov')close()});
 $('bMenu').innerHTML=ic('menu',22)+'<span class="mdot" id="mDot" hidden></span>';$('bMenu').onclick=()=>sideSet(!document.body.classList.contains('side-on'),true);
-(function(){const sp=$('sSplit');if(!sp)return;const g=store.get('sd2_gx',null);if(g!=null&&isWide())setGX(+g);setTimeout(posSplit,200);addEventListener('resize',()=>{if(document.body.classList.contains('gxon'))setGX(parseInt(getComputedStyle(document.documentElement).getPropertyValue('--gx'))||0);else posSplit()});
+(function(){const sp=$('sSplit');if(!sp)return;try{new ResizeObserver(()=>posSplit()).observe(document.querySelector('.app'))}catch(e){}let n=0;(function lp(){posSplit();if(++n<120)requestAnimationFrame(lp)})();addEventListener('load',posSplit);
+  $('sGame').onclick=sideGo(()=>{if(document.body.classList.contains('gxon'))setGX(null,true);else setGX(24,true);gameLabel()});gameLabel();const g=store.get('sd2_gx',null);if(g!=null&&isWide())setGX(+g);setTimeout(posSplit,200);addEventListener('resize',()=>{if(document.body.classList.contains('gxon'))setGX(parseInt(getComputedStyle(document.documentElement).getPropertyValue('--gx'))||0);else posSplit()});
   sp.addEventListener('pointerdown',e=>{if(!isWide())return;e.preventDefault();try{sp.setPointerCapture(e.pointerId)}catch(x){}sp.classList.add('drag');
     const mv=ev=>setGX(ev.clientX-260),up=()=>{sp.classList.remove('drag');sp.removeEventListener('pointermove',mv);sp.removeEventListener('pointerup',up);sp.removeEventListener('pointercancel',up);const v=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--gx'));if(!isNaN(v))store.set('sd2_gx',v)};
     sp.addEventListener('pointermove',mv);sp.addEventListener('pointerup',up);sp.addEventListener('pointercancel',up)});
