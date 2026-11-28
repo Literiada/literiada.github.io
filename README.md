@@ -1,4 +1,8 @@
 # literiada.github.io
 „Literiada – codzienna gra słowna”.
 
-Wersja 20.3 (2026-11-28)
+Wersja 20.3.1 (2026-11-28)
+
+Nowości 20.3.1: przycisk Start przed każdym poziomem (zegar rusza po Start), ciemny motyw domyślnie (jasny w Ustawieniach), podpowiedź dla przeglądarek wbudowanych (X, Messenger), wyższy kontrast rankingu i menu.
+
+Wersja 20.3

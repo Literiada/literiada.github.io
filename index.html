@@ -25,10 +25,38 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Literiada">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2312a150'/%3E%3Ctext x='32' y='47' font-size='44' font-family='Arial Black,Arial' font-weight='900' text-anchor='middle' fill='white'%3EL%3C/text%3E%3C/svg%3E">
-<style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}body{margin:0}[hidden]{display:none!important}</style>
+<style>html{-webkit-text-size-adjust:100%;text-size-adjust:100%}body{margin:0}[hidden]{display:none!important}/* v20.3.1: ekran Start, wyższy kontrast (ciemny motyw) */
+.board-wrap{position:relative}
+#startov{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;background:var(--ovbg);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);padding:8px}
+#startov[hidden]{display:none!important}
+#startov .sc{background:var(--panel);border:2px solid var(--hit);border-radius:14px;padding:14px 16px;text-align:center;max-width:300px;box-shadow:0 6px 24px rgba(0,0,0,.45)}
+#startov .st1{font:700 .75rem var(--body);letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+#startov h2{margin:4px 0 6px;font:800 1.2rem var(--display)}
+#startov p{margin:0 0 12px;font-size:.88rem;line-height:1.35}
+#startov .sbtn{width:100%;border:0;border-radius:10px;background:#12a150;color:#fff;font:800 1.15rem var(--body);padding:13px 16px;cursor:pointer;min-height:48px}
+#startov .sbtn:focus-visible{outline:3px solid #fff;outline-offset:2px}
+body.startp .board{opacity:.25}
+.kb.pend{opacity:.55}
+.tnudge{animation:tnud .5s}@keyframes tnud{30%{transform:scale(1.06)}60%{transform:scale(.98)}}
+:root:not([data-theme="light"]) .rtabs button:not([aria-pressed="true"]){background:#0b0f0d;color:#fff;border:1.5px solid var(--tc);font-weight:700}
+:root[data-theme="light"]{color-scheme:light}
+:root:not([data-theme="light"]) .rtabs::before{color:#fff}
+:root:not([data-theme="light"]) .rlist div:nth-child(n+4){background:#0e1311;color:#fff;border:1.5px solid color-mix(in srgb,var(--rowc) 65%,#fff 0%)}
+:root:not([data-theme="light"]) .rlist div.me{background:#14502a;color:#fff;border:2px solid #7ee29a}
+:root:not([data-theme="light"]) .rlist .ktitle{background:#000;color:#fff;border:1.5px solid #f2b84b}
+:root:not([data-theme="light"]) .rlist .pt{color:#fff}
+:root:not([data-theme="light"]) #ov .sub,:root:not([data-theme="light"]) .rk-fs .sub,:root:not([data-theme="light"]) .rk-pk .sub{color:#e3eae5}
+:root:not([data-theme="light"]) .chb{background:#0b0f0d;color:#e9ddff;border:2px solid #b794f6;font-weight:800}
+:root:not([data-theme="light"]) .chb:disabled{color:#c9d1cc;border-color:#6b7570}
+:root:not([data-theme="light"]) .sgrp{background:color-mix(in srgb,var(--gc) 9%,#0b0f0d)}
+:root:not([data-theme="light"]) .sgrp .shdr{color:#fff;font-weight:900}
+:root:not([data-theme="light"]) .sgrp .shdr::first-letter{color:inherit}
+:root:not([data-theme="light"]) .sgrp .sitem{color:#fff}
+</style>
 </head>
 <body>
-<meta name="color-scheme" content="light dark">
+<meta name="color-scheme" content="dark light">
+<script>try{if(localStorage.getItem("lt_light")==="1")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
 <meta name="darkreader-lock">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -42,7 +70,7 @@
   --display:"Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
   --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+@media all{:root:not([data-theme="light"]){
   --bg:#121614; --panel:#1b211e; --ink:#eef2ef; --muted:#9aa69e; --line:#38423c;
   --key:#4a5550; --keyink:#eef2ef; --hit:#3d9b58; --near:#c8930f; --miss:#4b544e; --keymiss:#0b0e0c; --keymissink:#5c6660; --keypl:#4f5545; --lvwon:#21402b; --lvlost:#2a302d; --ovbg:rgba(18,22,20,.8); color-scheme:dark}}
 :root[data-theme="dark"]{
@@ -233,7 +261,7 @@ table.vals td:last-child{text-transform:uppercase;letter-spacing:.08em}
 @media (max-height:700px){.k,.k.go,.k.del{height:46px}.kb{gap:4px}}
 body.duel .top{background:#f3e8ff;border-radius:10px;padding:4px 6px}
 body.duel .lvl{color:#6d28d9}
-@media (prefers-color-scheme:dark){body.duel .top{background:#2e1065}body.duel .lvl{color:#c4b5fd}}
+:root:not([data-theme="light"]) body.duel .top{background:#2e1065}:root:not([data-theme="light"]) body.duel .lvl{color:#c4b5fd}
 .duelbtn{width:100%;border:2px solid #8b5cf6;border-radius:8px;padding:11px;font:800 .95rem var(--body);background:var(--panel);color:#6d28d9;cursor:pointer;display:inline-flex;gap:6px;justify-content:center;align-items:center}
 .dform{display:flex;flex-direction:column;gap:10px}
 .dform label{display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:.9rem}
@@ -466,7 +494,7 @@ textarea.fi{resize:vertical}
   <div class="jstrip" id="jstrip" hidden></div>
   <div class="lvtabs" id="lvtabs" hidden></div>
   <div class="pvbar" id="pvbar" hidden></div>
-  <div class="board-wrap"><div class="board" id="board"></div></div>
+  <div class="board-wrap"><div class="board" id="board"></div><div id="startov" hidden></div></div>
   <div class="kb" id="kb"></div>
 </div>
 <div id="sideBg" hidden></div>
@@ -487,6 +515,7 @@ textarea.fi{resize:vertical}
   <a class="sitem" id="sX" href="https://x.com/Literiada" target="_blank" rel="noopener" style="text-decoration:none"></a></div>
   <details class="sset sgrp g4"><summary class="shdr">Ustawienia</summary>
   <button class="sitem" id="sRelax"></button>
+  <button class="sitem" id="sTheme"></button>
   <button class="sitem" id="sChOpt"></button>
   <button class="sitem" id="sMove"></button>
   <button class="sitem" id="sInst" hidden></button>
@@ -498,7 +527,7 @@ textarea.fi{resize:vertical}
   <div class="shdr" id="sTeamH" hidden>Zespół</div>
   <button class="sitem" id="sAdm" hidden></button>
   <button class="sitem" id="sRep" hidden></button>
-  <div class="sfoot">Literiada · wersja 20.3 · 2026-11-28</div>
+  <div class="sfoot">Literiada · wersja 20.3.1 · 2026-11-28</div>
 </nav>
 <div class="toast" id="toast" hidden></div>
 <div class="ov" id="ov" hidden><div class="card" id="card"></div></div>
@@ -663,7 +692,7 @@ function paint(){
   if(inPlay()&&day.hpos&&day.hpos[L1]!=null)best[A1[day.hpos[L1]]]='hit';
   document.querySelectorAll('.k').forEach(b=>{if(!b.dataset.k||b.dataset.k.length>1)return;b.classList.remove('hit','near','miss');clearStyle(b);const st=best[b.dataset.k];if(st){b.classList.add(st);paintKey(b,st)}});
   $('kb').classList.toggle('off',pv);
-  paintLevels();updJoker();lvTabs();updKolo();updHelpBtn();
+  paintLevels();updJoker();lvTabs();updKolo();updHelpBtn();updStart();$('kb').classList.toggle('pend',startPending());
   cancelAnimationFrame(paint.raf);paint.raf=requestAnimationFrame(fitBoard);
 }
 // ---- v19: zakładki poziomów nad planszą + przesuwanie palcem / strzałki
@@ -754,9 +783,17 @@ function unlocked(i){return i===3?p4open():(i===0||day.res[i-1]==='won')}
 function toast(msg,ms=1600){const t=$('toast');t.textContent=msg;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,ms)}
 function shake(){const row=$('board').children[guesses.length];row.classList.remove('shake');void row.offsetWidth;row.classList.add('shake')}
 
+function startPending(){return mode!=='free'&&!duel&&!!day&&inPlay()&&view==null&&!done&&!guesses.length&&!day.t[lvl]&&!day.res[lvl]}
+function startLevel(){if(!startPending())return;SFX.unlock();day.t[lvl]=Date.now();saveDay();updStart();updTimer();paint()}
+function updStart(){const o=$('startov');if(!o)return;
+  if(!startPending()){o.hidden=true;document.body.classList.remove('startp');return}
+  const T=lvl===3?10:5,rx=RX();
+  o.innerHTML=`<div class="sc"><div class="st1">${mode==='arch'?'Archiwum '+shortDate(archKey)+' · ':''}${lvl===3?'Weekendowa niespodzianka':'Poziom '+(lvl+1)+' z 3'}</div><h2>Gotowy(a)?</h2><p>${rx?'Grasz na luzie: bez zegara i punktów.':'Masz '+T+' min na bonus za czas (do +'+TMAX[lvl]+' pkt). Zegar rusza po naciśnięciu Start.'}</p><button class="sbtn" id="bStart">Start</button></div>`;
+  const was=o.hidden;o.hidden=false;document.body.classList.add('startp');const b=$('bStart');b.onclick=startLevel;if(was){try{b.focus({preventScroll:true})}catch(e){}}}
 function press(k){
   SFX.unlock();
   if(done||busy)return;
+  if(startPending()){if(k==='ENTER')startLevel();else{toast('Najpierw naciśnij Start');const o=$('startov');if(o){o.classList.remove('tnudge');void o.offsetWidth;o.classList.add('tnudge')}}return}
   if(view!=null&&view!==lvl){goLevel(lvl);return}
   if(guesses.length>=maxG()){if(canKolo())offerKolo();return}
   if(k!=='ENTER')SFX.key();
@@ -1025,13 +1062,13 @@ function showHelp(){
   <p><b>Ikona na pulpicie.</b> W menu ☰ wybierz „Ikona na pulpicie”, żeby otwierać Literiadę jak aplikację, bez paska przeglądarki.</p>
   <p><b>Joker.</b> Na poziomie 2, 3 i w niespodziance możesz odsłonić jedną literę hasła. Jokera dostajesz za polecenie gry znajomemu (jeden na poziom). Odsłonięta litera kosztuje tyle punktów, ile jest warta w Scrabble.</p>
   <p>Wynik = wartość słowa × premia za szybkość: 6 za odgadnięcie w 1. próbie, 5 w 2., i tak dalej do 1 w 6. próbie. Przykład: ŻÓŁTY (17 pkt) odgadnięty w 3. próbie daje 17 × 4 = 68 pkt.</p>
-  <p><b>Bonus za czas.</b> Zegar 5:00 rusza po wpisaniu pierwszej litery danego poziomu i nie zatrzymuje się po wyjściu z gry. Bonus maleje płynnie z każdą sekundą: na starcie wynosi 20 pkt na poziomie 1, 40 pkt na poziomie 2 i 60 pkt na poziomie 3, a po 5 minutach spada do zera. Pasek pod zegarem pokazuje, ile jeszcze zostało. Po 5 minutach usłyszysz sygnał i grasz dalej, już bez bonusu za czas.</p>
+  <p><b>Bonus za czas.</b> Zegar 5:00 rusza po naciśnięciu przycisku Start na danym poziomie i nie zatrzymuje się po wyjściu z gry. Bonus maleje płynnie z każdą sekundą: na starcie wynosi 20 pkt na poziomie 1, 40 pkt na poziomie 2 i 60 pkt na poziomie 3, a po 5 minutach spada do zera. Pasek pod zegarem pokazuje, ile jeszcze zostało. Po 5 minutach usłyszysz sygnał i grasz dalej, już bez bonusu za czas.</p>
   <p><b>Medale.</b> Za odgadnięte hasło dostajesz medal: złoty za 1–2 próby, srebrny za 3–4, brązowy za 5–6. Jeśli zgarniesz co najmniej połowę bonusu za czas, dochodzi Błyskawica.</p>
   <p class="sub">Wartości liter (do liczenia punktów):</p>
   <table class="vals">${Object.keys(groups).sort((a,b)=>a-b).map(v=>`<tr><td>${v} pkt</td><td>${groups[v].join(' ')}</td></tr>`).join('')}</table>
   <p class="sub">Trening (w menu i na stronie podsumowania) losuje słowa z wybranego poziomu bez limitu; punkty w treningu się nie liczą.</p>
   <p class="sub">Archiwum (w menu, czerwona liczba to zaległe dni) pozwala zagrać hasła z poprzednich dni. Punkty liczą się do dnia, którego dotyczą.</p>
-  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 20.3 · 2026-11-28</p>`);
+  <div class="actions"><button class="main" id="aClose">Gramy</button></div><p class="sub" style="text-align:center">Literiada · wersja 20.3.1 · 2026-11-28</p>`);
 }
 function saveDay(){const k=curKey();
   if(mode==='arch'){const a=store.get('sd2_arch',{});day.late=true;a[k]=day;store.set('sd2_arch',a)}else store.set('sd2_day',day);
@@ -1050,7 +1087,7 @@ function loadDayLevel(){
   if(day.t[lvl]&&Date.now()-day.t[lvl]>tl(lvl)*1000)timeupFired=curKey()+':'+lvl;
   paint();updTimer();
 }
-// ---- Zegar: 5 minut od pierwszej litery, bonus maleje płynnie do zera
+// ---- Zegar: 5 minut od naciśnięcia Start, bonus maleje płynnie do zera
 const TMAX=[20,40,60,60], tl=l=>l===3?600:300;
 const fmtT=ms=>{const x=Math.max(0,Math.floor(ms/1000));return Math.floor(x/60)+':'+String(x%60).padStart(2,'0')};
 const bonusFor=(L0,ms)=>ms>=tl(L0)*1000?0:Math.max(0,Math.ceil(TMAX[L0]*(1-ms/(tl(L0)*1000))));
@@ -1092,7 +1129,7 @@ function updTimer(){const el=$('timer');if(!el)return;
   const st=day.t[lvl],te=day.te[lvl];
   if(done){if(te==null){el.hidden=true;return}
     const b=day.tb[lvl];el.innerHTML=ic('clock',14)+' Czas '+fmtT(te)+' · '+(b?'bonus <b>+'+b+' pkt</b>':'bez bonusu za czas');return}
-  if(!st){el.innerHTML=ic('clock',14)+' '+fmtT(tl(lvl)*1000)+' · start po pierwszej literze · bonus do <b>+'+TMAX[lvl]+'</b><span class="tbar"><i style="width:100%"></i></span>';return}
+  if(!st){el.innerHTML=ic('clock',14)+' '+fmtT(tl(lvl)*1000)+' · czeka na Start · bonus do <b>+'+TMAX[lvl]+'</b><span class="tbar"><i style="width:100%"></i></span>';return}
   const e=Date.now()-st;
   if(e>tl(lvl)*1000){el.className='timer out';el.innerHTML=ic('clock',14)+' Czas minął · bez bonusu za czas';
     const key=curKey()+':'+lvl;
@@ -1331,7 +1368,7 @@ function menuHint(){if(store.get('sd2_hint_menu',false)||!$('ov').hidden)return;
   const rm=()=>h.remove();h.onclick=rm;$('bMenu').addEventListener('click',rm,{once:true});document.body.appendChild(h);setTimeout(rm,9000)}
 function showTrain(){open(`<div class="step">Trening</div><h2>${ic('train',22)} Trening</h2>${trainPicker()}<div class="actions"><button id="aClose">Zamknij</button></div>`);bindTrain()}
 // ---- Pasek dla przeglądarek w aplikacjach: zachęta do otwarcia w Chrome/Safari
-function inApp(){if(inFrame)return false;const u=navigator.userAgent||'';return /FBAN|FBAV|FB_IAB|FBIOS|FB4A|Messenger|MESSENGER|Instagram/i.test(u)}
+function inApp(){if(inFrame)return false;const u=navigator.userAgent||'';return /FBAN|FBAV|FB_IAB|FBIOS|FB4A|Messenger|MESSENGER|Instagram|Twitter|TwitterAndroid|TwitterIOS|GSA\/|\bLine\/|LinkedInApp|Snapchat/i.test(u)}
 function showIab(){const el=$('iab');if(!el||!inApp())return;
   let k='';try{k=sessionStorage.getItem('sd2_iab_x')||''}catch(e){}if(k)return;
   const android=/Android/i.test(navigator.userAgent),ios=/iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -1766,7 +1803,7 @@ function helpGive(x){const t=store.get('sd2_day',null),my=t&&t.d===dayNo()?norm(
     catch(e){console.warn('pomoc',e);$('hGo').disabled=false;$('hGo').textContent='Wyślij podpowiedź';toast('Nie udało się wysłać. Prośba mogła zostać anulowana.',3000)}}}
 
 // ---- v19.1: zgłoszenia graczy (kolekcja reports), kosz (trash), kopia bazy, powitanie, zajęty nick
-const VER='20.3';
+const VER='20.3.1';
 const NICK_MSG='Ten pseudonim już gra w rankingu. Jeśli to Ty na innym urządzeniu albo w ikonie na pulpicie, przenieś wyniki: menu ☰ → Przenieś wyniki. Jeśli nie, wybierz inny pseudonim.';
 const nickKey=v=>'n-'+String(v).trim().toLowerCase().replace(/ /g,'~');
 async function nickClaim(v){try{const {F,db,uid}=await fb();const ref=F.doc(db,'nicks',nickKey(v));let d=null;
@@ -1936,6 +1973,9 @@ function showWelcome(){open(`${logo()}<h2>Witaj w Literiadzie!</h2>
   <div class="wl"><div><b>1</b><span>Odgadnij 5-literowe słowo w 6 próbach.</span></div><div><b>2</b><span>Kolory podpowiadają: <i style="background:${COL.hit}">zielony</i> litera na swoim miejscu, <i style="background:${COL.near}">żółty</i> litera jest w słowie, <i style="background:${COL.miss}">szary</i> litery nie ma.</span></div><div><b>3</b><span>Codziennie 3 poziomy: każdy kolejny trudniejszy i wyżej punktowany.</span></div></div>
   <div class="actions"><button class="main" id="aClose">Zagraj</button><button id="wFull">Pełna instrukcja</button></div>`);$('wFull').onclick=showHelp}
 function showNews(){open(`<div class="step">Co nowego</div><h2>Literiada ${VER}</h2><ul class="news">
+  <li><b>Przycisk Start.</b> Każdy poziom zaczyna się od ekranu z przyciskiem Start. Zegar bonusu rusza dopiero po jego naciśnięciu, więc możesz spokojnie usiąść i się przygotować.</li>
+  <li><b>Ciemny motyw wszędzie.</b> Gra otwiera się ciemna także w przeglądarce z X czy Messengera. Jasny motyw włączysz w Ustawieniach.</li>
+  <li><b>Wyraźniejszy ranking i menu.</b> Wyższy kontrast zakładek, wierszy, tytułów i przycisku Wyzwij.</li>
   <li><b>Błysk geniuszu 💡 i Za pięć dwunasta ⏳.</b> Trzy zielone litery w pierwszej minucie poziomu albo w ostatniej minucie czasu z bonusem trafiają do nowych klasyfikacji: <b>Sigmy</b> i <b>Prokrastynatorzy</b>. Bez punktów, dla zabawy, z tytułami od Iskry do Sigmy i od Odkładacza do Wielkiego Prokrastynatora. Znajdziesz je w Rankingu.</li>
   <li><b>Kolorowe menu i jaśniejsze rankingi.</b> Każda grupa w menu ma swój kolor, zakładki rankingu są wyraźniejsze, podium świeci złotem, srebrem i brązem, a Prokrastynatorzy mają niebieskie tło.</li>
   <li><b>Unikalne pseudonimy.</b> Dwóch graczy nie może już mieć tego samego pseudonimu w rankingu.</li>
@@ -1999,12 +2039,16 @@ $('sReset').innerHTML=ic('trash',20)+'Zacznij od nowa';$('sReset').onclick=sideG
 $('sSup').innerHTML=ic('chat',20)+'Pomoc – napisz do admina';$('sSup').onclick=sideGo(showSupport);
 function relaxLabel(){$('sRelax').innerHTML='<span style="width:20px;text-align:center">🌿</span>Gra na luzie: <b style="margin-left:4px">'+(RX()?'włączona':'wyłączona')+'</b>'}
 async function rankHide(){try{const {F,db,uid}=await fb();await F.deleteDoc(F.doc(db,'players',uid));await nickRelease(store.get('sd2_nick',''))}catch(e){console.warn('ranking',e)}}
-function setRelax(on){store.set('sd2_relax',on);document.body.classList.toggle('relax',on);relaxLabel();paintLevels();updTimer();
+function setRelax(on){store.set('sd2_relax',on);document.body.classList.toggle('relax',on);relaxLabel();paintLevels();updTimer();updStart();
   const nk=store.get('sd2_nick','');
   if(on){if(nk)rankHide();toast('Gra na luzie: bez zegara, punktów i rankingu 🌿',2600)}
   else{rankSync();toast(nk?'Gra na punkty ⏱ Wracasz do rankingu jako '+nk:'Wracasz do gry na punkty i czas ⏱',2800)}}
 relaxLabel();if(RX())document.body.classList.add('relax');
 $('sRelax').onclick=sideGo(()=>setRelax(!RX()));
+const isLight=()=>document.documentElement.getAttribute('data-theme')==='light';
+function themeLabel(){$('sTheme').innerHTML='<span style="width:20px;text-align:center">🌗</span>Motyw: <b style="margin-left:4px">'+(isLight()?'jasny':'ciemny')+'</b>'}
+$('sTheme').onclick=sideGo(()=>{const l=!isLight();if(l)document.documentElement.setAttribute('data-theme','light');else document.documentElement.removeAttribute('data-theme');try{localStorage.setItem('lt_light',l?'1':'0')}catch(e){}themeLabel();toast(l?'Motyw jasny':'Motyw ciemny')});
+themeLabel();
 $('sInv').innerHTML=ic('send',20)+'Zaproś do gry';$('sX').innerHTML='<span style="font:900 1.15rem var(--body);width:20px;text-align:center">𝕏</span>Obserwuj nas na X';$('sInv').onclick=sideGo(()=>inviteFriends());
 if(mqWide.addEventListener)mqWide.addEventListener('change',()=>sideSet(isWide()&&store.get('sd2_side',true)));
 if(isWide()&&store.get('sd2_side',true))sideSet(true);
