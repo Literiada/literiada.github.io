@@ -1,6 +1,10 @@
 # literiada.github.io
 „Literiada – codzienna gra słowna”.
 
+Wersja 20.3.4 (2026-11-28)
+
+Poprawka 20.3.4: jasny motyw z własną paletą (ranking, podium, menu), zapasowe kolory dla przeglądarek bez color-mix(), domyślny motyw z systemu (ciemny w przeglądarkach wbudowanych).
+
 Wersja 20.3.3 (2026-11-28)
 
 Poprawka 20.3.3: wyraźniejsza belka położenia gry i przycisk „Gra na komputerze” w Ustawieniach.
